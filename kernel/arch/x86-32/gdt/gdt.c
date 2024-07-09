@@ -1,26 +1,50 @@
 #include "gdt.h"
+#include "../../../libk/memset.h"
 
+extern void tss_flush();
+extern void gdt_flush(uint32_t);
 
-extern void gdt_flush(addr_t);
-
-struct gdt_entry_struct gdt_entries[5];
+struct gdt_entry_struct gdt_entries[6];
 struct gdt_ptr_struct gdt_ptr;
+struct tss tss;
 
 void initGdt()
 {
-    gdt_ptr.limit = (sizeof(struct gdt_entry_struct) * 5) -1;
-    gdt_ptr.base = &gdt_entries;
+    gdt_ptr.limit = (sizeof(struct gdt_entry_struct) * 6) -1;
+    gdt_ptr.base = (uint32_t)&gdt_entries;
 
-    setGdtGate(0, 0, 0, 0, 0);                  //Null segment
-    setGdtGate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);   //Kernel code segment       -> 0x9A = 1001 1010 (these are the privileges etc.)
-    setGdtGate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);   //Kernel data segment
-    setGdtGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);   //User code segment         -> 0xFA = 1111 1010
-    setGdtGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);   //User data segment
+    setGdtEntry(0, 0, 0, 0, 0);                  //Null segment
+    setGdtEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);   //Kernel code segment       -> 0x9A = 1001 1010 (these are the privileges etc.)
+    setGdtEntry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);   //Kernel data segment
+    setGdtEntry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);   //User code segment         -> 0xFA = 1111 1010
+    setGdtEntry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);   //User data segment
+    setTSS(5, 0x10, 0x0);
 
-    gdt_flush(&gdt_ptr);
+    gdt_flush((uint32_t)&gdt_ptr);
+    tss_flush();
 }
 
-void setGdtGate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint32_t flags)
+void setTSS(uint32_t num, uint16_t ss0, uint32_t esp0)
+{
+    uint32_t base = (uint32_t) &tss;
+    uint32_t limit = base + sizeof(tss);
+
+    setGdtEntry(num, base, limit, 0xE9, 0x00);      //0xE9 = 1110 1001
+    memset(&tss, 0, sizeof(tss));
+    
+    tss.ss0 = ss0;      //set kernel stack segment
+    tss.esp0 = esp0;    //set kernel stack pointer
+
+    //User mode segment registers
+    tss.cs = 0x08 | 0x3;    //0x3 sets the privilege level to ring 3 (0x3 sets the two lowest bits from the segment selector(cs here))
+    tss.ss = 0x10 | 0x3;
+    tss.ds = 0x10 | 0x3;
+    tss.es = 0x10 | 0x3;
+    tss.fs = 0x10 | 0x3;
+    tss.gs = 0x10 | 0x3;
+}
+
+void setGdtEntry(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint32_t flags)
 {
 
     //base address
