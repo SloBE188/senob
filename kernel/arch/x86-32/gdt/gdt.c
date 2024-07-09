@@ -1,5 +1,5 @@
 #include "gdt.h"
-#include "../../../libk/memset.h"
+#include "../../../libk/memory.h"
 
 extern void tss_flush();
 extern void gdt_flush(uint32_t);

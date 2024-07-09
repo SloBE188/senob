@@ -1,6 +1,6 @@
 #ifndef VGA_H
 #define VGA_H
-#include <stdint.h>
+#include <stdint-gcc.h>
 
 
 #define COLOR8_BLACK 0

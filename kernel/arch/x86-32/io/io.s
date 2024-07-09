@@ -8,7 +8,7 @@ global outw
 
 ;label reads 8 bits (1 byte) from a specified I/O port. The read data is transferred to the dx register and then loaded into the lowest bytes of the ax register
 insb:
-    push eb
+    push ebp
     mov ebp, esp    
 
     xor eax, eax
