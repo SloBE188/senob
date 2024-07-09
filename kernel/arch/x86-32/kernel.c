@@ -14,4 +14,6 @@ void kernel_main(void)
     print("--IDT loaded\n");
     print(1/0);
     print("Herzlich willkommen bei senob!\n");
+    while (1){}
+    
 }

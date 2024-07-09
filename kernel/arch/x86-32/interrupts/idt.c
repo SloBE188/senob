@@ -102,28 +102,27 @@ void idt_init()
 
     //irqs
     idt_set_descriptor(32, (uint32_t)irq0);
-    idt_set_descriptor(32, (uint32_t)irq1);
-    idt_set_descriptor(32, (uint32_t)irq2);
-    idt_set_descriptor(32, (uint32_t)irq3);
-    idt_set_descriptor(32, (uint32_t)irq4);
-    idt_set_descriptor(32, (uint32_t)irq5);
-    idt_set_descriptor(32, (uint32_t)irq6);
-    idt_set_descriptor(32, (uint32_t)irq7);
-    idt_set_descriptor(32, (uint32_t)irq8);
-    idt_set_descriptor(32, (uint32_t)irq9);
-    idt_set_descriptor(32, (uint32_t)irq10);
-    idt_set_descriptor(32, (uint32_t)irq11);
-    idt_set_descriptor(32, (uint32_t)irq12);
-    idt_set_descriptor(32, (uint32_t)irq13);
-    idt_set_descriptor(32, (uint32_t)irq14);
-    idt_set_descriptor(32, (uint32_t)irq15);
+    idt_set_descriptor(33, (uint32_t)irq1);
+    idt_set_descriptor(34, (uint32_t)irq2);
+    idt_set_descriptor(35, (uint32_t)irq3);
+    idt_set_descriptor(36, (uint32_t)irq4);
+    idt_set_descriptor(37, (uint32_t)irq5);
+    idt_set_descriptor(38, (uint32_t)irq6);
+    idt_set_descriptor(39, (uint32_t)irq7);
+    idt_set_descriptor(40, (uint32_t)irq8);
+    idt_set_descriptor(41, (uint32_t)irq9);
+    idt_set_descriptor(42, (uint32_t)irq10);
+    idt_set_descriptor(43, (uint32_t)irq11);
+    idt_set_descriptor(44, (uint32_t)irq12);
+    idt_set_descriptor(45, (uint32_t)irq13);
+    idt_set_descriptor(46, (uint32_t)irq14);
+    idt_set_descriptor(47, (uint32_t)irq15);
 
     //Syscalls
     idt_set_descriptor(128, (uint32_t)isr128);
     idt_set_descriptor(177, (uint32_t)isr177);
 
     idt_flush((uint32_t)&idtr);
-
 
 }
 
