@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/kernel.o ./build/gdt/gdt.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memset.o
+FILES= ./build/boot.o ./build/kernel.o ./build/gdt/gdt.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memset.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin
@@ -26,6 +26,12 @@ all: $(FILES) ./senob/boot/senob.bin
 
 ./build/libk/memset.o:
 	i686-elf-gcc -g -c ./kernel/libk/memset.c -o ./build/libk/memset.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+./build/interrupts/idt.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/interrupts/idt.c -o ./build/interrupts/idt.o -std=gnu99 -O2 -Wall -Wextra
+
+./build/interrupts/idt.s.o:
+	nasm -f elf ./kernel/arch/x86-32/interrupts/idt.s -o ./build/interrupts/idt.s.o
 
 clean:
 	rm -rf ${FILES}

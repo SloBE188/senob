@@ -17,6 +17,6 @@ gdt_flush:
     ret
 
 tss_flush:
-    mov ax, 0x2B
+    mov ax, 0x2B    ;not 0x28 because 0x2B are the bottom 2 bits
     ltr ax
     ret   
