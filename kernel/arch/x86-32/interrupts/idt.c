@@ -1,37 +1,24 @@
 #include "idt.h"
 #include "../../../libk/memory.h"
 #include "../io/io.h"
-//#include "../regs.c"
 #include "../../../../drivers/video/vga/vga.h"
 
 struct idt_entry_t idt_descriptors[256];
 struct idtr_t idtr;
 
-extern idt_flush(uint32_t);
+extern void idt_flush(uint32_t);
 
 
 
-/*
-void idt_set_descriptor(uint8_t interrupt_number, void *isr)
-{
+void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr) {
     struct idt_entry_t *descriptor = &idt_descriptors[interrupt_number];
-    descriptor->isr_low = (uint32_t)isr & 0x0000FFFF;
+    descriptor->isr_low = isr & 0xFFFF;
     descriptor->kernel_cs = 0x08;
     descriptor->reserved = 0x00;
-    descriptor->type = 0xEE;
-    descriptor->isr_high = (uint16_t) isr >> 16;
+    descriptor->type = 0x8E; // Present, DPL=0, Type=0xE (32-bit interrupt gate)
+    descriptor->isr_high = (isr >> 16) & 0xFFFF;
 }
-*/
 
-void idt_set_descriptor(uint8_t interrupt_number, void *isr)
-{
-    struct idt_entry_t *descriptor = &idt_descriptors[interrupt_number];
-    descriptor->isr_low = (uint32_t)isr & 0xFFFF;
-    descriptor->kernel_cs = 0x08;
-    descriptor->reserved = 0x00;
-    descriptor->type = 0x8E;
-    descriptor->isr_high = (uint32_t) isr >> 16;
-}
 
 
 
@@ -126,7 +113,7 @@ void idt_init()
 
 }
 
-unsigned char* exceptions[] = {
+static const char* exceptions[] = {
     "[0x00] Divide by Zero Exception",
     "[0x01] Debug Exception",
     "[0x02] Unhandled Non-maskable Interrupt",

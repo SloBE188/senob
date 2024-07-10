@@ -39,7 +39,7 @@ struct Interrupt_registers{
 };
 
 
-void idt_set_descriptor(uint8_t interrupt_number, void *isr);
+void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr);
 void idt_init();
 
 void isr_handler(struct Interrupt_registers *regs);
