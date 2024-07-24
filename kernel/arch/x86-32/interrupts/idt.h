@@ -17,7 +17,6 @@ struct idtr_t{
 	uint32_t	base;
 } __attribute__((packed));
 
-
 struct Interrupt_registers{
     uint32_t cr2;
     uint32_t ds;
@@ -38,11 +37,6 @@ struct Interrupt_registers{
     uint32_t ss;
 };
 
-
-void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr);
-void idt_init();
-
-void isr_handler(struct Interrupt_registers *regs);
 
 //Exceptions
 extern void isr0();
@@ -100,5 +94,11 @@ extern void irq15();
 //Syscalls
 extern void isr128();
 extern void isr177();
+
+void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr);
+void idt_init();
+void isr_handler(struct Interrupt_registers *regs);
+void irq_add_handler(int irq_number, void (*handler)(struct Interrupt_registers *regs));
+void irq_delete_handler(int irq_number);
 
 #endif

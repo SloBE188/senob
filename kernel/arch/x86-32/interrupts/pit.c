@@ -18,7 +18,7 @@
 #include "idt.h"
 #include "../../../../drivers/video/vga/vga.h"
 #include "../io/io.h"
-#include <stdint.h>
+#include <stdint-gcc.h>
 
 #define PIT_IRQ 0
 
@@ -43,7 +43,7 @@ void irq0_pit(struct Interrupt_registers *regs)
 void initpit(uint64_t hz)
 {
     //adding interrupt
-    irq_add_handler(PIT_IRQ, irq0_pit());
+    irq_add_handler(PIT_IRQ, &irq0_pit);
 
     uint64_t divisor = PIT_SCALE / hz;
 

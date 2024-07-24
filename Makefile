@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/kernel.o ./build/gdt/gdt.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/kernel.o ./build/gdt/gdt.o ./build/interrupts/pit.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin
@@ -32,6 +32,9 @@ all: $(FILES) ./senob/boot/senob.bin
 
 ./build/interrupts/idt.s.o:
 	nasm -f elf ./kernel/arch/x86-32/interrupts/idt.s -o ./build/interrupts/idt.s.o
+
+./build/interrupts/pit.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/interrupts/pit.c -o ./build/interrupts/pit.o -std=gnu99 -O2 -Wall -Wextra
 
 ./build/io/io.s.o:
 	nasm -f elf ./kernel/arch/x86-32/io/io.s -o ./build/io/io.s.o

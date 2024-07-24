@@ -18,7 +18,7 @@
 #include "../../../drivers/video/vga/vga.h"
 #include "gdt/gdt.h"
 #include "interrupts/idt.h"
-#include "interrupt/pit.h"
+#include "interrupts/pit.h"
 
 
 void trigger_breakpoint() {
@@ -70,7 +70,7 @@ void kernel_main(void)
     print("--TSS loaded\n");
     idt_init();
     print("--IDT loaded\n");
-    initpit(100);
+    initpit(50);
     //trigger_breakpoint();
     //trigger_division_by_zero();
     print("Herzlich willkommen bei senob!\n");
