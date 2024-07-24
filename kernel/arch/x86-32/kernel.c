@@ -19,24 +19,25 @@
 #include "gdt/gdt.h"
 #include "interrupts/idt.h"
 #include "interrupts/pit.h"
+#include "../../../drivers/keyboard/keyboard.h"
 
 
 void trigger_breakpoint() {
-    asm volatile("int $3"); // Breakpoint Interrupt
+    asm volatile("int $3");
 }
 
 void trigger_general_protection_fault() {
     asm volatile (
         "mov $0x10, %ax\n\t"
-        "ltr %ax" // Läd ungültiges Segment in TR
+        "ltr %ax"
     );
 }
 
 void trigger_division_by_zero() {
     asm volatile (
-        "movl $1, %eax\n\t"  // Setze eax auf 1
-        "movl $0, %ebx\n\t"  // Setze ebx auf 0
-        "divl %ebx"          // Dividiere eax durch ebx (Division durch Null)
+        "movl $1, %eax\n\t"
+        "movl $0, %ebx\n\t"
+        "divl %ebx"
     );
 }
 
@@ -65,12 +66,14 @@ void trigger_overflow() {
 void kernel_main(void)
 {
     reset();
-    initGdt();
+    init_gdt();
     print("--GDT loaded\n");
     print("--TSS loaded\n");
     idt_init();
     print("--IDT loaded\n");
-    initpit(50);
+    init_keyboard();
+    print("--KEYBOARD DRIVER LOADED\n");
+    //init_pit(50);
     //trigger_breakpoint();
     //trigger_division_by_zero();
     print("Herzlich willkommen bei senob!\n");

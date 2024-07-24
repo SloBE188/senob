@@ -32,7 +32,7 @@
 
 uint64_t ticks;
 
-void irq0_pit(struct Interrupt_registers *regs)
+void irq0_handler(struct Interrupt_registers *regs)
 {
     ticks += 1;
     print("testing irq0");
@@ -40,10 +40,10 @@ void irq0_pit(struct Interrupt_registers *regs)
 }
 
 
-void initpit(uint64_t hz)
+void init_pit(uint64_t hz)
 {
     //adding interrupt
-    irq_add_handler(PIT_IRQ, &irq0_pit);
+    irq_add_handler(PIT_IRQ, &irq0_handler);
 
     uint64_t divisor = PIT_SCALE / hz;
 

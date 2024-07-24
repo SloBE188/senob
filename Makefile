@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/kernel.o ./build/gdt/gdt.o ./build/interrupts/pit.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin
@@ -27,6 +27,11 @@ all: $(FILES) ./senob/boot/senob.bin
 ./build/libk/memory.o:
 	i686-elf-gcc -g -c ./kernel/libk/memory.c -o ./build/libk/memory.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
+
+./build/libk/stdiok.o:
+	i686-elf-gcc -g -c ./kernel/libk/stdiok.c -o ./build/libk/stdiok.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+
 ./build/interrupts/idt.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/interrupts/idt.c -o ./build/interrupts/idt.o -std=gnu99 -O2 -Wall -Wextra
 
@@ -38,6 +43,10 @@ all: $(FILES) ./senob/boot/senob.bin
 
 ./build/io/io.s.o:
 	nasm -f elf ./kernel/arch/x86-32/io/io.s -o ./build/io/io.s.o
+
+
+./build/drivers/keyboard.o:
+	i686-elf-gcc -g -c ./drivers/keyboard/keyboard.c -o ./build/drivers/keyboard.o -std=gnu99 -O2 -Wall -Wextra
 
 
 

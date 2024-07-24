@@ -4,7 +4,7 @@
 
 
 void irq0_pit(struct Interrupt_registers *regs);
-void initpit(uint64_t hz);
+void init_pit(uint64_t hz);
 
 
 #endif
