@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/mm/memory.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin
@@ -47,6 +47,9 @@ all: $(FILES) ./senob/boot/senob.bin
 
 ./build/drivers/keyboard.o:
 	i686-elf-gcc -g -c ./drivers/keyboard/keyboard.c -o ./build/drivers/keyboard.o -std=gnu99 -O2 -Wall -Wextra
+
+./build/mm/memory.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/mm/memory.c -o ./build/mm/memory.o -std=gnu99 -O2 -Wall -Wextra
 
 
 

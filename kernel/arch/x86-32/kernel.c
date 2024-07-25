@@ -22,6 +22,7 @@
 #include "../../../drivers/keyboard/keyboard.h"
 #include "multiboot.h"
 #include "../../libk/stdiok.h"
+#include "mm/memory.h"
 
 
 
@@ -87,12 +88,14 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //init_pit(50);
     //trigger_breakpoint();
     //trigger_division_by_zero();
-    if (magic_value != magic)
+    /*if (magic_value != magic)
     {
         printf("magic value isnt right");
-    }
+    }*/
     
     print("Herzlich willkommen bei senob!\n");
+
+    init_memory(multibootinfo);
 
     //uint64_t addr = multibootinfo->framebuffer_addr;
     printf("%d\n", multibootinfo->framebuffer_addr);

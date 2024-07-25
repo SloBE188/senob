@@ -15,6 +15,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MULTIBOOT_H 
+#define MULTIBOOT_H
+
+
 #include <stdint-gcc.h>
 
 struct multiboot_aout_symbol_table
@@ -110,7 +114,7 @@ struct multiboot_info
     };
   };
 };
-
+ 
 struct multiboot_mmap_entry
 {
   uint32_t size;
@@ -125,3 +129,5 @@ struct multiboot_mmap_entry
 #define MULTIBOOT_MEMORY_BADRAM                 5
   uint32_t type;
 } __attribute__((packed));
+
+#endif
