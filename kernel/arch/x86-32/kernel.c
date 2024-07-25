@@ -24,6 +24,9 @@
 #include "../../libk/stdiok.h"
 
 
+
+#define magic 0x1BADB002
+
 void trigger_breakpoint() {
     asm volatile("int $3");
 }
@@ -63,6 +66,12 @@ void trigger_overflow() {
     );
 }
 
+void panic()
+{
+    print("Kernel Panic");
+    while (1){}
+}
+
 
 
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
@@ -78,10 +87,15 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //init_pit(50);
     //trigger_breakpoint();
     //trigger_division_by_zero();
+    if (magic_value != magic)
+    {
+        printf("magic value isnt right");
+    }
+    
     print("Herzlich willkommen bei senob!\n");
 
-    double addr = multibootinfo->framebuffer_addr;
-    printf("%d", addr);
+    //uint64_t addr = multibootinfo->framebuffer_addr;
+    printf("%d\n", multibootinfo->framebuffer_addr);
     while (1){}
     
 }
