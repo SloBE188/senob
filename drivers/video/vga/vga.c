@@ -71,43 +71,46 @@ void scrollUp()
     
 }
 
-void print(const char* s)
-{
-    while (*s)
-    {
-        switch (*s)
-        {
-        case '\n':
-            newLine();
-            break;
+void handleBackspace() {
+    if (column > 0) {
+        column--;
+        vga_address[line * width + column] = ' ' | currColor;
+    } else if (line > 0) {
+        line--;
+        column = width - 1;
+        vga_address[line * width + column] = ' ' | currColor;
+    }
+}
 
-        case '\r':
-            column = 0;
-            break;
-
-        case '\t':
-            if (column == width)
-            {
+void print(const char* s) {
+    while (*s) {
+        switch (*s) {
+            case '\n':
                 newLine();
-            }
-            uint16_t tablen = 4 - (column % 4);
-            while (tablen != 0)
-            {
-                vga_address[line * width + (column++)] = ' ' | currColor;
-                tablen--;
-            }
-            break;
-
-        default:
-            if (column == width)
-            {
-                newLine();
-            }
-            vga_address[line * width + (column++)] = *s | currColor;
-            break;
+                break;
+            case '\r':
+                column = 0;
+                break;
+            case '\t':
+                if (column == width) {
+                    newLine();
+                }
+                uint16_t tablen = 4 - (column % 4);
+                while (tablen != 0) {
+                    vga_address[line * width + (column++)] = ' ' | currColor;
+                    tablen--;
+                }
+                break;
+            case '\b':
+                handleBackspace();
+                break;
+            default:
+                if (column == width) {
+                    newLine();
+                }
+                vga_address[line * width + (column++)] = *s | currColor;
+                break;
         }
         s++;
     }
-    
 }
-

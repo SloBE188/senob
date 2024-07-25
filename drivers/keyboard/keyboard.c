@@ -105,6 +105,11 @@ void handle_special_key(uint32_t scancode, bool pressed) {
                 capsLock = !capsLock;
             }
             break;
+        case 14:  // Backspace
+            if (pressed) {
+                handleBackspace();
+            }
+            break;
     }
 }
 
