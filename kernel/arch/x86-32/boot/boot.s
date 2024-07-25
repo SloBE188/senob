@@ -18,8 +18,17 @@ BITS 32
 section .text
 	ALIGN 4
 	DD 0x1BADB002
-	DD 0x00000000
-	DD -(0x1BADB002 + 0x00000000)
+	DD 0x00000007
+	DD -(0x1BADB002 + 0x00000007)
+	DD 0
+	DD 0
+	DD 0
+	DD 0
+	DD 0
+	DD 1
+	DD 1024
+	DD 768
+	DD 32
 	
 global start
 extern kernel_main
@@ -27,6 +36,8 @@ extern kernel_main
 start:
 	CLI
 	MOV esp, stack_space
+	PUSH EBX	; Pointer to the Multiboot information structure
+	PUSH EAX	; Magic value
 	CALL kernel_main
 	HLT
 

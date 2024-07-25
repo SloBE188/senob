@@ -20,6 +20,8 @@
 #include "interrupts/idt.h"
 #include "interrupts/pit.h"
 #include "../../../drivers/keyboard/keyboard.h"
+#include "multiboot.h"
+#include "../../libk/stdiok.h"
 
 
 void trigger_breakpoint() {
@@ -63,7 +65,7 @@ void trigger_overflow() {
 
 
 
-void kernel_main(void)
+void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
     reset();
     init_gdt();
@@ -77,6 +79,9 @@ void kernel_main(void)
     //trigger_breakpoint();
     //trigger_division_by_zero();
     print("Herzlich willkommen bei senob!\n");
+
+    double addr = multibootinfo->framebuffer_addr;
+    printf("%d", addr);
     while (1){}
     
 }
