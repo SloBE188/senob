@@ -26,8 +26,7 @@
 #define KEYBOARD_PORT 0x60
 #define KEYBOARD_ENABLE_PORT 0xAE
 
-
-//special keys
+// Special keys
 #define UNKNOWN 0xFFFFFFE0
 #define ESC     0xFFFFFFE1
 #define CTRL    0xFFFFFFE2
@@ -61,16 +60,14 @@
 #define NONE    0xFFFFFFFE
 #define ALTGR   0xFFFFFFDF
 #define NUMLCK  0xFFFFFFC0
-
-
+#define BACKSPACE 0xFFFFFFBF
 
 bool capsOn;
 bool capsLock;
 
-
 const uint32_t lowercase[128] = {
     UNKNOWN, ESC, '1', '2', '3', '4', '5', '6', '7', '8',
-    '9', '0', '\'', '^', '\b', '\t', 'q', 'w', 'e', 'r',
+    '9', '0', '\'', '^', BACKSPACE, '\t', 'q', 'w', 'e', 'r',
     't', 'z', 'u', 'i', 'o', 'p', 'ü', '*', '\n', CTRL,
     'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ö',
     'ä', '$', LSHFT, '<', 'y', 'x', 'c', 'v', 'b', 'n', 'm', ',',
@@ -83,7 +80,7 @@ const uint32_t lowercase[128] = {
 
 const uint32_t uppercase[128] = {
     UNKNOWN, ESC, '+', '"', '*', 'ç', '%', '&', '/', '(',
-    ')', '=', '?', '`', '\b', '\t', 'Q', 'W', 'E', 'R',
+    ')', '=', '?', '`', BACKSPACE, '\t', 'Q', 'W', 'E', 'R',
     'T', 'Z', 'U', 'I', 'O', 'P', 'Ü', '!', '\n', CTRL,
     'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö',
     'Ä', '£', LSHFT, '>', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', ';',
@@ -94,50 +91,55 @@ const uint32_t uppercase[128] = {
     UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN
 };
 
-
-void handle_special_key(uint32_t scancode, bool pressed) {
-    switch (scancode) {
-        case 42:  // Shift
+void handle_special_key(uint32_t key, bool pressed) {
+    switch (key) {
+        case LSHFT:
+        case RSHFT:  // Shift
             capsOn = pressed;
             break;
-        case 58:  // Caps Lock
+        case CAPS:  // Caps Lock
             if (pressed) {
                 capsLock = !capsLock;
             }
             break;
-        case 14:  // Backspace
+        case BACKSPACE:  // Backspace
             if (pressed) {
                 handleBackspace();
             }
             break;
+        default:
+            break;
     }
 }
 
-bool is_special_key(uint32_t scancode) {
-    switch (scancode) {
-        case 1:
-        case 29:
-        case 56:
-        case 59:
-        case 60:
-        case 61:
-        case 62:
-        case 63:
-        case 64:
-        case 65:
-        case 66:
-        case 67:
-        case 68:
-        case 87:
-        case 88:
-        case 42:
-        case 58:
+bool is_special_key(uint32_t key) {
+    switch (key) {
+        case ESC:
+        case CTRL:
+        case LSHFT:
+        case RSHFT:
+        case ALT:
+        case F1:
+        case F2:
+        case F3:
+        case F4:
+        case F5:
+        case F6:
+        case F7:
+        case F8:
+        case F9:
+        case F10:
+        case F11:
+        case F12:
+        case SCRLCK:
+        case CAPS:
+        case NUMLCK:
+        case BACKSPACE:
             return true;
         default:
             return false;
     }
 }
-
 
 void irq1_handler(struct Interrupt_registers *regs) {
     char scancode = insb(KEYBOARD_PORT) & 0x7F;  // Scan-Code without highest Bit
@@ -145,8 +147,8 @@ void irq1_handler(struct Interrupt_registers *regs) {
 
     bool pressed = shiftpressed == 0;
 
-    if (is_special_key(scancode)) {
-        handle_special_key(scancode, pressed);
+    if (is_special_key(lowercase[scancode])) {
+        handle_special_key(lowercase[scancode], pressed);
     } else {
         if (pressed) {
             if (capsOn || capsLock) {
@@ -157,8 +159,6 @@ void irq1_handler(struct Interrupt_registers *regs) {
         }
     }
 }
-
-
 
 void init_keyboard() {
     capsOn = false;
