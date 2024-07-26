@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../drivers/video/vga/vga.h"
+//#include "../../../drivers/video/vga/vga.h"
 #include "gdt/gdt.h"
 #include "interrupts/idt.h"
 #include "interrupts/pit.h"
@@ -23,6 +23,7 @@
 #include "multiboot.h"
 #include "../../libk/stdiok.h"
 #include "mm/memory.h"
+#include "../../../drivers/video/vbe/vbe.h"
 
 
 
@@ -74,17 +75,17 @@ void panic()
 }
 
 
-
+struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
     reset();
     init_gdt();
-    print("--GDT loaded\n");
-    print("--TSS loaded\n");
+    //print("--GDT loaded\n");
+    //print("--TSS loaded\n");
     idt_init();
-    print("--IDT loaded\n");
+    //print("--IDT loaded\n");
     init_keyboard();
-    print("--KEYBOARD DRIVER LOADED\n");
+    //print("--KEYBOARD DRIVER LOADED\n");
     //init_pit(50);
     //trigger_breakpoint();
     //trigger_division_by_zero();
@@ -94,13 +95,24 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     }*/
     if (magic_value != 0x2BADB002)
     {
-        printf("Invalid magic value: %x\n", magic_value);
+        //printf("Invalid magic value: %x\n", magic_value);
         panic();
     }
     
-    print("Herzlich willkommen bei senob!\n");
 
-    init_memory(multibootinfo);
+    vbeinfo.framebuffer_addr = multibootinfo->framebuffer_addr;
+    vbeinfo.framebuffer_pitch = multibootinfo->framebuffer_pitch;
+    vbeinfo.framebuffer_width = multibootinfo->framebuffer_width;
+    vbeinfo.framebuffer_height = multibootinfo->framebuffer_height;
+    vbeinfo.framebuffer_bpp = multibootinfo->framebuffer_bpp;
+
+    init_vbe(&vbeinfo);
+    draw_rectangle(200, 200, 100, 50, COLOR_RED, &vbeinfo);
+
+
+    //print("Herzlich willkommen bei senob!\n");
+
+    //init_memory(multibootinfo);
 
     //uint64_t addr = multibootinfo->framebuffer_addr;
     //printf("%d\n", multibootinfo->framebuffer_addr);
