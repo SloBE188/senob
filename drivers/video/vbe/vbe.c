@@ -1,4 +1,5 @@
 #include "vbe.h"
+#include "font.h"
 
 
 static struct vbe_info* globalvbeinfo;
@@ -22,6 +23,26 @@ void draw_rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uin
         for (uint32_t j = 0; j < width; j++) {
             draw_pixel(x + j, y + i, color, vbeinfo);
         }
+    }
+}
+
+void draw_char(uint32_t x, uint32_t y, char c, uint32_t color, struct vbe_info* vbeinfo) {
+    uint8_t* glyph = font_get_glyph(c);
+    for (uint32_t i = 0; i < FONT_HEIGHT; i++) {
+        for (uint32_t j = 0; j < FONT_WIDTH; j++) {
+            if (glyph[i] & (1 << j)) {
+                draw_pixel(x + j, y + i, color, vbeinfo);
+            }
+        }
+    }
+}
+
+void draw_string(uint32_t x, uint32_t y, const char* str, uint32_t color, struct vbe_info* vbeinfo) 
+{
+    while (*str) {
+        draw_char(x, y, *str, color, vbeinfo);
+        x += FONT_WIDTH;
+        str++;
     }
 }
 

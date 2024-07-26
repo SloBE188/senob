@@ -24,6 +24,7 @@
 #include "../../libk/stdiok.h"
 #include "mm/memory.h"
 #include "../../../drivers/video/vbe/vbe.h"
+#include "../../../drivers/video/vbe/font.h"
 
 
 
@@ -107,8 +108,8 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     vbeinfo.framebuffer_bpp = multibootinfo->framebuffer_bpp;
 
     init_vbe(&vbeinfo);
-    draw_rectangle(200, 200, 100, 50, COLOR_RED, &vbeinfo);
-
+    draw_rectangle(450, 300, 100, 100, COLOR_RED, &vbeinfo);
+    draw_string(100, 100, "Hello VBE!", COLOR_WHITE, &vbeinfo);
 
     //print("Herzlich willkommen bei senob!\n");
 
