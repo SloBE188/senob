@@ -20,7 +20,7 @@
 void init_memory(struct multiboot_info* bootinfo)
 {
 
-    printf("&d\n", bootinfo->vbe_mode_info);
+    printf("%d\n", bootinfo->vbe_mode_info);
     for (int i = 0; i < bootinfo->mmap_length; i += sizeof(struct multiboot_mmap_entry)){
         struct multiboot_mmap_entry *mmmt = (struct multiboot_mmap_entry*)(bootinfo->mmap_addr + i);
 

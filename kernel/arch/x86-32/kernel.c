@@ -92,13 +92,18 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     {
         printf("magic value isnt right");
     }*/
+    if (magic_value != 0x2BADB002)
+    {
+        printf("Invalid magic value: %x\n", magic_value);
+        panic();
+    }
     
     print("Herzlich willkommen bei senob!\n");
 
     init_memory(multibootinfo);
 
     //uint64_t addr = multibootinfo->framebuffer_addr;
-    printf("%d\n", multibootinfo->framebuffer_addr);
+    //printf("%d\n", multibootinfo->framebuffer_addr);
     while (1){}
     
 }

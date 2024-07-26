@@ -25,7 +25,7 @@ section .text
 	DD 0
 	DD 0
 	DD 0
-	DD 1
+	DD 0
 	DD 1024
 	DD 768
 	DD 32
