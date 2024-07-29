@@ -81,7 +81,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
     reset();
     init_gdt();
-    //print("--GDT loaded\n");
+    //printf("--GDT loaded\n");
     //print("--TSS loaded\n");
     idt_init();
     //print("--IDT loaded\n");
@@ -107,10 +107,11 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     set_vbe_info(&vbeinfo);
     draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     draw_string(450, 300, "Ich hasse Talahons!", COLOR_GREEN, &vbeinfo);
-    printf("hgallo");
-    //print("Herzlich willkommen bei senob!\n");
+    print("Herzlich willkommen bei senob!\n");
+    int a = 100;
+    printf("int a = %d\n", a);
 
-    //init_memory(multibootinfo);
+    init_memory(multibootinfo);
     while (1){}
     
 }
