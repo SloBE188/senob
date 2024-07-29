@@ -104,9 +104,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     vbeinfo.framebuffer_bpp = multibootinfo->framebuffer_bpp;
 
     init_vbe(&vbeinfo);
-    draw_rectangle(450, 300, 400, 100, COLOR_RED, &vbeinfo);
+    set_vbe_info(&vbeinfo);
+    draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     draw_string(450, 300, "Ich hasse Talahons!", COLOR_GREEN, &vbeinfo);
-
+    printf("hgallo");
     //print("Herzlich willkommen bei senob!\n");
 
     //init_memory(multibootinfo);
