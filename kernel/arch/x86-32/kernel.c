@@ -24,6 +24,7 @@
 #include "../../libk/stdiok.h"
 #include "mm/memory.h"
 #include "../../../drivers/video/vbe/vbe.h"
+#include "../../../drivers/video/vbe/wm/window.h"
 #include "../../../drivers/video/vbe/font.h"
 
 
@@ -92,7 +93,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //trigger_division_by_zero();
     if (magic_value != 0x2BADB002)
     {
-        //printf("Invalid magic value: %x\n", magic_value);
+        printf("Invalid magic value: %x\n", magic_value);
         panic();
     }
     
@@ -111,6 +112,9 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     int a = 100;
     printf("int a = %d\n", a);
 
+    //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
+    //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
+    
     init_memory(multibootinfo);
     while (1){}
     

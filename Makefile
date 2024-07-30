@@ -57,6 +57,9 @@ all: $(FILES) ./senob/boot/senob.bin
 ./build/vbe/font.o:
 	i686-elf-gcc -g -c ./drivers/video/vbe/font.c -o ./build/vbe/font.o -std=gnu99 -O2 -Wall -Wextra
 
+./build/vbe/wm/window.o:
+	i686-elf-gcc -g -c ./drivers/video/vbe/wm/window.c -o ./build/vbe/wm/window.o -std=gnu99 -O2 -Wall -Wextra
+
 
 clean:
 	rm -rf ${FILES}
