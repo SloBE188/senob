@@ -88,7 +88,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //print("--IDT loaded\n");
     init_keyboard();
     //print("--KEYBOARD DRIVER LOADED\n");
-    //init_pit(50);
+    init_pit(50);
     //trigger_breakpoint();
     //trigger_division_by_zero();
     if (magic_value != 0x2BADB002)
@@ -107,7 +107,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     init_vbe(&vbeinfo);
     set_vbe_info(&vbeinfo);
     draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
-    draw_string(450, 300, "Ich hasse Talahons!", COLOR_GREEN, &vbeinfo);
+    draw_string(450, 300, "Hellou Lena ;)", COLOR_GREEN, &vbeinfo);
     print("Herzlich willkommen bei senob!\n");
     int a = 100;
     printf("int a = %d\n", a);
