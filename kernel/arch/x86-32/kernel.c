@@ -80,7 +80,6 @@ void panic()
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
-    reset();
     init_gdt();
     //printf("--GDT loaded\n");
     //print("--TSS loaded\n");
@@ -115,7 +114,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
     
-    init_memory(multibootinfo);
+    //init_memory(multibootinfo);
     while (1){}
     
 }
