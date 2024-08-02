@@ -23,6 +23,7 @@
 #include "multiboot.h"
 #include "../../libk/stdiok.h"
 #include "mm/memory.h"
+#include "../../../drivers/video/vga/vga.h"
 #include "../../../drivers/video/vbe/vbe.h"
 #include "../../../drivers/video/vbe/wm/window.h"
 #include "../../../drivers/video/vbe/font.h"
@@ -80,13 +81,14 @@ void panic()
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
+    reset();
     init_gdt();
-    //printf("--GDT loaded\n");
-    //print("--TSS loaded\n");
+    print("--GDT loaded\n");
+    print("--TSS loaded\n");
     idt_init();
-    //print("--IDT loaded\n");
+    print("--IDT loaded\n");
     init_keyboard();
-    //print("--KEYBOARD DRIVER LOADED\n");
+    print("--KEYBOARD DRIVER LOADED\n");
     init_pit(50);
     //trigger_breakpoint();
     //trigger_division_by_zero();
@@ -103,13 +105,13 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     vbeinfo.framebuffer_height = multibootinfo->framebuffer_height;
     vbeinfo.framebuffer_bpp = multibootinfo->framebuffer_bpp;
 
-    init_vbe(&vbeinfo);
+    /*init_vbe(&vbeinfo);
     set_vbe_info(&vbeinfo);
     draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     draw_string(450, 300, "Hellou Lena ;)", COLOR_GREEN, &vbeinfo);
     print("Herzlich willkommen bei senob!\n");
     int a = 100;
-    printf("int a = %d\n", a);
+    printf("int a = %d\n", a);*/
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);

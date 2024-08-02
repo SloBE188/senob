@@ -35,7 +35,7 @@ section .multiboot
     DD 0                    ; Load End Address
     DD 0                    ; BSS End Address
     DD 0                    ; Entry Address
-    DD 0                    ; Mode Type (0 for linear framebuffer)
+    DD 1                    ; Mode Type (0 for linear framebuffer)
     DD 1024                 ; Framebuffer Width
     DD 768                  ; Framebuffer Height
     DD 32                   ; Framebuffer Depth
@@ -53,8 +53,8 @@ kernel_directory:
     DD 0x00800083           ; Third Page Table Entry (0x00800000 - 0x00BFFFFF)
     DD 0x00C00083           ; Fourth Page Table Entry (0x00C00000 - 0x00FFFFFF)
     ; Mapping für den Framebuffer (virtuelle Adresse 0xE0000000)
-    DD 0xFD000083			; should map 0xE0000000 - 0xE03FFFFF (4 MiB) to 0xFD000000 - 0xFD3FFFFF
-    TIMES 767-5 DD 0        ; Fill up
+    ;DD 0xFD000083			; should map 0xE0000000 - 0xE03FFFFF (4 MiB) to 0xFD000000 - 0xFD3FFFFF
+    TIMES 768-4 DD 0        ; Fill up
     DD 0x00000083
     TIMES 256-1 DD 0		; fill up
 

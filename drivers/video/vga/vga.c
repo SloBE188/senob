@@ -29,12 +29,12 @@ void reset()
     column = 0;
     currColor = defaultColor;
 
-    //loops threw all the line & columns and clears them with the for loop height & width
-    for (uint16_t y = 0; y < height; y++)
+    //loops threw all the line & columns and clears them with the for loop heightvga & widthvga
+    for (uint16_t y = 0; y < heightvga; y++)
     {
-        for (uint16_t x = 0; x < width; x++)
+        for (uint16_t x = 0; x < widthvga; x++)
         {
-            vga_address[y * width + x] = ' ' | defaultColor;    //Every character has a character and a color
+            vga_address[y * widthvga + x] = ' ' | defaultColor;    //Every character has a character and a color
         }
         
     }
@@ -43,7 +43,7 @@ void reset()
 
 void newLine()
 {
-    if (line < height - 1)
+    if (line < heightvga - 1)
     {
         line++;
         column = 0;
@@ -57,16 +57,16 @@ void newLine()
 
 void scrollUp()
 {
-    for (uint16_t y = 0; y < height; y++)
+    for (uint16_t y = 0; y < heightvga; y++)
     {
-        for (uint16_t x = 0; x < width; x++)
+        for (uint16_t x = 0; x < widthvga; x++)
         {
-            vga_address[(y-1) * width + x] = vga_address[y * width + x];
+            vga_address[(y-1) * widthvga + x] = vga_address[y * widthvga + x];
         }
     }
-    for (uint16_t x = 0; x < width; x++)
+    for (uint16_t x = 0; x < widthvga; x++)
     {
-        vga_address[(height-1) * width + x] = ' ' | currColor;
+        vga_address[(heightvga-1) * widthvga + x] = ' ' | currColor;
     }
     
 }
@@ -74,11 +74,11 @@ void scrollUp()
 void handleBackspace() {
     if (column > 0) {
         column--;
-        vga_address[line * width + column] = ' ' | currColor;
+        vga_address[line * widthvga + column] = ' ' | currColor;
     } else if (line > 0) {
         line--;
-        column = width - 1;
-        vga_address[line * width + column] = ' ' | currColor;
+        column = widthvga - 1;
+        vga_address[line * widthvga + column] = ' ' | currColor;
     }
 }
 
@@ -92,12 +92,12 @@ void print(const char* s) {
                 column = 0;
                 break;
             case '\t':
-                if (column == width) {
+                if (column == widthvga) {
                     newLine();
                 }
                 uint16_t tablen = 4 - (column % 4);
                 while (tablen != 0) {
-                    vga_address[line * width + (column++)] = ' ' | currColor;
+                    vga_address[line * widthvga + (column++)] = ' ' | currColor;
                     tablen--;
                 }
                 break;
@@ -105,10 +105,10 @@ void print(const char* s) {
                 handleBackspace();
                 break;
             default:
-                if (column == width) {
+                if (column == widthvga) {
                     newLine();
                 }
-                vga_address[line * width + (column++)] = *s | currColor;
+                vga_address[line * widthvga + (column++)] = *s | currColor;
                 break;
         }
         s++;

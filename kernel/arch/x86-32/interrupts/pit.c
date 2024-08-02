@@ -35,7 +35,7 @@ uint64_t ticks;
 void irq0_handler(struct Interrupt_registers *regs)
 {
     ticks += 1;
-    print("testing irq0");
+    //print("testing irq0");
 
 }
 
