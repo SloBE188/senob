@@ -30,7 +30,7 @@ void clear_screen(uint32_t color, struct vbe_info* vbeinfo)
 void draw_pixel(uint32_t x, uint32_t y, uint32_t color, struct vbe_info* vbeinfo) 
 {
     if (x >= vbeinfo->framebuffer_width || y >= vbeinfo->framebuffer_height) return;
-    uint32_t* framebuffer = (uint32_t*)vbeinfo->framebuffer_addr;
+    uint32_t* framebuffer = 0xe0000000;
     framebuffer[y * (vbeinfo->framebuffer_pitch / 4) + x] = color;
 }
 

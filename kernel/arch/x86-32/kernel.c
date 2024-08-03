@@ -106,8 +106,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     init_vbe(&vbeinfo);
     set_vbe_info(&vbeinfo);
     draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
-    draw_string(450, 300, "Hellou Lena ;)", COLOR_GREEN, &vbeinfo);
-    print("Herzlich willkommen bei senob!\n");
+    draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
     int a = 100;
     printf("int a = %d\n", a);
 

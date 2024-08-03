@@ -48,15 +48,18 @@ stack_top:
 section .data
 ALIGN 4096
 kernel_directory:
-    DD 0x00000083           ; First Page Table Entry (0x00000000 - 0x003FFFFF)
-    DD 0x00400083           ; Second Page Table Entry (0x00400000 - 0x007FFFFF)
-    DD 0x00800083           ; Third Page Table Entry (0x00800000 - 0x00BFFFFF)
-    DD 0x00C00083           ; Fourth Page Table Entry (0x00C00000 - 0x00FFFFFF)
-    ; Mapping für den Framebuffer (virtuelle Adresse 0xE0000000)
-    DD 0xFD000083			; should map 0xE0000000 - 0xE03FFFFF (4 MiB) to 0xFD000000 - 0xFD3FFFFF
-    TIMES 767-5 DD 0        ; Fill up
+    DD 0x00000083 ; First Page Table Entry (0x00000000 - 0x003FFFFF)
+    DD 0x00400083 ; Second Page Table Entry (0x00400000 - 0x007FFFFF)
+    DD 0x00800083 ; Third Page Table Entry (0x00800000 - 0x00BFFFFF)
+    DD 0x00C00083 ; Fourth Page Table Entry (0x00C00000 - 0x00FFFFFF)
+    TIMES 768-4 DD 0 ; Fill up
+    ; Mapping the kernel from 0xC0000000 - 0xC03FFFFF (4 MiB) to 0x00000000 - 0x003FFFFF
     DD 0x00000083
-    TIMES 256-1 DD 0		; fill up
+    TIMES 128-1 DD 0 ; Fill up to entry 896
+    ; Mapping für den Framebuffer (virtuelle Adresse 0xE0000000)
+    DD 0xFD000083 ; should map 0xE0000000 - 0xE03FFFFF (4 MiB) to 0xFD000000 - 0xFD3FFFFF
+
+    TIMES 128-1 DD 0 ; fill up to entry 1024
 
 section .text
 _start:
