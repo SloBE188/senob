@@ -56,6 +56,8 @@ kernel_directory:
     ; Mapping the kernel from 0xC0000000 - 0xC03FFFFF (4 MiB) to 0x00000000 - 0x003FFFFF
     DD 0x00000083
     TIMES 128-1 DD 0 ; Fill up to entry 896
+    ; Mapping the heap from 0xD0000000 - 0xD003FFFF (4 MiB) to 0x00800000 - 0x00BFFFFF
+    DD 0x00800083
     ; Mapping für den Framebuffer (virtuelle Adresse 0xE0000000)
     DD 0xFD000083 ; should map 0xE0000000 - 0xE03FFFFF (4 MiB) to 0xFD000000 - 0xFD3FFFFF
 
