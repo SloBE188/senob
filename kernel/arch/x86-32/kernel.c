@@ -26,6 +26,7 @@
 #include "../../../drivers/video/vbe/vbe.h"
 #include "../../../drivers/video/vbe/wm/window.h"
 #include "../../../drivers/video/vbe/font.h"
+#include "mm/heap/heap.h"
 
 
 
@@ -77,12 +78,15 @@ void panic()
 }
 
 
+
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
     init_gdt();
     //printf("--GDT loaded\n");
     //print("--TSS loaded\n");
+
+    heap_init();
     idt_init();
     //print("--IDT loaded\n");
     init_keyboard();

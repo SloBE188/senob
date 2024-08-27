@@ -21,19 +21,16 @@
 struct heap kernel_heap;
 struct heap_table kernel_heap_table;
 
-heap_init()
-{
-    kernel_heap_table.total_blocks = HEAP_SIZE/HEAP_BLOCK_SIZE;
-    kernel_heap_table.entries = (HEAP_BLOCK_TABLE_ENTRY*)(HEAP_START_ADDRESS - kernel_heap_table.total_blocks);     //0xCFFFFFE7
+void heap_init() {
+    kernel_heap_table.total_blocks = HEAP_SIZE / HEAP_BLOCK_SIZE;
+    kernel_heap_table.entries = (HEAP_BLOCK_TABLE_ENTRY*)HEAP_START_ADDRESS;
 
     kernel_heap.table = &kernel_heap_table;
     kernel_heap.start_address = (void*)HEAP_START_ADDRESS;
 
-    for (int i = 0; i < kernel_heap_table.total_blocks; i++)
-    {
+    for (size_t i = 0; i < kernel_heap_table.total_blocks; i++) {
         kernel_heap_table.entries[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
     }
-    
 }
 
 void *malloc(size_t size) {
@@ -72,19 +69,20 @@ void *malloc(size_t size) {
     return (void *)((uintptr_t)kernel_heap.start_address + (start_block * HEAP_BLOCK_SIZE));
 }
 
-
 void free(void *ptr) {
     uintptr_t addr = (uintptr_t)ptr;
     size_t start_block = (addr - (uintptr_t)kernel_heap.start_address) / HEAP_BLOCK_SIZE;
 
     // Gehe durch die Blöcke und markiere sie als frei
     for (size_t i = start_block; i < kernel_heap.table->total_blocks; i++) {
-        HEAP_BLOCK_TABLE_ENTRY entry = kernel_heap_table.entries[i];
+        HEAP_BLOCK_TABLE_ENTRY entry = kernel_heap_table.entries[i];  // Blockstatus wird geladen
+
+        // Markiere den aktuellen Block als frei
         kernel_heap_table.entries[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
 
-        // Wenn das aktuelle Block keinen "next" mehr hat, höre auf
+        // Überprüfe, ob dieser Block der letzte in der Kette ist
         if (!(entry & HEAP_BLOCK_HAS_NEXT)) {
-            break;
+            break;  // Beende die Schleife, wenn dies der letzte Block ist
         }
     }
 }

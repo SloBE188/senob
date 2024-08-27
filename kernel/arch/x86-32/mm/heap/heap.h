@@ -14,6 +14,7 @@
 
 #include <stdint-gcc.h>
 #include <stddef.h>
+#include "../../../../libk/stdiok.h"
 
 typedef uint8_t HEAP_BLOCK_TABLE_ENTRY;
 
@@ -27,6 +28,10 @@ struct heap
     struct heap_table* table;
     void* start_address;
 };
+
+void heap_init();
+void *malloc(size_t size);
+void free(void *ptr);
 
 
 #endif
