@@ -52,16 +52,18 @@ kernel_directory:
     DD 0x00400083 ; Second Page Table Entry (0x00400000 - 0x007FFFFF)
     DD 0x00800083 ; Third Page Table Entry (0x00800000 - 0x00BFFFFF)
     DD 0x00C00083 ; Fourth Page Table Entry (0x00C00000 - 0x00FFFFFF)
-    TIMES 768-4 DD 0 ; Fill up
+    TIMES 768-4 DD 0 ; Fill up to entry 768
     ; Mapping the kernel from 0xC0000000 - 0xC03FFFFF (4 MiB) to 0x00000000 - 0x003FFFFF
-    DD 0x00000083
-    TIMES 128-1 DD 0 ; Fill up to entry 896
-    ; Mapping the heap from 0xD0000000 - 0xD003FFFF (4 MiB) to 0x00800000 - 0x00BFFFFF
-    DD 0x00800083
+    DD 0x00000083 ; Entry 768 (0xC0000000 - 0xC03FFFFF)
+    TIMES 64-1 DD 0 ; Fill up to entry 832
+    ; Mapping the heap from 0xD0000000 - 0xD03FFFFF (4 MiB) to 0x00800000 - 0x00BFFFFF
+    DD 0x00800083 ; Entry 832 (0xD0000000 - 0xD03FFFFF)
+    TIMES 64-1 DD 0 ; Fill up to entry 896
     ; Mapping für den Framebuffer (virtuelle Adresse 0xE0000000)
-    DD 0xFD000083 ; should map 0xE0000000 - 0xE03FFFFF (4 MiB) to 0xFD000000 - 0xFD3FFFFF
+    DD 0xFD000083 ; Entry 896 (0xE0000000 - 0xE03FFFFF) mapped to 0xFD000000 - 0xFD3FFFFF
 
-    TIMES 128-1 DD 0 ; fill up to entry 1024
+    TIMES 1024-897 DD 0 ; fill up to entry 1024
+
 
 section .text
 _start:
