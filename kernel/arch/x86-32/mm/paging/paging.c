@@ -23,88 +23,84 @@
 extern uint32_t kernel_directory[1024];
 uint32_t get_physical_addr(uint32_t virtual_addr);
 
-struct page_directory* create_page_directory()
-{
+struct page_directory* create_page_directory() {
     struct page_directory* dir = (struct page_directory*)kmalloc(sizeof(struct page_directory));
     memset(dir, 0, sizeof(struct page_directory));
 
-    //kernel mappings
+    // Copy kernel mappings
     dir->entries[768] = *(struct page_directory_entry*)&kernel_directory[768];
     dir->entries[832] = *(struct page_directory_entry*)&kernel_directory[832];
     dir->entries[896] = *(struct page_directory_entry*)&kernel_directory[896];
 
-
-    for (int i = 0; i < 1024; i++)
-    {
-        if (i == 768 || i == 832 || i ==896)
-        {
-            continue;
-        }
-
-        struct page_table* table = (struct page_table*)kmalloc(sizeof(struct page_table));
-        memset(table, 0, sizeof(struct page_table));
-
-        // fill the new page table in the page directory
-        dir->entries[i].table_addr = ((uint32_t)table) >> 12;  // physical addr from the new page table
-        dir->entries[i].present = 1;       // present true
-        dir->entries[i].rw = 1;            // read & write
-        dir->entries[i].user = 1;          // user access yes
-
-        /*for (int j = 0; j < 1024; j++)
-        {
-            void* virtual_addr = kmalloc(PAGE_SIZE);
-            if (virtual_addr == NULL)
-            {
-                panic();
-            }
-
-            uint32_t physical_addr = get_physical_addr(virtual_addr);
-            table->entries[j].frame = (uint32_t) physical_addr >> 12; // need the physical address
-            table->entries[j].present = 1;                 // present true
-            table->entries[j].rw = 1;                      // read & write
-            table->entries[j].user = 1;                    // user access yes 
-            
-        }*/
-        
-    }
-    
-
     return dir;
 }
 
-
 uint32_t* get_current_page_directory() {
     uint32_t cr3;
-    asm volatile ("mov %%cr3, %0" : "=r" (cr3));  // reads the Cr3 reg (the cr3 register has the address from the page directory)
+    asm volatile ("mov %%cr3, %0" : "=r" (cr3));
     return (uint32_t*)cr3;
 }
 
-
 uint32_t get_physical_addr(uint32_t virtual_addr) {
-    // get current page directory
-    uint32_t* page_directory = (uint32_t*)get_current_page_directory();
+    uint32_t* page_directory = get_current_page_directory();
+    uint32_t pd_index = (virtual_addr >> 22) & 0x3FF;
+    uint32_t pt_index = (virtual_addr >> 12) & 0x3FF;
+    uint32_t offset = virtual_addr & 0xFFF;
 
-    // extract the different parts of the virtual address
-    uint32_t pd_index = (virtual_addr >> 22) & 0x3FF;  // high 10 bits
-    uint32_t pt_index = (virtual_addr >> 12) & 0x3FF;  // high 10 bits
-    uint32_t offset = virtual_addr & 0xFFF;            // low 12 bits
+    if (!(page_directory[pd_index] & 1)) return 0;
+    uint32_t* page_table = (uint32_t*)(page_directory[pd_index] & ~0xFFF);
 
-    // get the address of the page table from the page directory
-    uint32_t* page_table = (uint32_t*)(page_directory[pd_index] & ~0xFFF); //mask flags
-    if (!(page_directory[pd_index] & 1)) 
-    {
-        return 0;
-    }
+    if (!(page_table[pt_index] & 1)) return 0;
+    uint32_t physical_frame = page_table[pt_index] & ~0xFFF;
 
-    // get the physical frame address from the page table
-    uint32_t physical_frame = page_table[pt_index] & ~0xFFF; // maks flags
-    if (physical_frame == 0) 
-    {
-        return 0;
-    }
     return physical_frame + offset;
 }
 
 void load_page_directory(struct page_directory* dir) {
     asm volatile("mov %0, %%cr3" :: "r"(dir));
+}
+
+void switch_to_kernel_directory() {
+    load_page_directory((struct page_directory*)kernel_directory);
+}
+
+void map_page(struct page_directory* dir, uint32_t virtual_addr, uint32_t physical_addr, uint32_t flags) {
+    uint32_t pd_index = (virtual_addr >> 22) & 0x3FF;
+    uint32_t pt_index = (virtual_addr >> 12) & 0x3FF;
+
+    struct page_table* table;
+    if (!(dir->entries[pd_index].present)) {
+        // Page Table does not exist, create a new one
+        table = (struct page_table*)kmalloc(sizeof(struct page_table));
+        memset(table, 0, sizeof(struct page_table));
+
+        dir->entries[pd_index].table_addr = ((uint32_t)table) >> 12;
+        dir->entries[pd_index].present = 1;
+        dir->entries[pd_index].rw = (flags & 0x2) >> 1;  // Set read/write flag
+        dir->entries[pd_index].user = (flags & 0x4) >> 2; // Set user flag
+    } else {
+        table = (struct page_table*)((dir->entries[pd_index].table_addr) << 12);
+    }
+
+    table->entries[pt_index].frame = (physical_addr >> 12);
+    table->entries[pt_index].present = 1;
+    table->entries[pt_index].rw = (flags & 0x2) >> 1;  // Set read/write flag
+    table->entries[pt_index].user = (flags & 0x4) >> 2; // Set user flag
+}
+
+
+void test_paging() {
+    struct page_directory* new_pd = create_page_directory();
+
+    // Map new page and test
+    map_page(new_pd, 0x40000000, 0x100000, 0x3);
+    load_page_directory(new_pd);
+
+    uint32_t* ptr = (uint32_t*)0x40000000;
+    *ptr = 42;
+    //assert(*ptr == 42);
+
+    switch_to_kernel_directory();
+
+    uint32_t kernel_value = *(uint32_t*)0xC0000000;
 }
