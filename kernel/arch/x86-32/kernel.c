@@ -83,17 +83,10 @@ struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
     init_gdt();
-    //printf("--GDT loaded\n");
-    //print("--TSS loaded\n");
-
     heap_init();
     idt_init();
-    //print("--IDT loaded\n");
     init_keyboard();
-    //print("--KEYBOARD DRIVER LOADED\n");
     init_pit(50);
-    //trigger_breakpoint();
-    //trigger_division_by_zero();
     if (magic_value != 0x2BADB002)
     {
         printf("Invalid magic value: %x\n", magic_value);
