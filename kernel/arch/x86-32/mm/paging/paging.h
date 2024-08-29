@@ -3,6 +3,8 @@
 
 #include <stdint-gcc.h>
 
+#define PAGE_SIZE 4096
+
  struct page_table_entry {
     uint32_t present    : 1;   // P
     uint32_t rw         : 1;   // R/W
@@ -20,7 +22,7 @@
 
 struct page_table
 {
-    page_table_entry entries[1024];
+    struct page_table_entry entries[1024];
 };
 
  struct page_directory_entry {
@@ -39,7 +41,11 @@ struct page_table
 
 struct page_directory
 {
-    page_directory_entry entries[1024];
+    struct page_directory_entry entries[1024];
 };
+
+struct page_directory* create_page_directory();
+void load_page_directory(struct page_directory* dir);
+uint32_t get_physical_address(uint32_t virtual_addr);
 
 #endif
