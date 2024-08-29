@@ -91,7 +91,7 @@ void* heap_malloc_blocks(struct heap* heap, int total_blocks)
     }
 
     // Convert start block index to memory address
-    address = heap->start_address + (startblock + HEAP_BLOCK_SIZE);
+    address = heap->start_address + (startblock * HEAP_BLOCK_SIZE);
     
     // Mark the blocks as taken
     int endblock = (startblock + total_blocks) - 1;
