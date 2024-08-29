@@ -115,6 +115,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     int agrad = kmalloc(5000);
     agrad = 213456;
     printf("agrad: %d", agrad);
+    kfree(agrad);
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);

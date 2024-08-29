@@ -90,17 +90,36 @@ void* heap_malloc_blocks(struct heap* heap, int total_blocks)
         goto out;
     }
 
-    //the heap_get_start_block function gives me the index of the startblock, now i have to convert the index to its memory address
+    // Convert start block index to memory address
     address = heap->start_address + (startblock + HEAP_BLOCK_SIZE);
-    //mark the blocks as taken
-    for (int i = 0; i < total_blocks; i++)
+    
+    // Mark the blocks as taken
+    int endblock = (startblock + total_blocks) - 1;
+    HEAP_BLOCK_TABLE_ENTRY entry = HEAP_BLOCK_IS_FIRST;
+
+    if (total_blocks > 1)
     {
-        heap->table->entries[startblock + i] = HEAP_BLOCK_TABLE_ENTRY_TAKEN;
+        entry |= HEAP_BLOCK_HAS_NEXT;
+    }
+    
+    for (int i = startblock; i <= endblock; i++)
+    {
+        heap->table->entries[i] = entry;
+
+        if (i != endblock)
+        {
+            entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_HAS_NEXT;
+        }
+        else
+        {
+            entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN;
+        }
     }
     
 out:
     return address;
 }
+
 
 void* heap_malloc(struct heap* heap, size_t size)
 {
@@ -112,4 +131,36 @@ void* heap_malloc(struct heap* heap, size_t size)
 void* kmalloc(size_t size)
 {
     return heap_malloc(&kernel_heap, size);
+}
+
+
+void heap_mark_blocks_free(struct heap* heap, int startblock)
+{
+    struct heap_table* table = heap->table;
+    for (int i = startblock; i < table->total_blocks; i++)
+    {
+        HEAP_BLOCK_TABLE_ENTRY entry = table->entries[i];
+        table->entries[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
+        if (!entry & HEAP_BLOCK_HAS_NEXT)
+        {
+            break;
+        }
+        
+    }
+    
+}
+
+int heap_address_to_block(struct heap* heap, void* address)
+{
+    return ((int)(address - heap->start_address)) / HEAP_BLOCK_SIZE;
+}
+
+void* heap_free(struct heap* heap, void* ptr)
+{
+    heap_mark_blocks_free(heap, heap_address_to_block(heap, ptr));
+}
+
+void kfree(void* ptr)
+{
+    heap_free(&kernel_heap, ptr);
 }
