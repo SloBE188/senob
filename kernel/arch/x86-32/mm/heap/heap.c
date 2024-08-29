@@ -101,20 +101,28 @@ void* heap_malloc_blocks(struct heap* heap, int total_blocks)
     {
         entry |= HEAP_BLOCK_HAS_NEXT;
     }
-    
     for (int i = startblock; i <= endblock; i++)
     {
-        heap->table->entries[i] = entry;
-
-        if (i != endblock)
+        if (i == startblock)
         {
-            entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_HAS_NEXT;
+            entry = HEAP_BLOCK_IS_FIRST;
+            if (total_blocks > 1)
+            {
+                entry |= HEAP_BLOCK_HAS_NEXT;
+            }
         }
-        else
+        else if (i == endblock)
         {
             entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN;
         }
+        else
+        {
+            entry = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_HAS_NEXT;
+        }
+
+        heap->table->entries[i] = entry;
     }
+
     
 out:
     return address;
