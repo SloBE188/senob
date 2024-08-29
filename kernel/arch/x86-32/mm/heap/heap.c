@@ -33,56 +33,83 @@ void heap_init() {
     }
 }
 
-void *malloc(size_t size) {
-    size_t total_blocks_needed = (size + HEAP_BLOCK_SIZE - 1) / HEAP_BLOCK_SIZE;
 
-    size_t block_index = 0;
-    size_t found_blocks = 0;
+int heap_get_start_block(struct heap* heap, int total_blocks)
+{
+    struct heap_table* table = heap->table;
+    int blockcount = 0;
+    int blockstart = -1;
 
-    // Suche nach einem zusammenhängenden Bereich von freien Blöcken
-    for (block_index = 0; block_index < kernel_heap_table.total_blocks; block_index++) {
-        if (kernel_heap_table.entries[block_index] == HEAP_BLOCK_TABLE_ENTRY_FREE) {
-            found_blocks++;
-        } else {
-            found_blocks = 0;
+    for (size_t i = 0; i < table->total_blocks; i++)
+    {
+        if (heap->table->entries[i] != HEAP_BLOCK_TABLE_ENTRY_FREE)
+        {
+            blockcount = 0;
+            blockstart = -1;
+            continue;
         }
 
-        if (found_blocks == total_blocks_needed) {
+        if (blockstart == -1)
+        {
+            blockstart = i;
+        }
+        blockcount++;
+        if (blockcount == total_blocks)
+        {
             break;
         }
+        
     }
 
-    // Wenn kein ausreichender Bereich gefunden wurde, gib NULL zurück
-    if (found_blocks < total_blocks_needed) {
-        return NULL;
+    if(blockstart == -1)
+    {
+        printf("No startblock was found\n");
+    }
+    
+
+    return blockstart;
+}
+static uint32_t heap_align_value_to_upper(uint32_t val)
+{
+    if ((val % HEAP_BLOCK_SIZE) == 0)
+    {
+        return val;
     }
 
-    // Markiere die Blöcke als belegt und setze die entsprechenden Flags
-    size_t start_block = block_index - (total_blocks_needed - 1);
+    val = (val - ( val % HEAP_BLOCK_SIZE));
+    val += HEAP_BLOCK_SIZE;
+    return val;
+}
+void* heap_malloc_blocks(struct heap* heap, int total_blocks)
+{
+    void * address = 0;
 
-    kernel_heap_table.entries[start_block] = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_IS_FIRST;
-    for (size_t i = 1; i < total_blocks_needed; i++) {
-        kernel_heap_table.entries[start_block + i] = HEAP_BLOCK_TABLE_ENTRY_TAKEN | HEAP_BLOCK_HAS_NEXT;
+    int startblock = heap_get_start_block(heap, total_blocks);
+    if (startblock < 0)
+    {
+        goto out;
     }
 
-    // Gib die Startadresse des zugewiesenen Speicherbereichs zurück
-    return (void *)((uintptr_t)kernel_heap.start_address + (start_block * HEAP_BLOCK_SIZE));
+    //the heap_get_start_block function gives me the index of the startblock, now i have to convert the index to its memory address
+    address = heap->start_address + (startblock + HEAP_BLOCK_SIZE);
+    //mark the blocks as taken
+    for (int i = 0; i < total_blocks; i++)
+    {
+        heap->table->entries[startblock + i] = HEAP_BLOCK_TABLE_ENTRY_TAKEN;
+    }
+    
+out:
+    return address;
 }
 
-void free(void *ptr) {
-    uintptr_t addr = (uintptr_t)ptr;
-    size_t start_block = (addr - (uintptr_t)kernel_heap.start_address) / HEAP_BLOCK_SIZE;
+void* heap_malloc(struct heap* heap, size_t size)
+{
+    size_t aligned_number_to_allocate = heap_align_value_to_upper(size);
+    int decimal_total_blocks = aligned_number_to_allocate / HEAP_BLOCK_SIZE;
+    return heap_malloc_blocks(heap, decimal_total_blocks);
+}
 
-    // Gehe durch die Blöcke und markiere sie als frei
-    for (size_t i = start_block; i < kernel_heap.table->total_blocks; i++) {
-        HEAP_BLOCK_TABLE_ENTRY entry = kernel_heap_table.entries[i];  // Blockstatus wird geladen
-
-        // Markiere den aktuellen Block als frei
-        kernel_heap_table.entries[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
-
-        // Überprüfe, ob dieser Block der letzte in der Kette ist
-        if (!(entry & HEAP_BLOCK_HAS_NEXT)) {
-            break;  // Beende die Schleife, wenn dies der letzte Block ist
-        }
-    }
+void* kmalloc(size_t size)
+{
+    return heap_malloc(&kernel_heap, size);
 }
