@@ -19,7 +19,7 @@
 #include "../../../libk/memory.h"
 #include "../io/io.h"
 #include "../../../../drivers/video/vga/vga.h"
-
+#include "../../../libk/stdiok.h"
 struct idt_entry_t idt_descriptors[256];
 struct idtr_t idtr;
 
@@ -170,9 +170,9 @@ void isr_handler(struct Interrupt_registers *regs)
 {
     if(regs->interrupt_number < 32)
     {
-        print(exceptions[regs->interrupt_number]);
-        print("\n");
-        print("Exception occured!\n");
+        printf(exceptions[regs->interrupt_number]);
+        printf("\n");
+        printf("Exception occured!\n");
         for(;;);
     }
 }

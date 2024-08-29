@@ -16,6 +16,7 @@
  */
 
 //#include "../../../drivers/video/vga/vga.h"
+#include "kernel.h"
 #include "gdt/gdt.h"
 #include "interrupts/idt.h"
 #include "interrupts/pit.h"
@@ -27,6 +28,7 @@
 #include "../../../drivers/video/vbe/wm/window.h"
 #include "../../../drivers/video/vbe/font.h"
 #include "mm/heap/heap.h"
+#include "mm/paging/paging.h"
 
 
 
@@ -104,6 +106,8 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     set_vbe_info(&vbeinfo);
     draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
+
+    struct page_directory* directoryforprocess1 = create_page_directory();
 
     int agrad = kmalloc(5000);
     agrad = 213456;

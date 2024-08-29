@@ -21,7 +21,7 @@
 #include "../../kernel.h"
 
 extern uint32_t kernel_directory[1024];
-uint32_t get_physical_address(uint32_t virtual_addr);
+uint32_t get_physical_addr(uint32_t virtual_addr);
 
 struct page_directory* create_page_directory()
 {
@@ -50,7 +50,7 @@ struct page_directory* create_page_directory()
         dir->entries[i].rw = 1;            // read & write
         dir->entries[i].user = 1;          // user access yes
 
-        for (int j = 0; j < 1024; j++)
+        /*for (int j = 0; j < 1024; j++)
         {
             void* virtual_addr = kmalloc(PAGE_SIZE);
             if (virtual_addr == NULL)
@@ -59,12 +59,12 @@ struct page_directory* create_page_directory()
             }
 
             uint32_t physical_addr = get_physical_addr(virtual_addr);
-            table->entries[j].frame = (uint32_t) physical_addr >> 12; // need the physical address this wont work like that
+            table->entries[j].frame = (uint32_t) physical_addr >> 12; // need the physical address
             table->entries[j].present = 1;                 // present true
             table->entries[j].rw = 1;                      // read & write
             table->entries[j].user = 1;                    // user access yes 
             
-        }
+        }*/
         
     }
     
@@ -80,7 +80,7 @@ uint32_t* get_current_page_directory() {
 }
 
 
-uint32_t get_physical_address(uint32_t virtual_addr) {
+uint32_t get_physical_addr(uint32_t virtual_addr) {
     // get current page directory
     uint32_t* page_directory = (uint32_t*)get_current_page_directory();
 
@@ -91,13 +91,15 @@ uint32_t get_physical_address(uint32_t virtual_addr) {
 
     // get the address of the page table from the page directory
     uint32_t* page_table = (uint32_t*)(page_directory[pd_index] & ~0xFFF); //mask flags
-    if (page_table == NULL) {
+    if (!(page_directory[pd_index] & 1)) 
+    {
         return 0;
     }
 
     // get the physical frame address from the page table
     uint32_t physical_frame = page_table[pt_index] & ~0xFFF; // maks flags
-    if (physical_frame == 0) {
+    if (physical_frame == 0) 
+    {
         return 0;
     }
     return physical_frame + offset;

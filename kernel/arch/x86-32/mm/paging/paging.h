@@ -46,6 +46,6 @@ struct page_directory
 
 struct page_directory* create_page_directory();
 void load_page_directory(struct page_directory* dir);
-uint32_t get_physical_address(uint32_t virtual_addr);
+uint32_t get_physical_addr(uint32_t virtual_addr);
 
 #endif
