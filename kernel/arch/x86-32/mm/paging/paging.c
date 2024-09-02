@@ -25,7 +25,33 @@ extern void load_page_directory(uint32_t* dir);
 extern uint32_t kernel_directory[1024];
 
 
+struct paging_4gb_area* create_paging_4gb_area(uint8_t flags)
+{
+    uint32_t* directory = kzalloc(sizeof(uint32_t) * PAGE_DIRECTORY_ENTRIES);
+    int offset = 0;
 
+    for (int i = KERNEL_START_PAGE_INDEX; i < KERNEL_DIRECTORY_TOTAL_ENTRIES; i++)
+    {
+        directory[i] = kernel_directory[i];
+    }
+
+    for (int i = 0; i < KERNEL_START_PAGE_INDEX - 1; i++)
+    {
+        uint32_t* page_table_entry = kzalloc(sizeof(uint32_t) * PAGE_TABLE_ENTRIES);
+        for (int j = 0; j < PAGE_TABLE_ENTRIES; j++)
+        {
+            page_table_entry[j] = (offset + (j * PAGE_SIZE)) | flags;
+        }
+        offset += (PAGE_DIRECTORY_ENTRIES * PAGE_SIZE);
+        directory[i] = (uint32_t) page_table_entry | flags | 0x3;
+        
+    }
+
+    struct paging_4gb_area* new_area = kzalloc(sizeof(struct paging_4gb_area));
+    new_area->directory_entry = directory;
+    return new_area;
+
+}
 
 
 uint32_t* get_current_page_directory() {
