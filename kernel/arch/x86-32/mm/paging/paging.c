@@ -59,7 +59,30 @@ struct paging_4gb_area* create_paging_4gb_area(uint8_t flags)
 
     directory[768] = kernel_directory[768];
     directory[832] = kernel_directory[832];
+    directory[833] = kernel_directory[833];
+    directory[834] = kernel_directory[834];
+    directory[835] = kernel_directory[835];
+    directory[836] = kernel_directory[836];
+    directory[837] = kernel_directory[837];
+    directory[838] = kernel_directory[838];
+    directory[839] = kernel_directory[839];
+    directory[840] = kernel_directory[840];
+    directory[841] = kernel_directory[841];
+    directory[842] = kernel_directory[842];
+    directory[843] = kernel_directory[843];
+    directory[844] = kernel_directory[844];
+    directory[845] = kernel_directory[845];
+    directory[846] = kernel_directory[846];
+    directory[847] = kernel_directory[847];
+    directory[848] = kernel_directory[848];
+    directory[849] = kernel_directory[849];
+    directory[850] = kernel_directory[850];
+    directory[851] = kernel_directory[851];
+    directory[852] = kernel_directory[852];
+    directory[853] = kernel_directory[853];
+    directory[854] = kernel_directory[854];
     directory[896] = kernel_directory[896];
+
 
     for (int i = 0; i < PAGE_DIRECTORY_ENTRIES; i++)
     {
