@@ -20,5 +20,9 @@ struct paging_4gb_area
 };
 
 struct paging_4gb_area* create_paging_4gb_area(uint8_t flags);
+extern void load_page_directory(uint32_t* dir);
+uint32_t* get_directory_from_4gb_area(struct paging_4gb_area* area);
+void switch_to_kernel_directory();
+struct paging_4gb_area* create_minimal_paging_area();
 
 #endif

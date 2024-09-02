@@ -112,8 +112,16 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     printf("agrad: %d", agrad);
     kfree(agrad);
 
-    static struct paging_4gb_area* area = 0;
-    area = create_paging_4gb_area(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    struct paging_4gb_area* new_area = create_paging_4gb_area(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    if (new_area == NULL) {
+        printf("Failed to create new paging area.\n");
+        panic();
+    }
+
+    uint32_t* phys_dir = get_directory_from_4gb_area(new_area);
+    load_page_directory(phys_dir);
+    printf("New 4GB paging area loaded successfully.\n");
+    switch_to_kernel_directory();
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
     

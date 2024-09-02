@@ -149,10 +149,11 @@ void* kzalloc(size_t size)
     {
         return 0;
     }
-    memset(ptr, 0x00, sizeof(ptr));
+    memset(ptr, 0x00, size);
 
     return ptr;
 }
+
 
 
 void heap_mark_blocks_free(struct heap* heap, int startblock)
