@@ -107,12 +107,11 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
 
-    struct page_directory* directoryforprocess1 = create_page_directory();
-
     int agrad = kmalloc(5000);
     agrad = 213456;
     printf("agrad: %d", agrad);
     kfree(agrad);
+    test_paging();
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);

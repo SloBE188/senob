@@ -16,6 +16,7 @@
  */
 
 #include "heap.h"
+#include "../../../../libk/memory.h"
 
 
 struct heap kernel_heap;
@@ -139,6 +140,18 @@ void* heap_malloc(struct heap* heap, size_t size)
 void* kmalloc(size_t size)
 {
     return heap_malloc(&kernel_heap, size);
+}
+
+void* kzalloc(size_t size)
+{
+    void* ptr = kmalloc(size);
+    if (ptr == 0)
+    {
+        return 0;
+    }
+    memset(ptr, 0x00, sizeof(ptr));
+
+    return ptr;
 }
 
 
