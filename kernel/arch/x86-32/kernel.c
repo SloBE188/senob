@@ -124,9 +124,11 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     
     int process_id = 1;
+    struct page_directory* process_dir = create_page_directory(process_id);
 
-    create_page_directory(process_id);
-    map_process_page(process_id, 0x00400000, 0x00002000);
+    // mapping from a process(virtual 0x00400000 to physical 0x00002000)
+    map_process_space(process_dir, 0x00400000, 0x00002000);
+
     load_process_directory(process_id);
     //load_page_directory((uint32_t*)((uint32_t)directory - 0xC0000000));
 
