@@ -25,7 +25,10 @@
 #define PAGE_USER       0x4      // User-mode (1=User, 0=Supervisor)
 #define PAGE_SUPERVISOR 0x0      // Supervisor-only Zugriff$
 
-
+// Extrahiere die Bits 12–21 der virtuellen Adresse für den Page Table Index
+#define PAGE_TABLE_INDEX(virt_addr) (((virt_addr) >> 12) & 0x03FF)
+// Extrahiere die Bits 22–31 der virtuellen Adresse für den Page Directory Index
+#define PAGE_DIRECTORY_INDEX(virt_addr) (((virt_addr) >> 22) & 0x03FF)
 
 
 #define KERNEL_BASE 0xC0000000
@@ -42,9 +45,9 @@ extern uint32_t kernel_directory[1024];
 
 
 
-uint32_t* create_page_directory()
+uint32_t* create_page_directory(int process_id)
 {
-    uint32_t* dir = page_directory[1];
+    uint32_t* dir = page_directory[process_id];
 
     for (int i = 768; i < 1024; i++)
     {
@@ -53,12 +56,28 @@ uint32_t* create_page_directory()
 
     for (int i = 0; i < 768; i++)
     {
-        dir[i] = 0x00000002;
+        dir[i] = 0x00000001;
     }
 
     return dir;      
 }
 
+
+// Beispiel, um Pages zu mappen (statische Tables verwendet)
+void map_process_page(int process_id, uint32_t virt_addr, uint32_t phys_addr) {
+    uint32_t* dir = page_directory[process_id];
+    uint32_t pd_index = PAGE_DIRECTORY_INDEX(virt_addr);
+    uint32_t pt_index = PAGE_TABLE_INDEX(virt_addr);
+
+    // Page Table sicherstellen
+    if (!(dir[pd_index] & PAGE_PRESENT)) {
+        dir[pd_index] = ((uint32_t) &page_tables[process_id][pd_index]) | PAGE_PRESENT | PAGE_RW | PAGE_USER;
+    }
+
+    // Page Table Eintrag setzen
+    uint32_t* table = (uint32_t*)(dir[pd_index] & 0xFFFFF000);
+    table[pt_index] = phys_addr | PAGE_PRESENT | PAGE_RW | PAGE_USER;
+}
 
 
 /*struct page_directory* create_page_directory() {

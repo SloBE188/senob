@@ -34,5 +34,6 @@ uint32_t* get_current_page_directory();
 uint32_t* create_page_directory();
 void load_process_directory(int process_id);
 uint32_t virtual_to_physical(uint32_t virt_addr);
+void map_process_page(int process_id, uint32_t virt_addr, uint32_t phys_addr);
 
 #endif

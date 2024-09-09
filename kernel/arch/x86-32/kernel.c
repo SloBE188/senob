@@ -122,11 +122,15 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     printf("agrad: %d", agrad);
     kfree(agrad);
 
-    uint32_t* directory = create_page_directory();
-    load_process_directory(1);
+    
+    int process_id = 1;
+
+    create_page_directory(process_id);
+    map_process_page(process_id, 0x00400000, 0x00002000);
+    load_process_directory(process_id);
     //load_page_directory((uint32_t*)((uint32_t)directory - 0xC0000000));
 
-    switch_to_kernel_directory();
+    //switch_to_kernel_directory();
 
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
