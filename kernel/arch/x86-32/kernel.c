@@ -79,6 +79,16 @@ void panic()
     while (1){}
 }
 
+void check_page_directory(struct page_directory* dir) {
+    for (int i = 768; i < 1024; i++) {
+        printf("Kernel Mapping Entry %d: 0x%x\n", i, dir->entries[i]);
+    }
+
+    // Optional: Überprüfe auch Heap- und User-Space-Einträge
+    for (int i = 832; i <= 855; i++) {
+        printf("Heap Mapping Entry %d: 0x%x\n", i, dir->entries[i]);
+    }
+}
 
 
 struct vbe_info vbeinfo;
@@ -112,17 +122,13 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     printf("agrad: %d", agrad);
     kfree(agrad);
 
+    uint32_t* directory = create_page_directory();
+    load_process_directory(1);
+    //load_page_directory((uint32_t*)((uint32_t)directory - 0xC0000000));
+
     switch_to_kernel_directory();
 
-    struct paging_4gb_area* new_area = create_paging_4gb_area(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
-    if (new_area == NULL) {
-        printf("Failed to create new paging area.\n");
-        panic();
-    }
 
-    uint32_t* phys_dir = get_directory_from_4gb_area(new_area);
-    load_page_directory(phys_dir);
-    printf("New 4GB paging area loaded successfully.\n");
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
     

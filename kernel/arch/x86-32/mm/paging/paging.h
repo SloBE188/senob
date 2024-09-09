@@ -11,18 +11,28 @@
 #define KERNEL_DIRECTORY_TOTAL_ENTRIES 1024
 
 
+#define PAGING_CACHE_DISABLED  0b00010000
+#define PAGING_WRITE_THROUGH   0b00001000
 #define PAGING_ACCESS_FROM_ALL 0b00000100
+#define PAGING_IS_WRITEABLE    0b00000010
 #define PAGING_IS_PRESENT      0b00000001
 
-struct paging_4gb_area
+struct page_directory
 {
-    uint32_t* directory_entry;
+    uint32_t entries[1024];
 };
 
-struct paging_4gb_area* create_paging_4gb_area(uint8_t flags);
+struct page_table
+{
+    uint32_t entries[1024];
+};
+
+
 extern void load_page_directory(uint32_t* dir);
-uint32_t* get_directory_from_4gb_area(struct paging_4gb_area* area);
 void switch_to_kernel_directory();
-struct paging_4gb_area* create_minimal_paging_area();
+uint32_t* get_current_page_directory();
+uint32_t* create_page_directory();
+void load_process_directory(int process_id);
+uint32_t virtual_to_physical(uint32_t virt_addr);
 
 #endif
