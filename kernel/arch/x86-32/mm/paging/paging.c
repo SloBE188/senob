@@ -41,8 +41,15 @@ void init_memory(uint32_t memHigh, uint32_t physicalAllocstart)
     mem_num_vpages = 0;
     
     //unmap the first entry in the kernel directory (DD 0x00000083 ; First Page Table Entry (0x00000000 - 0x003FFFFF)), the kernel is also mapped to this physical address so there where 2 mappings on it before
-    kernel_directory[0] = 0;
+    uint32_t pt_addr = pmm_alloc_pageframe();
+    kernel_directory[0] = pt_addr | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
     invalidate(0);
+    kernel_directory[1] = 0;
+    kernel_directory[2] = 0;
+    kernel_directory[3] = 0;
+    invalidate(1);
+    invalidate(2);
+    invalidate(3);
 
     //recursive mapping
     kernel_directory[1023] = ((uint32_t)kernel_directory - KERNEL_START) | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
