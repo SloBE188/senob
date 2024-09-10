@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/paging/paging.s.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/mm/memory.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/mm/paging/paging.s.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin
@@ -48,9 +48,6 @@ all: $(FILES) ./senob/boot/senob.bin
 ./build/drivers/keyboard.o:
 	i686-elf-gcc -g -c ./drivers/keyboard/keyboard.c -o ./build/drivers/keyboard.o -std=gnu99 -O2 -Wall -Wextra
 
-./build/mm/memory.o:
-	i686-elf-gcc -g -c ./kernel/arch/x86-32/mm/memory.c -o ./build/mm/memory.o -std=gnu99 -O2 -Wall -Wextra
-
 ./build/vbe/vbe.o:
 	i686-elf-gcc -g -c ./drivers/video/vbe/vbe.c -o ./build/vbe/vbe.o -std=gnu99 -O2 -Wall -Wextra
 
@@ -69,6 +66,9 @@ all: $(FILES) ./senob/boot/senob.bin
 
 ./build/mm/paging/paging.s.o:
 	nasm -f elf ./kernel/arch/x86-32/mm/paging/paging.s -o ./build/mm/paging/paging.s.o
+
+./build/mm/pmm.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/mm/PMM/pmm.c -o ./build/mm/pmm.o -std=gnu99 -O2 -Wall -Wextra
 
 clean:
 	rm -rf ${FILES}

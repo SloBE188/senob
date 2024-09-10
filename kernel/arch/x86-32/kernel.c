@@ -23,12 +23,12 @@
 #include "../../../drivers/keyboard/keyboard.h"
 #include "multiboot.h"
 #include "../../libk/stdiok.h"
-#include "mm/memory.h"
 #include "../../../drivers/video/vbe/vbe.h"
 #include "../../../drivers/video/vbe/wm/window.h"
 #include "../../../drivers/video/vbe/font.h"
 #include "mm/heap/heap.h"
 #include "mm/paging/paging.h"
+#include "mm/PMM/pmm.h"
 
 
 
@@ -79,17 +79,6 @@ void panic()
     while (1){}
 }
 
-void check_page_directory(struct page_directory* dir) {
-    for (int i = 768; i < 1024; i++) {
-        printf("Kernel Mapping Entry %d: 0x%x\n", i, dir->entries[i]);
-    }
-
-    // Optional: Überprüfe auch Heap- und User-Space-Einträge
-    for (int i = 832; i <= 855; i++) {
-        printf("Heap Mapping Entry %d: 0x%x\n", i, dir->entries[i]);
-    }
-}
-
 
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
@@ -122,17 +111,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     printf("agrad: %d", agrad);
     kfree(agrad);
 
-    
-    int process_id = 1;
-    struct page_directory* process_dir = create_page_directory(process_id);
+    uint32_t mod1 = *(uint32_t*)(multibootinfo->mods_addr + 4);
+    uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
 
-    // mapping from a process(virtual 0x00400000 to physical 0x00002000)
-    map_process_space(process_dir, 0x00400000, 0x00002000);
-
-    load_process_directory(process_id);
-    //load_page_directory((uint32_t*)((uint32_t)directory - 0xC0000000));
-
-    //switch_to_kernel_directory();
+    init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
 
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
