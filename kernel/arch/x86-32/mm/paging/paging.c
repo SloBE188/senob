@@ -30,7 +30,6 @@ static uint32_t pageDirs[NUM_PAGE_DIRS][1024] __attribute__((aligned(4096)));
 static uint8_t pageDirsUsed[NUM_PAGE_DIRS];
 
 
-extern uint32_t kernel_directory[1024];
 
 void invalidate(int vaddr);
 
@@ -220,7 +219,7 @@ uint32_t* mem_alloc_page_dir() {
 
             // first 768 entries are user page tables
             for (int i = 0; i < 768; i++) {
-                page_dir[i] = 0;
+                page_dir[i] = 0 | PAGE_FLAG_PRESENT;
             }
 
             // next 256 are kernel (except last)
@@ -234,7 +233,6 @@ uint32_t* mem_alloc_page_dir() {
         }
     }
 
-    //assert_msg(false, "no page dirs left!");
     return 0;
 }
 

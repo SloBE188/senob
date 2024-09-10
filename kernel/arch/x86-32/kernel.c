@@ -116,6 +116,9 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
 
+    mem_change_page_directory(kernel_directory);
+    uint32_t* dir = mem_alloc_page_dir();
+    mem_change_page_directory(dir);
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
