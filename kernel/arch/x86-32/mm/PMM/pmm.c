@@ -70,8 +70,9 @@ uint32_t pmm_alloc_pageframe() {
 			if (!used) {
 				byte ^= (-1 ^ byte) & (1 << i);
 				physical_memory_bitmap[b] = byte;
-				total_allocated++;
 				uint32_t addr = (b * 8 + i) * PAGE_FRAME_SIZE;
+				set_page_frame_used_or_free((b * 8 + i), true);
+				total_allocated++;
 				return addr;
 			}
 		}
