@@ -108,7 +108,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     int agrad = kmalloc(26214400);
     agrad = 213456;
-    printf("agrad: %d", agrad);
+    printf("agrad: %d\n", agrad);
     kfree(agrad);
 
     uint32_t mod1 = *(uint32_t*)(multibootinfo->mods_addr + 4);
@@ -119,7 +119,13 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     mem_change_page_directory(kernel_directory);
     uint32_t* dir = mem_alloc_page_dir();
     mem_change_page_directory(dir);
-    mem_change_page_directory(kernel_directory);
+    mem_map_page(0x00400000, pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
+    //mem_change_page_directory(kernel_directory);
+    
+    uint32_t* ptr = 0x00400000;
+    *ptr = 80793;
+
+    printf("%u", *ptr);
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
