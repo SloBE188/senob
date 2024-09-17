@@ -39,7 +39,7 @@ void init_memory(uint32_t memHigh, uint32_t physicalAllocstart)
 {
     mem_num_vpages = 0;
     
-    //unmap the first entry in the kernel directory (DD 0x00000083 ; First Page Table Entry (0x00000000 - 0x003FFFFF)), the kernel is also mapped to this physical address so there where 2 mappings on it before
+    //unmap the first 4 entry in the kernel directory (DD 0x00000083 ; First Page Table Entry (0x00000000 - 0x003FFFFF)) and so on, the kernel is also mapped to this physical address so there where 2 mappings on it before
     uint32_t pt_addr = pmm_alloc_pageframe();
     kernel_directory[0] = pt_addr | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
     invalidate(0);
@@ -85,39 +85,33 @@ uint32_t* mem_get_current_page_directory() {
 // addresses need to be page aligned (4096)
 void mem_map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {
 
+    // if the virtual address is in the kernel memory space, change to the kernel directory
     uint32_t* prev_page_dir = 0;
-    if (virt_addr >= KERNEL_START) {
-        // optimization: just copy from current pagedir to all others, including init_page_dir
-        //              we might just wanna have init_page_dir be page_dirs[0] instead
-        //              then we would have to build it in boot.asm in assembly
-        
-        // write to kernel_directory, so that we can sync that across all others
-
+    if (virt_addr >= KERNEL_START) 
+    {
         prev_page_dir = mem_get_current_page_directory();
 
         if (prev_page_dir != kernel_directory)
             mem_change_page_directory(kernel_directory);
     }
 
-    // extract indices from the vaddr
-    uint32_t pd_index = virt_addr >> 22;
+    // extract indices from the vaddr with bit shifting
+    uint32_t pd_index = virt_addr >> 22;    
     uint32_t pt_index = virt_addr >> 12 & 0x3FF;
 
     uint32_t* page_dir = REC_PAGEDIR;
 
-    // page tables can only be directly accessed/modified using the recursive strat?
-    // > yes since their physical page is not mapped into memory
+    // page tables can only be directly accessed/modified using the recursive strat because their physical page is not mapped into memory
     uint32_t* pt = REC_PAGETABLE(pd_index);
 
     if (!(page_dir[pd_index] & PAGE_FLAG_PRESENT)) {
         // allocate a page table
         uint32_t pt_paddr = pmm_alloc_pageframe();
-        // kernel_log("creating table %x", pt_paddr);
 
         page_dir[pd_index] = pt_paddr | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_OWNER | flags;
         invalidate(virt_addr);
 
-        // we can now access it directly using the recursive strategy
+        // access it directly using the recursive strategy
         for (uint32_t i = 0; i < 1024; i++) {
             pt[i] = 0;
         }
@@ -127,10 +121,11 @@ void mem_map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {
     mem_num_vpages++;
     invalidate(virt_addr);
 
-    if (prev_page_dir != 0) {
+    if (prev_page_dir != 0) 
+    {
         // ... then sync that across all others
         sync_page_dirs();
-        // we changed to init page dir, now we need to change back
+        // because i changed it to the kernel directory at the start of this function, i have to change back
         if (prev_page_dir != kernel_directory)
             mem_change_page_directory(prev_page_dir);
     }
@@ -139,14 +134,10 @@ void mem_map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {
 // returns page table entry (physical address and flags)
 uint32_t mem_unmap_page(uint32_t virt_addr) {
 
+    // if the virtual address is in the kernel memory space, change to the kernel directory
     uint32_t* prev_page_dir = 0;
-    if (virt_addr >= KERNEL_START) {
-        // optimization: just copy from current pagedir to all others, including init_page_dir
-        //              we might just wanna have init_page_dir be page_dirs[0] instead
-        //              then we would have to build it in boot.asm in assembly
-        
-        // write to kernel_directory, so that we can sync that across all others
-
+    if (virt_addr >= KERNEL_START) 
+    {
         prev_page_dir = mem_get_current_page_directory();
 
         if (prev_page_dir != kernel_directory)
@@ -156,22 +147,32 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
     uint32_t pd_index = virt_addr >> 22;
     uint32_t pt_index = virt_addr >> 12 & 0x3FF;
 
-    uint32_t* page_dir = REC_PAGEDIR;
+    uint32_t* page_dir = REC_PAGEDIR;   //get page directory from the recursive mapping
 
     uint32_t pd_entry = page_dir[pd_index];
-    //assert_msg(pd_entry & PAGE_FLAG_PRESENT, "tried to free page from a non present page table?");
+    if (!(pd_entry & PAGE_FLAG_PRESENT))
+    {
+        printf("tried to free a page from a non present page table\n");
+        return 0;
+    }
+    
 
     uint32_t* pt = REC_PAGETABLE(pd_index);
 
     uint32_t pte = pt[pt_index];
-   // assert_msg(pte & PAGE_FLAG_PRESENT, "tried to free non present page");
+   if(!(pte & PAGE_FLAG_PRESENT))
+   {
+        printf("triet to free a non present page\n");
+        return 0;
+   }
 
+    // virtual site gets set to 0
     pt[pt_index] = 0;
 
     mem_num_vpages--;
 
+    // checks if all entrys in the page table are free, if yes, remove = true
     bool remove = true;
-    // optimization: keep track of the number of pages present in each page table
     for (uint32_t i = 0; i < 1024; i++) {
         if (pt[i] & PAGE_FLAG_PRESENT) {
             remove = false;
@@ -180,11 +181,10 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
     }
 
     if (remove) {
-        // table is empty, destroy its physical frame if we own it.
+        // table is empty, destroy its physical frame if im the page owner.
         uint32_t pde = page_dir[pd_index];
         if (pde & PAGE_FLAG_OWNER) {
             uint32_t pt_paddr = P_PHYS_ADDR(pde);
-            // kernel_log("removing page table %x", pt_paddr);
             pmm_free_pageframe(pt_paddr);
             page_dir[pd_index] = 0;
         }
@@ -192,15 +192,16 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
 
     invalidate(virt_addr);
 
-    // free it here for now
+    // free it here
     if (pte & PAGE_FLAG_OWNER) {
         pmm_free_pageframe(P_PHYS_ADDR(pte));
     }
 
-    if (prev_page_dir != 0) {
+    if (prev_page_dir != 0) 
+    {
         // ... then sync that across all others
         sync_page_dirs();
-        // we changed to init page dir, now we need to change back
+        // because i changed it to the kernel directory at the start of this function, i have to change back
         if (prev_page_dir != kernel_directory)
             mem_change_page_directory(prev_page_dir);
     }
@@ -211,6 +212,7 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
 uint32_t* mem_alloc_page_dir() {
 
     for (int i = 0; i < NUM_PAGE_DIRS; i++) {
+        // searches for a unused entry in the pageDirsUsed array
         if (!pageDirsUsed[i]) {
             pageDirsUsed[i] = true;
 
@@ -222,9 +224,9 @@ uint32_t* mem_alloc_page_dir() {
                 page_dir[i] = 0 | PAGE_FLAG_PRESENT;
             }
 
-            // next 256 are kernel (except last)
+            // next 256 are kernel (except last, this is the recursive mapping)
             for (int i = 768; i < 1023; i++) {
-                page_dir[i] = kernel_directory[i] & ~PAGE_FLAG_OWNER; // we don't own these though
+                page_dir[i] = kernel_directory[i] & ~PAGE_FLAG_OWNER; // don't own these though
             }
 
             // recursive mapping
@@ -236,6 +238,8 @@ uint32_t* mem_alloc_page_dir() {
     return 0;
 }
 
+
+// frees the user page tables from the give page dir
 void mem_free_page_dir(uint32_t* page_dir) {
 
     uint32_t* prev_pagedir = mem_get_current_page_directory();
@@ -244,7 +248,6 @@ void mem_free_page_dir(uint32_t* page_dir) {
     uint32_t pagedir_index = ((uint32_t)page_dir) - ((uint32_t) pageDirs);
     pagedir_index /= 4096;
 
-    // kernel_log("pagedir_index = %u", pagedir_index);
 
     uint32_t* pd = REC_PAGEDIR;
     for (int i = 0; i < 768; i++) {
@@ -260,16 +263,15 @@ void mem_free_page_dir(uint32_t* page_dir) {
                 pmm_free_pageframe(P_PHYS_ADDR(pte));
             }
         }
-        memset(ptable, 0, 4096); // is this necessary?
+        memset(ptable, 0, 4096);
 
         if (pde & PAGE_FLAG_OWNER) {
-            // we created this pagetable, lets free it now
+            // created this pagetable, free it now
             pmm_free_pageframe(P_PHYS_ADDR(pde));
         }
         pd[i] = 0;
     }
 
-    // do we need to clean the kernel portion?
 
     pageDirsUsed[pagedir_index] = 0;
     mem_change_page_directory(prev_pagedir);
@@ -283,7 +285,7 @@ void sync_page_dirs() {
             uint32_t* page_dir = pageDirs[i];
             
             for (int i = 768; i < 1023; i++) {
-                page_dir[i] = kernel_directory[i] & ~PAGE_FLAG_OWNER; // we don't own these though
+                page_dir[i] = kernel_directory[i] & ~PAGE_FLAG_OWNER; // don't own these though
             }
         }
     }

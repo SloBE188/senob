@@ -125,7 +125,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     uint32_t* ptr = 0x00400000;
     *ptr = 80793;
 
-    printf("%u", *ptr);
+    printf("%u\n", *ptr);
 
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
