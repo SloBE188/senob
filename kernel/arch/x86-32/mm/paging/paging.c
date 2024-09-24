@@ -31,6 +31,15 @@ static uint8_t pageDirsUsed[NUM_PAGE_DIRS];
 
 
 
+// A virtual address 'la' has a three-part structure as follows:
+//
+// +--------10------+-------10-------+---------12----------+
+// | Page Directory |   Page Table   | Offset within Page  |
+// |      Index     |      Index     |                     |
+// +----------------+----------------+---------------------+
+//  \--- PDX(va) --/ \--- PTX(va) --/
+
+
 void invalidate(int vaddr);
 
 int mem_num_vpages;
