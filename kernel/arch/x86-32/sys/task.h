@@ -62,6 +62,7 @@ struct task
 
 
 struct task* create_task(uint32_t index, void* func, bool iskerneltaskornot, uint32_t* page_directory);
-
+void schedule();
+void init_tasks();
 
 #endif

@@ -29,6 +29,7 @@
 #include "mm/heap/heap.h"
 #include "mm/paging/paging.h"
 #include "mm/PMM/pmm.h"
+#include "sys/task.h"
 
 
 
@@ -79,6 +80,10 @@ void panic()
     while (1){}
 }
 
+void testunction()
+{
+    printf("hallo ich bin ein task xd");
+}
 
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
@@ -117,16 +122,18 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
 
     mem_change_page_directory(kernel_directory);
-    uint32_t* dir = mem_alloc_page_dir();
-    mem_change_page_directory(dir);
-    mem_map_page(0x00400000, pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
+    //int32_t* dir = mem_alloc_page_dir();
+    //mem_change_page_directory(dir);
+    //mem_map_page(0x00400000, pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
     //mem_change_page_directory(kernel_directory);
     
-    uint32_t* ptr = 0x00400000;
-    *ptr = 80793;
+    //uint32_t* ptr = 0x00400000;
+    //*ptr = 80793;
 
-    printf("%u\n", *ptr);
+    //printf("%u\n", *ptr);
 
+        init_tasks();
+        schedule();
     //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
     //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
     

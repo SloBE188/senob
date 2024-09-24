@@ -1,9 +1,10 @@
 #ifndef GDT_H
 #define GDT_H
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 
-struct tss tss;
+extern struct tss tss;
+
 
 struct gdt_entry_struct
 {

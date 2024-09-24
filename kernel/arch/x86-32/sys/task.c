@@ -31,6 +31,31 @@ struct task tasks[32];
 
 extern void task_switch(struct task* old, struct task* new);
 
+void task1() {
+    while (1) {
+        printf("Task 1 is running\n");
+        for (volatile int i = 0; i < 5; i++);
+    }
+}
+
+void task2() {
+    while (1) {
+        printf("Task 2 is running\n");
+        for (volatile int i = 0; i < 5; i++);
+    }
+}
+
+
+void init_tasks() {
+    create_task(0, task1, true, mem_alloc_page_dir()); // test task 1
+    create_task(1, task2, true, mem_alloc_page_dir()); // test task 2
+
+    current_task = &tasks[0]; 
+    current_task_index = 0;
+    number_tasks = 2;
+}
+
+
 struct task* create_task(uint32_t index, void* func, bool iskerneltaskornot, uint32_t* page_directory)
 {
     memset(&tasks[index], 0x00, sizeof(struct task));
@@ -58,4 +83,14 @@ struct task* create_task(uint32_t index, void* func, bool iskerneltaskornot, uin
     return &tasks[index];
 
 }
+
+void schedule() {
+
+    struct task* old_task = current_task;
+    struct task* new_task = &tasks[1];
+    current_task = new_task;
+    current_task_index = 1;
+    task_switch(old_task, new_task);
+}
+
 
