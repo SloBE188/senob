@@ -23,7 +23,6 @@ extern void gdt_flush(uint32_t);
 
 struct gdt_entry_struct gdt_entries[6];
 struct gdt_ptr_struct gdt_ptr;
-struct tss tss;
 
 void init_gdt()
 {

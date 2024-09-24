@@ -21,11 +21,21 @@
 #include <stdint-gcc.h>
 #include "../mm/paging/paging.h"
 #include "../mm/PMM/pmm.h"
+#include <stdbool.h>
 
 
 #define KERNEL_STACK_SIZE 0x4000    //16KB
 #define USER_STACK_SIZE 0x4000      //16KB
-#define TASK_STATE_
+
+enum task_state
+{
+    TASK_RUNNING,
+    TASK_READY,
+    TASK_BLOCKED,
+    TASK_TERMINATED,
+    TASK_SLEEPING,
+    TASK_WAITING
+};
 
 
 struct task
@@ -39,17 +49,19 @@ struct task
 
     uint32_t kernel_stack;          //esp0 from tss
 
-    uint32_t* page_directory;
     uint32_t privilege_level;    // kernel task or user task
     uint32_t state;
 
     char name[32];
 
-    struct task* next;
-    struct task *prev;
+    //struct task* next;
+    //struct task *prev;
 
 
 };
+
+
+struct task* create_task(uint32_t index, void* func, bool iskerneltaskornot, uint32_t* page_directory);
 
 
 #endif

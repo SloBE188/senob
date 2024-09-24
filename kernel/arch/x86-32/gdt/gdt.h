@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+struct tss tss;
 
 struct gdt_entry_struct
 {
