@@ -3,8 +3,7 @@
 
 #include <stdint-gcc.h>
 
-extern struct tss tss;
-
+static struct tss tss;
 
 struct gdt_entry_struct
 {
@@ -56,5 +55,5 @@ struct tss
 void init_gdt();
 void setGdtEntry(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint32_t flags);
 void setTSS(uint32_t num, uint16_t ss0, uint32_t esp0);
-
+void update_tss_esp0(uint32_t esp0);
 #endif

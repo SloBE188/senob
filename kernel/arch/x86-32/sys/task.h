@@ -26,10 +26,12 @@
 
 #define KERNEL_STACK_SIZE 0x4000    //16KB
 #define USER_STACK_SIZE 0x4000      //16KB
+#define MAX_TASKS 32
 
 enum task_state
 {
     TASK_RUNNING,
+    TASK_FREE,
     TASK_READY,
     TASK_BLOCKED,
     TASK_TERMINATED,
@@ -38,19 +40,36 @@ enum task_state
 };
 
 
+//relevant registers for a task
+struct registers
+{
+    uint32_t edi;
+    uint32_t esi;
+    uint32_t ebp;
+    uint32_t ebx;
+    uint32_t edx;
+    uint32_t ecx;
+    uint32_t eax;
+
+    uint32_t ip;
+    uint32_t cs;
+    uint32_t flags;
+    uint32_t esp;
+    uint32_t ss;
+};
+
+
 struct task
 {
     uint32_t id;
     uint32_t* page_directory;       //tasks page directory, kernel tasks use the kernel_directory
 
-    uint32_t esp;
-    uint32_t ebp;
-    uint32_t eip;
-
     uint32_t kernel_stack;          //esp0 from tss
 
     uint32_t privilege_level;    // kernel task or user task
     uint32_t state;
+    
+    struct registers registers;
 
     char name[32];
 
@@ -62,7 +81,10 @@ struct task
 
 
 struct task* create_task(uint32_t index, void* func, bool iskerneltaskornot, uint32_t* page_directory);
-void schedule();
 void init_tasks();
+int find_avaiable_task_slot();
+void create_kernel_task(void* func);
+extern void context_switch(struct task* next_task);
+void switch_task();
 
 #endif

@@ -80,10 +80,13 @@ void panic()
     while (1){}
 }
 
-void testunction()
+int testfunction()
 {
-    printf("hallo ich bin ein task xd");
+    printf("hallo ich bin ein kernel task xd");
+    return 0;
 }
+
+
 
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
@@ -122,22 +125,11 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
 
     mem_change_page_directory(kernel_directory);
-    //int32_t* dir = mem_alloc_page_dir();
-    //mem_change_page_directory(dir);
-    //mem_map_page(0x00400000, pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
-    //mem_change_page_directory(kernel_directory);
-    
-    //uint32_t* ptr = 0x00400000;
-    //*ptr = 80793;
 
-    //printf("%u\n", *ptr);
+    init_tasks();
+    create_kernel_task(testfunction);
+    switch_task();
 
-        init_tasks();
-        schedule();
-    //struct window* window1 = window_create(50, 50, 200, 150, COLOR_WHITE, "Window 1", &vbeinfo);
-    //struct window* window2 = window_create(300, 100, 200, 150, COLOR_BLUE, "Window 2", &vbeinfo);
-    
-    //init_memory(multibootinfo);
     while (1){}
     
 }
