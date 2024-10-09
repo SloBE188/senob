@@ -54,9 +54,9 @@ void init_task(struct task *new_task)
 
 struct task* create_task(void*(start_function), int pid, uint32_t* page_dir, bool iskerneltaskornot)
 {
-    struct task *new_task = &tasks[pid];        //(struct task *)kmalloc(sizeof(struct task));
+    struct task *new_task = (struct task *)kmalloc(sizeof(struct task));    //&tasks[pid]                       
     new_task->pid = pid;
-    new_task->esp0 = (uint32_t)&kernel_stacks[pid][KERNEL_STACK_SIZE];            //(uint32_t *)kmalloc(KERNEL_STACK_SIZE);
+    new_task->esp0 = (uint32_t *)kmalloc(KERNEL_STACK_SIZE);                //((uint32_t)&kernel_stacks[pid][KERNEL_STACK_SIZE] & ~0xF);
     new_task->page_dir = page_dir;
     new_task->start_address = start_function;
 
@@ -112,5 +112,16 @@ void schedule() {
         //if no next tasks, switch to the first one
         switch_task(task_head);
     }
+}
+
+
+void manual_task_switch(struct task* next_task) {
+    asm volatile (
+        "mov %0, %%esp\n"      
+        "jmp *%1\n"         
+        : 
+        : "r"(next_task->esp0), "r"(next_task->start_address)
+        : "memory"
+    );
 }
 

@@ -21,8 +21,9 @@ struct gdt_ptr_struct
     unsigned int base;
 }__attribute__((packed));
 
-struct tss {
-    uint16_t prev_tss;
+struct tss
+{
+    uint16_t previous_task;
     uint32_t esp0;
     uint16_t ss0;
     uint32_t esp1;
@@ -39,7 +40,8 @@ struct tss {
     uint16_t gs;
     uint16_t ldt_selector;
     uint16_t io_map;
-} __attribute__ ((packed)) ;
+} __attribute__ ((packed));
+
 
 void init_gdt();
 void setGdtEntry(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint32_t flags);

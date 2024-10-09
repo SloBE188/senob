@@ -41,6 +41,7 @@ void init_task(struct task* new_task);
 struct task* create_task(void*(start_function), int pid, uint32_t* page_dir, bool iskerneltaskornot);
 void switch_task(struct task* next_task);
 void schedule();
+void manual_task_switch(struct task* next_task);
 
 
 #endif

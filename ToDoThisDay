@@ -1,9 +1,0 @@
-25.07.2024:
-    -Implement Backspace
-    -Multiboot info
-    -Starting with paging
-    -If i have time left play with the multiboot info (vbe)
-
-26.07.2024:
-    -Get Paging to a OK state
-    -Malloc

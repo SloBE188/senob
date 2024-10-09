@@ -114,10 +114,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
 
-    int agrad = kmalloc(26214400);
-    agrad = 213456;
-    printf("agrad: %d\n", agrad);
-    kfree(agrad);
 
     uint32_t mod1 = *(uint32_t*)(multibootinfo->mods_addr + 4);
     uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
@@ -126,24 +122,17 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     mem_change_page_directory(kernel_directory);
 
-    uint32_t current_dir = mem_get_current_page_directory();
-    printf("Current dir: %x\n", current_dir);
-    uint32_t* newdir = mem_alloc_page_dir();
-    //mem_change_page_directory(newdir);
-    //uint32_t current_dir2 = mem_get_current_page_directory();
-    //printf("Current dir: %x\n", current_dir2);
-    //printf("Hallo aus dem neuen Directory\n");
+    struct task* new_task = create_task(&testfunction, 4, kernel_directory, true);
 
-    //struct task* new_task = create_task(&testfunction, 4, kernel_directory,  true);
-    //void init_task(new_task);
-    //schedule();
+    printf("ss0: %x\n esp0: %x\n cs: %x\n ds: %x\n eip: %x", tss.ss0, tss.esp0, tss.cs, tss.ds, tss.eip);
 
 
-    //printf("ss0: %x\n esp0: %x\n cs: %x\n ds: %x\n eip: %x", tss.ss0, tss.esp0, tss.cs, tss.ds, tss.eip);
-
-    //tss.cs = 0x8;
-    //tss.ds = 0x10;
+    asm volatile("cli");  // Deaktiviere Interrupts vor dem Task-Wechsel
+    manual_task_switch(new_task);
     //switch_task(new_task);
+    asm volatile("sti");  // Aktiviere Interrupts wieder nach dem Task-Wechsel
+
+
 
     while (1){}
     

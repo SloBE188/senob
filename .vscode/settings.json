@@ -2,6 +2,7 @@
     "files.associations": {
         "pmm.h": "c",
         "paging.h": "c",
-        "stdint-gcc.h": "c"
+        "stdint-gcc.h": "c",
+        "idt.h": "c"
     }
 }

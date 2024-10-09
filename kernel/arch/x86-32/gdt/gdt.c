@@ -14,9 +14,7 @@ struct gdt_ptr_struct gdt_ptr;
 #define USER_DATA_SEG 0xF2
 #define TSS_SEG 0x89
 
-
 struct tss tss;
-
 
 void init_gdt()
 {
@@ -26,12 +24,12 @@ void init_gdt()
     memset(&tss, 0, sizeof(tss));
     tss.ss0 = 0x10;
     // User mode segment registers
-    /*tss.cs = 0x1B;  // 0x1B = User Code Segment Selector | RPL 3
+    tss.cs = 0x1B;  // 0x1B = User Code Segment Selector | RPL 3
     tss.ss = 0x23;  // 0x23 = User Data Segment Selector | RPL 3
     tss.ds = 0x23;
     tss.es = 0x23;
     tss.fs = 0x23;
-    tss.gs = 0x23;*/
+    tss.gs = 0x23;
 
     setGdtEntry(0, 0, 0, 0, 0);                  // Null segment
     setGdtEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);   // Kernel code segment
