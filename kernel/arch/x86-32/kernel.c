@@ -126,9 +126,24 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     mem_change_page_directory(kernel_directory);
 
-    init_tasks();
-    create_kernel_task(testfunction);
-    switch_task();
+    uint32_t current_dir = mem_get_current_page_directory();
+    printf("Current dir: %x\n", current_dir);
+    uint32_t* newdir = mem_alloc_page_dir();
+    //mem_change_page_directory(newdir);
+    //uint32_t current_dir2 = mem_get_current_page_directory();
+    //printf("Current dir: %x\n", current_dir2);
+    //printf("Hallo aus dem neuen Directory\n");
+
+    //struct task* new_task = create_task(&testfunction, 4, kernel_directory,  true);
+    //void init_task(new_task);
+    //schedule();
+
+
+    //printf("ss0: %x\n esp0: %x\n cs: %x\n ds: %x\n eip: %x", tss.ss0, tss.esp0, tss.cs, tss.ds, tss.eip);
+
+    //tss.cs = 0x8;
+    //tss.ds = 0x10;
+    //switch_task(new_task);
 
     while (1){}
     

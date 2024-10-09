@@ -21,143 +21,96 @@
 #include "../mm/PMM/pmm.h"
 #include "../../../libk/memory.h"
 #include "../interrupts/idt.h"
-#include "../gdt/gdt.h"
+//#include "../gdt/gdt.h"
 
+#define KERNEL_STACK_SIZE 0x4000
+#define KERNEL_DATA_SEGMENT 0x10
+#define KERNEL_CODE_SEGMENT 0x08
+#define USER_DATA_SEGMENT 0x20
+#define USER_CODE_SEGMENT 0x18
+#define RPL_USER 3
+#define USER_STACK_SIZE 0x4000
+#define USER_STACK_TOP 0xB0000000
+#define USER_STACK_PAGES 16
 
-uint32_t number_tasks;
-uint32_t current_task_index;
-struct task* current_task;
-struct task tasks[MAX_TASKS];
+struct task *task_head;
+struct task *task_tail;
+struct task *task_current;
 
-extern void task_switch();
+extern void tss_flush();
 
+uint8_t kernel_stacks[10][KERNEL_STACK_SIZE];
+struct task tasks[10];
 
-
-void init_tasks() 
+void init_task(struct task *new_task)
 {
-    memset(tasks, 0x00, sizeof(struct task) * MAX_TASKS);
-    for (int i = 0; i < MAX_TASKS; i++)
-    {
-        tasks[i].state = TASK_FREE;
-    }
-    tasks[0].state = TASK_RUNNING;
-    tasks[0].page_directory = mem_get_current_page_directory();
-    tasks[0].id = 100;
-    current_task = &tasks[0];
-    current_task_index = 0;
-    number_tasks = 0;
-    
-
+    memset(task_head, 0x00, sizeof(struct task));
+    memset(task_tail, 0x00, sizeof(struct task));
+    memset(task_current, 0x00, sizeof(struct task));
+    task_head = new_task;
+    task_tail = new_task;
+    task_current = new_task;
 }
 
-int find_avaiable_task_slot()
+struct task* create_task(void*(start_function), int pid, uint32_t* page_dir, bool iskerneltaskornot)
 {
-    for (int i = 0; i < MAX_TASKS; i++)
+    struct task *new_task = &tasks[pid];        //(struct task *)kmalloc(sizeof(struct task));
+    new_task->pid = pid;
+    new_task->esp0 = (uint32_t)&kernel_stacks[pid][KERNEL_STACK_SIZE];            //(uint32_t *)kmalloc(KERNEL_STACK_SIZE);
+    new_task->page_dir = page_dir;
+    new_task->start_address = start_function;
+
+    /*if (!iskerneltaskornot)
     {
-        if (tasks[i].state == TASK_FREE)
-            return i;
-    }
-    return -1;
-}
+        new_task->tss.esp = USER_STACK_TOP;
+        new_task->tss.ss = USER_DATA_SEGMENT;
+        for (int i = 0; i < USER_STACK_PAGES; i++)
+        {
+            mem_map_page(USER_STACK_TOP - USER_STACK_PAGES * 0x1000 + i * 0x1000, pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
+        }
+    }*/
 
+    uint32_t code_selector = iskerneltaskornot ? KERNEL_CODE_SEGMENT : (USER_CODE_SEGMENT | RPL_USER);
+    uint32_t data_selector = iskerneltaskornot ? KERNEL_DATA_SEGMENT : (USER_DATA_SEGMENT | RPL_USER);
 
+    tss.cs = code_selector;
+    tss.ds = data_selector;
+    tss.es = data_selector;
+    tss.fs = data_selector;
+    tss.gs = data_selector;
 
-struct task* create_task(uint32_t index, void* func, bool iskerneltaskornot, uint32_t* page_directory)
-{
-    if (index >= MAX_TASKS) {
-        return NULL;
-    }
-    
-    memset(&tasks[index], 0x00, sizeof(struct task));
-    tasks[index].id = index;
-    tasks[index].page_directory = page_directory;
-    tasks[index].state = TASK_READY;
-    tasks[index].privilege_level = iskerneltaskornot;
+    tss.ss0 = KERNEL_DATA_SEGMENT;
+    tss.esp0 = new_task->esp0;              //new_task->esp0 + KERNEL_STACK_SIZE;
 
-    // Allocate kernel stack
-    tasks[index].kernel_stack = (uint32_t) kmalloc(KERNEL_STACK_SIZE);
+    tss.eflags = 0x200;        //interrupts enabled
+    tss.eip = (uint32_t)new_task->start_address;
 
-    if (!tasks[index].kernel_stack) {
-        printf("failed to allocate memory for kernel stack");
-        return NULL;
-    }
+    task_tail->next = new_task;
+    task_head->prev = task_tail;
+    task_current = new_task;
 
-    // Set the kernel stack for the task in the TSS
-    tss.esp0 = tasks[index].kernel_stack + KERNEL_STACK_SIZE;
-    tss.ss0 = 0x10; // Kernel Data Segment Selector
-
-
-        // Kernel task initialization
-        tasks[index].registers.ss = 0x10;        // Kernel Data Segment Selector
-        tasks[index].registers.cs = 0x08;        // Kernel Code Segment Selector
-        tasks[index].registers.esp = tasks[index].kernel_stack + KERNEL_STACK_SIZE;
-        tasks[index].registers.ebp = tasks[index].registers.esp;
-        tasks[index].registers.ip = (uint32_t)func;
-        tasks[index].registers.flags = 0x200;    // Interrupt Flag (IF) enabled
-
-        return &tasks[index];
-}
-
-
-void create_kernel_task(void* func)
-{
-    int slot = find_avaiable_task_slot();
-    if (slot == -1)
-    {
-        printf("No slots are available anymore\n");
-        return;
-    }
-    
-    struct task* new_task = create_task(slot, func, true, kernel_directory);
-    if (!new_task)
-    {
-        printf("Failed to create a kernel task\n");
-        return;
-    }
-
-    number_tasks++;
-    current_task = new_task;
     return new_task;
+    
+}
+
+void switch_task(struct task* next_task)
+{
+    /*if(next_task == task_current)
+        return 0;
+    
+    task_current = next_task;*/
+
+    tss_flush();
 }
 
 
-void switch_to_user_mode() {
-			    // Set up a stack structure for switching to user mode.
-			    asm volatile("  \
-			        cli; \
-			        mov $0x23, %ax; \
-			        mov %ax, %ds; \
-			        mov %ax, %es; \
-			        mov %ax, %fs; \
-			        mov %ax, %gs; \
-			                \ 
-			        mov %esp, %eax; \
-			        pushl $0x23; \
-			        pushl %eax; \
-			        pushf; \
-			        mov $0x200, %eax; \
-			        push %eax; \
-			        pushl $0x1B; \
-			        push $1f; \
-			        iret; \    1: \
-			    "); 
-			}
 
-void switch_task()
-{
-    uint32_t next_task_index = (current_task_index + 1) % MAX_TASKS;  // Einfacher Round-Robin-Algorithmus
-    struct task* next_task = &tasks[next_task_index];
-
-    // Prüfe, ob der nächste Task bereit ist
-    if (next_task->state == TASK_READY || next_task->state == TASK_RUNNING)
-    {
-        current_task->state = TASK_READY;  // Setze den aktuellen Task auf READY
-        next_task->state = TASK_RUNNING;   // Setze den nächsten Task auf RUNNING
-        current_task = next_task;
-        current_task_index = next_task_index;
-
-        // Führe den Kontextwechsel durch
-        context_switch(next_task);
+void schedule() {
+    if (task_current && task_current->next) {
+        switch_task(task_current->next); // switch to next task
+    } else {
+        //if no next tasks, switch to the first one
+        switch_task(task_head);
     }
 }
 

@@ -3,7 +3,7 @@
 
 #include <stdint-gcc.h>
 
-static struct tss tss;
+extern struct tss tss;
 
 struct gdt_entry_struct
 {
@@ -21,36 +21,25 @@ struct gdt_ptr_struct
     unsigned int base;
 }__attribute__((packed));
 
-struct tss
-{
-    uint32_t prev_tss;
-    uint32_t esp0;      // Kernel stack pointer
-    uint32_t ss0;       // Kernel stack segment
+struct tss {
+    uint16_t prev_tss;
+    uint32_t esp0;
+    uint16_t ss0;
     uint32_t esp1;
+    uint16_t ss1;
     uint32_t esp2;
-    uint32_t ss2;
-    uint32_t sr3;
-    uint32_t eip;       //Instruction pointer (Program counter) ist ein register in der CPU, dass die IMMER Adresse der nächsten auszuführenden Anweusung im proigrammspeicher enthält
-    uint32_t eflags;    //spezielles register mit flags
-    uint32_t eax;       //General Purpose Registers (AX,BX,CX,DX) 
-    uint32_t ecx;       //*
-    uint32_t edx;       //*
-    uint32_t ebx;       //*
-    uint32_t esp;
-    uint32_t ebp;
-    uint32_t esi;
-    uint32_t edi;
-    uint32_t es;        //Segment selector
-    uint32_t cs;        //*
-    uint32_t ss;        //*
-    uint32_t ds;        //*
-    uint32_t fs;        //*
-    uint32_t gs;        //*
-    uint32_t ldt;
-    uint32_t trap;
-    uint32_t iomap_base;      //I/O permission bitmap.
-} __attribute__((packed));
-
+    uint16_t ss2;
+    uint32_t cr3;
+    uint32_t eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    uint16_t es;
+    uint16_t cs;
+    uint16_t ss;
+    uint16_t ds;
+    uint16_t fs;
+    uint16_t gs;
+    uint16_t ldt_selector;
+    uint16_t io_map;
+} __attribute__ ((packed)) ;
 
 void init_gdt();
 void setGdtEntry(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint32_t flags);
