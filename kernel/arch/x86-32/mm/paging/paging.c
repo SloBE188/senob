@@ -49,7 +49,7 @@ void init_memory(uint32_t memHigh, uint32_t physicalAllocstart)
     mem_num_vpages = 0;
     
     //unmap the first 4 entry in the kernel directory (DD 0x00000083 ; First Page Table Entry (0x00000000 - 0x003FFFFF)) and so on, the kernel is also mapped to this physical address so there where 2 mappings on it before
-    uint32_t pt_addr = pmm_alloc_pageframe();
+    /*uint32_t pt_addr = pmm_alloc_pageframe();
     kernel_directory[0] = pt_addr | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
     invalidate(0);
     kernel_directory[1] = 0;
@@ -57,7 +57,7 @@ void init_memory(uint32_t memHigh, uint32_t physicalAllocstart)
     kernel_directory[3] = 0;
     invalidate(1);
     invalidate(2);
-    invalidate(3);
+    invalidate(3);*/
 
     //recursive mapping
     kernel_directory[1023] = ((uint32_t)kernel_directory - KERNEL_START) | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
@@ -229,9 +229,11 @@ uint32_t* mem_alloc_page_dir() {
             memset(page_dir, 0, 0x1000);
 
             // first 768 entries are user page tables
-            for (int i = 0; i < 768; i++) {
-                page_dir[i] = 0 | PAGE_FLAG_PRESENT;
-            }
+                for (int i = 0; i < 768; i++) {
+                    uint32_t phys_addr = pmm_alloc_pageframe() * 1024; // Allokiere 4 MiB Page (1024 * 4 KiB)
+                    page_dir[i] = phys_addr | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_4MB;
+                }
+
 
             // next 256 are kernel (except last, this is the recursive mapping)
             for (int i = 768; i < 1023; i++) {

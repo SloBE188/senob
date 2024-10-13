@@ -54,9 +54,9 @@ void init_task(struct task *new_task)
 
 struct task* create_task(void*(start_function), int pid, uint32_t* page_dir, bool iskerneltaskornot)
 {
-    struct task *new_task = (struct task *)kmalloc(sizeof(struct task));    //&tasks[pid]                       
+    struct task *new_task = &tasks[pid];                                    //(struct task *)kmalloc(sizeof(struct task));                    
     new_task->pid = pid;
-    new_task->esp0 = (uint32_t *)kmalloc(KERNEL_STACK_SIZE);                //((uint32_t)&kernel_stacks[pid][KERNEL_STACK_SIZE] & ~0xF);
+    new_task->esp0 = ((uint32_t)&kernel_stacks[pid][KERNEL_STACK_SIZE] & ~0xF); //(uint32_t *)kmalloc(KERNEL_STACK_SIZE);                
     new_task->page_dir = page_dir;
     new_task->start_address = start_function;
 

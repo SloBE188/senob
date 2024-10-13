@@ -120,17 +120,18 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
 
-    mem_change_page_directory(kernel_directory);
 
-    struct task* new_task = create_task(&testfunction, 4, kernel_directory, true);
+    uint32_t* new_dir = mem_alloc_page_dir();
+    mem_change_page_directory(new_dir);
+
+    struct task* new_task = create_task(&testfunction, 4, new_dir, true);
 
     printf("ss0: %x\n esp0: %x\n cs: %x\n ds: %x\n eip: %x", tss.ss0, tss.esp0, tss.cs, tss.ds, tss.eip);
 
 
-    asm volatile("cli");  // Deaktiviere Interrupts vor dem Task-Wechsel
     manual_task_switch(new_task);
     //switch_task(new_task);
-    asm volatile("sti");  // Aktiviere Interrupts wieder nach dem Task-Wechsel
+    //switch_task(new_task);
 
 
 
