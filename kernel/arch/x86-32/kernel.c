@@ -31,7 +31,7 @@
 #include "mm/PMM/pmm.h"
 #include "sys/task.h"
 
-
+extern void rust_testfunction();
 
 #define magic 0x1BADB002
 
@@ -120,16 +120,17 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
 
+    rust_testfunction();
 
     uint32_t* new_dir = mem_alloc_page_dir();
     mem_change_page_directory(new_dir);
 
-    struct task* new_task = create_task(&testfunction, 4, new_dir, true);
+    /*struct task* new_task = create_task(&testfunction, 4, new_dir, true);
 
     printf("ss0: %x\n esp0: %x\n cs: %x\n ds: %x\n eip: %x", tss.ss0, tss.esp0, tss.cs, tss.ds, tss.eip);
 
 
-    manual_task_switch(new_task);
+    manual_task_switch(new_task);*/
     //switch_task(new_task);
     //switch_task(new_task);
 
