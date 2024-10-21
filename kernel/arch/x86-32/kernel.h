@@ -5,5 +5,8 @@
 
 void panic();
 
+void dummyfunction1();
+void dummyfunction2();
+
 
 #endif

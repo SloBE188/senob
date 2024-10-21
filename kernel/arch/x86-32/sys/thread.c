@@ -16,7 +16,6 @@
  */
 
 #include "thread.h"
-#include "process.h"
 #include "../mm/heap/heap.h"
 #include "../mm/paging/paging.h"
 #include "../mm/PMM/pmm.h"
@@ -37,11 +36,6 @@
 
 #define KERNEL_STACK_SIZE 0x4000
 #define USER_STACK_SIZE 0x4000
-
-struct thread* thread_head = 0;
-struct thread* thread_tail = 0;
-
-struct thread* thread_current = 0;
 
 uint32_t thread_id = 0;
 
@@ -77,7 +71,7 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     new_thread->kernel_stack = (uint32_t*) kmalloc(KERNEL_STACK_SIZE);
     if (new_thread->kernel_stack == NULL) {
         printf("Failed to allocate memory for kernel stack\n");
-        free(new_thread);
+        kfree(new_thread);
         return;
     }
     memset(new_thread->kernel_stack, 0x00, KERNEL_STACK_SIZE);

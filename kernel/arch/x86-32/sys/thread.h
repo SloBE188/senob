@@ -23,6 +23,7 @@
 #include "../mm/PMM/pmm.h"
 #include <stdbool.h>
 #include "../gdt/gdt.h"
+#include "process.h"
 
 
 #include <stdint.h>

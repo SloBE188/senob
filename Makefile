@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/rust/kernel_part.a ./build/vbe/vbe.o ./build/mm/pmm.o ./build/mm/paging/paging.s.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin
@@ -7,22 +7,10 @@ all: $(FILES) ./senob/boot/senob.bin
 
 
 ./senob/boot/senob.bin:
-	i686-elf-gcc -T linker.ld -o ./senob/boot/senob.bin -ffreestanding -O2 -nostdlib \
-    ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/mm/paging/paging.s.o \
-    ./build/sys/task.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o \
-    ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o \
-    ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o \
-    ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o \
-    -lgcc ./build/rust/kernel_part.a
-
+	i686-elf-gcc -T linker.ld -o ./senob/boot/senob.bin -ffreestanding -O2 -nostdlib $(FILES) -lgcc
 
 ./build/kernel.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-
-./build/rust/kernel_part.a:
-	cd kernel/arch/x86-32/kernel_part && cargo build --release --target=i686-unknown-linux-gnu
-	cp kernel/arch/x86-32/kernel_part/target/i686-unknown-linux-gnu/release/libkernel_part.a ./build/rust/kernel_part.a
-
 
 ./build/boot.o:
 	nasm -f elf ./kernel/arch/x86-32/boot/boot.s -o ./build/boot.o
@@ -82,9 +70,6 @@ all: $(FILES) ./senob/boot/senob.bin
 ./build/mm/pmm.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/mm/PMM/pmm.c -o ./build/mm/pmm.o -std=gnu99 -O2 -Wall -Wextra
 
-./build/sys/task.s.o:
-	nasm -f elf ./kernel/arch/x86-32/sys/task.s -o ./build/sys/task.s.o
-
 ./build/sys/thread.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/thread.c -o ./build/sys/thread.o -std=gnu99 -O2 -Wall -Wextra
 
@@ -94,4 +79,3 @@ all: $(FILES) ./senob/boot/senob.bin
 clean:
 	rm -rf ${FILES}
 	rm -rf ./senob/boot/senob.bin
-	cd kernel/arch/x86-32/kernel_part && cargo clean

@@ -29,8 +29,8 @@
 #include "mm/heap/heap.h"
 #include "mm/paging/paging.h"
 #include "mm/PMM/pmm.h"
-#include "sys/thread.h"
 #include "sys/process.h"
+#include "sys/thread.h"
 
 
 extern void rust_testfunction();
@@ -82,10 +82,15 @@ void panic()
     while (1){}
 }
 
-int testfunction()
+void dummyfunction1()
 {
-    printf("hallo ich bin ein kernel task xd");
-    return 0;
+    printf("Hallo, ich bin Kernel Thread Nr.1");
+}
+
+
+void dummyfunction2()
+{
+    printf("Hallo, ich bin Kernel Thread Nr.2");
 }
 
 
@@ -122,31 +127,27 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
 
-    rust_testfunction();
+    //rust_testfunction();
 
     uint32_t* new_dir = mem_alloc_page_dir();
     //mem_change_page_directory(new_dir);
 
 
+    printf("starting process and thread test\n");
+
     struct pcb* first_process = (struct pcb*) kmalloc(sizeof(struct pcb));
     if (first_process == NULL)
     {
-        printf("Couldn't allocate memory for the first processes struct\n");
+        printf("failed to allocate memory for the first pcb struct\n");
     }
-    
-    //init_processes(first_process);
-    /*struct pcb* first_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+
     init_processes(first_process);
-    printf("Process initialization successful\n");
-
-    create_kernel_thread(first_process, &testfunction);
-    printf("Kernel thread created successfully\n");
-
-    struct pcb* second_process = (struct pcb*) kmalloc(sizeof(struct pcb));
-    add_process(second_process);
-    create_user_thread(second_process, (void(*)())0x87654321);
-    printf("User thread created successfully\n");*/
-
+    printf("first process initialization successfull\n");
+    create_kernel_thread(first_process, dummyfunction1);
+    printf("kernel thread for first process created");
+    schedule();
+    
+    
 
 
     while (1){}
