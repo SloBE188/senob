@@ -125,16 +125,24 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     rust_testfunction();
 
     uint32_t* new_dir = mem_alloc_page_dir();
-    mem_change_page_directory(new_dir);
+    //mem_change_page_directory(new_dir);
 
-    struct pcb* first_process = (struct pcb*) malloc(sizeof(struct pcb));
+
+    struct pcb* first_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    if (first_process == NULL)
+    {
+        printf("Couldn't allocate memory for the first processes struct\n");
+    }
+    
+    //init_processes(first_process);
+    /*struct pcb* first_process = (struct pcb*) kmalloc(sizeof(struct pcb));
     init_processes(first_process);
     printf("Process initialization successful\n");
 
-    create_kernel_thread(first_process, (void(*)())0x12345678);
+    create_kernel_thread(first_process, &testfunction);
     printf("Kernel thread created successfully\n");
 
-    /*struct pcb* second_process = (struct pcb*) malloc(sizeof(struct pcb));
+    struct pcb* second_process = (struct pcb*) kmalloc(sizeof(struct pcb));
     add_process(second_process);
     create_user_thread(second_process, (void(*)())0x87654321);
     printf("User thread created successfully\n");*/

@@ -66,7 +66,6 @@ struct registers
 struct thread
 {
     uint32_t id;
-    uint32_t state;
     uint32_t* kernel_stack;
     uint32_t* user_stack;
     struct registers regs;

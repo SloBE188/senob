@@ -18,6 +18,7 @@
 #include "process.h"
 #include "../../../libk/stdiok.h"
 #include "thread.h"
+#include "../kernel.h"
 
 
 struct pcb* pcb_head = NULL;

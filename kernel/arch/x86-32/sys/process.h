@@ -17,4 +17,9 @@ struct pcb
 
 };
 
+
+void init_processes(struct pcb* process);
+void add_process(struct pcb* new_process);
+void add_thread_to_process(struct pcb* process, struct thread* new_thread);
+
 #endif
