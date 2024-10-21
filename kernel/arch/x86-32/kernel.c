@@ -29,7 +29,9 @@
 #include "mm/heap/heap.h"
 #include "mm/paging/paging.h"
 #include "mm/PMM/pmm.h"
-#include "sys/task.h"
+#include "sys/thread.h"
+#include "sys/process.h"
+
 
 extern void rust_testfunction();
 
@@ -125,14 +127,17 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     uint32_t* new_dir = mem_alloc_page_dir();
     mem_change_page_directory(new_dir);
 
-    /*struct task* new_task = create_task(&testfunction, 4, new_dir, true);
+    struct pcb* first_process = (struct pcb*) malloc(sizeof(struct pcb));
+    init_processes(first_process);
+    printf("Process initialization successful\n");
 
-    printf("ss0: %x\n esp0: %x\n cs: %x\n ds: %x\n eip: %x", tss.ss0, tss.esp0, tss.cs, tss.ds, tss.eip);
+    create_kernel_thread(first_process, (void(*)())0x12345678);
+    printf("Kernel thread created successfully\n");
 
-
-    manual_task_switch(new_task);*/
-    //switch_task(new_task);
-    //switch_task(new_task);
+    /*struct pcb* second_process = (struct pcb*) malloc(sizeof(struct pcb));
+    add_process(second_process);
+    create_user_thread(second_process, (void(*)())0x87654321);
+    printf("User thread created successfully\n");*/
 
 
 

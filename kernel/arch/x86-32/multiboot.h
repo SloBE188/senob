@@ -18,7 +18,7 @@
 #ifndef MULTIBOOT_H 
 #define MULTIBOOT_H
 
-#include <stdint-gcc.h>
+#include <stdint.h>
 
 struct multiboot_aout_symbol_table
 {

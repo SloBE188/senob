@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/rust/kernel_part.a ./build/vbe/vbe.o ./build/mm/pmm.o ./build/mm/paging/paging.s.o ./build/sys/task.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/rust/kernel_part.a ./build/vbe/vbe.o ./build/mm/pmm.o ./build/mm/paging/paging.s.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin
@@ -85,8 +85,11 @@ all: $(FILES) ./senob/boot/senob.bin
 ./build/sys/task.s.o:
 	nasm -f elf ./kernel/arch/x86-32/sys/task.s -o ./build/sys/task.s.o
 
-./build/sys/task.o:
-	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/task.c -o ./build/sys/task.o -std=gnu99 -O2 -Wall -Wextra
+./build/sys/thread.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/thread.c -o ./build/sys/thread.o -std=gnu99 -O2 -Wall -Wextra
+
+./build/sys/process.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/process.c -o ./build/sys/process.o -std=gnu99 -O2 -Wall -Wextra
 
 clean:
 	rm -rf ${FILES}

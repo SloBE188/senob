@@ -1,7 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <stdint-gcc.h>
+#include <stdint.h>
 
 struct window
 {
