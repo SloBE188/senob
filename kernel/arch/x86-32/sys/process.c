@@ -72,42 +72,48 @@ void add_thread_to_process(struct pcb* process, struct thread* new_thread)
     process->thread_count++;
 }
 
-void schedule()
-{
-    if (current_thread == NULL) {
-        // if there is no thread active, start with the first thread from the process
-        if (pcb_head && pcb_head->thread_head) {
-            current_thread = pcb_head->thread_head;
-            current_pcb = pcb_head;
-        }
-    } else {
-        // if there is a thread, switch to the next thread in the process thread list
-        if (current_thread->next != NULL) {
-            current_thread = current_thread->next;
-        } else {
-            // if there are no more threads in the process, switch to the next process
-            if (current_pcb->next != NULL) {
-                current_pcb = current_pcb->next;
-                current_thread = current_pcb->thread_head;
-            } else {
-                // if senob came to the end of the process list, start again from the front
-                current_pcb = pcb_head;
-                if (current_pcb) {
-                    current_thread = current_pcb->thread_head;
+void schedule() {
+    if (current_thread == NULL || current_thread->state == TERMINATED) {
+        // Suche den nächsten READY Thread
+        struct pcb* pcb = pcb_head;
+        struct thread* thread = NULL;
+
+        while (pcb) {
+            thread = pcb->thread_head;
+            while (thread) {
+                if (thread->state == READY) {
+                    break;
                 }
+                thread = thread->next;
             }
+            if (thread && thread->state == READY) {
+                break;
+            }
+            pcb = pcb->next;
+        }
+
+        // Fallback zum Idle Thread, falls kein anderer READY Thread gefunden wurde
+        if (thread == NULL) {
+            current_pcb = pcb_head;  // Idle Process sollte immer an erster Stelle sein
+            current_thread = current_pcb->thread_head;
+        } else {
+            current_thread = thread;
+            current_pcb = current_thread->owner;
         }
     }
 
     if (current_thread != NULL) {
+        current_thread->state = RUNNING;
         printf("Switching to Thread ID: %u of Process %u\n", current_thread->id, current_thread->owner->pid);
         context_switch(current_thread);
     }
 }
 
+
+
 void context_switch(struct thread* next_thread)
 {
-    if (next_thread == NULL) {
+    if (next_thread == NULL || next_thread->state == TERMINATED) {
         printf("Next thread is NULL, unable to perform context switch\n");
         return;
     }
@@ -149,3 +155,17 @@ void context_switch(struct thread* next_thread)
         : clobbered registers       // verwendete Register (optional)
     );
 */
+
+void idle_thread() 
+{
+    printf("hey, hier ist der idle thread");
+    while (1) {
+        asm volatile("hlt"); // CPU in den Ruhezustand versetzen
+    }
+}
+
+void thread_exit() {
+    printf("Thread %u is exiting\n", current_thread->id);
+    current_thread->state = TERMINATED;
+    schedule();
+}

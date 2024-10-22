@@ -68,16 +68,16 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     uint32_t data_selector = iskernelthreadornot ? KERNEL_DATA_SEGMENT : (USER_DATA_SEGMENT | RPL_USER);
 
     // Allocate kernel stack for the new thread
-    new_thread->kernel_stack = (uint32_t*) kmalloc(KERNEL_STACK_SIZE);
+    /*new_thread->kernel_stack = (uint32_t*) kmalloc(KERNEL_STACK_SIZE);
     if (new_thread->kernel_stack == NULL) {
         printf("Failed to allocate memory for kernel stack\n");
         kfree(new_thread);
         return;
-    }
+    }*/
     memset(new_thread->kernel_stack, 0x00, KERNEL_STACK_SIZE);
 
     if (iskernelthreadornot) {
-        new_thread->regs.esp = (uint32_t)(new_thread->kernel_stack + KERNEL_STACK_SIZE);
+        //new_thread->regs.esp = (uint32_t)(new_thread->kernel_stack + KERNEL_STACK_SIZE);
         new_thread->user_stack = NULL;
     } else {
         new_thread->user_stack = (uint32_t*) USER_STACK_TOP;
@@ -99,4 +99,3 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     // Add thread to the specific process's thread list
     add_thread_to_process(process, new_thread);
 }
-

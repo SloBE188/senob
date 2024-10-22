@@ -85,7 +85,9 @@ void panic()
 
 void dummyfunction1()
 {
-    printf("Hallo, ich bin Kernel Thread Nr.1");
+    printf("Hallo, ich bin Kernel Thread Nr.1\n");
+    //thread_exit();
+    
 }
 
 
@@ -103,7 +105,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     heap_init();
     idt_init();
     init_keyboard();
-    init_pit(50);
+    //init_pit(50);
     if (magic_value != 0x2BADB002)
     {
         printf("Invalid magic value: %x\n", magic_value);
@@ -134,19 +136,14 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //mem_change_page_directory(new_dir);
 
 
-    printf("starting process and thread test\n");
 
-    struct pcb* first_process = (struct pcb*) kmalloc(sizeof(struct pcb));
-    memset(first_process, 0x00, sizeof(struct pcb));
-    if (first_process == NULL)
-    {
-        printf("failed to allocate memory for the first pcb struct\n");
-    }
 
-    init_processes(first_process);
-    printf("first process initialization successfull\n");
-    create_kernel_thread(first_process, dummyfunction1);
-    printf("kernel thread for first process created\n");
+    struct pcb* idle_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    printf("created first process successfully");
+    init_processes(idle_process);
+    printf("Idle process initialization successfull\n");
+    create_kernel_thread(idle_process, idle_thread);
+    printf("kernel thread for idle process created\n");
     schedule();
     
     

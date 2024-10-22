@@ -49,12 +49,8 @@ section .data
 ALIGN 4096
 kernel_directory:
     DD 0x00000083 ; First Page Table Entry (0x00000000 - 0x003FFFFF)
-    DD 0x00400083 ; Second Page Table Entry (0x00400000 - 0x007FFFFF)
-    DD 0x00800083 ; Third Page Table Entry (0x00800000 - 0x00BFFFFF)
-    DD 0x00C00083 ; Fourth Page Table Entry (0x00C00000 - 0x00FFFFFF)
-    TIMES 768-4 DD 0 ; Fill up to entry 768
-    
-    ; Kernel Mapping: Mapping from 0xC0000000 - 0xC2FFFFFF (48 MiB) to 0x00000000 - 0x02FFFFFF
+    TIMES 768-1 DD 0
+    ; Kernel Mapping: Mapping von 0xC0000000 - 0xC2FFFFFF (48 MiB)
     DD 0x00000083 ; Entry 768 (0xC0000000 - 0xC03FFFFF) mapped to 0x00000000 - 0x003FFFFF
     DD 0x00400083 ; Entry 769 (0xC0400000 - 0xC07FFFFF) mapped to 0x00400000 - 0x007FFFFF
     DD 0x00800083 ; Entry 770 (0xC0800000 - 0xC0BFFFFF) mapped to 0x00800000 - 0x00BFFFFF
@@ -67,10 +63,9 @@ kernel_directory:
     DD 0x02400083 ; Entry 777 (0xC2400000 - 0xC27FFFFF) mapped to 0x02400000 - 0x027FFFFF
     DD 0x02800083 ; Entry 778 (0xC2800000 - 0xC2BFFFFF) mapped to 0x02800000 - 0x02BFFFFF
     DD 0x02C00083 ; Entry 779 (0xC2C00000 - 0xC2FFFFFF) mapped to 0x02C00000 - 0x02FFFFFF
-    
-	TIMES 64-12 DD 0 ; Fill up to entry 832
 
-    ; Heap Mapping: Mapping from 0xD0000000 - 0xD63FFFFF (100 MiB) to a separate physical address range
+    TIMES 64-12 DD 0
+    ; Heap Mapping: Mapping ab 0xD0000000
     DD 0x03000083 ; Entry 832 (0xD0000000 - 0xD03FFFFF) mapped to 0x03000000 - 0x033FFFFF
     DD 0x03400083 ; Entry 833 (0xD0400000 - 0xD07FFFFF) mapped to 0x03400000 - 0x037FFFFF
     DD 0x03800083 ; Entry 834 (0xD0800000 - 0xD0BFFFFF) mapped to 0x03800000 - 0x03BFFFFF
@@ -79,29 +74,12 @@ kernel_directory:
     DD 0x04400083 ; Entry 837 (0xD1400000 - 0xD17FFFFF) mapped to 0x04400000 - 0x047FFFFF
     DD 0x04800083 ; Entry 838 (0xD1800000 - 0xD1BFFFFF) mapped to 0x04800000 - 0x04BFFFFF
     DD 0x04C00083 ; Entry 839 (0xD1C00000 - 0xD1FFFFFF) mapped to 0x04C00000 - 0x04FFFFFF
-    DD 0x05000083 ; Entry 840 (0xD2000000 - 0xD23FFFFF) mapped to 0x05000000 - 0x053FFFFF
-    DD 0x05400083 ; Entry 841 (0xD2400000 - 0xD27FFFFF) mapped to 0x05400000 - 0x057FFFFF
-    DD 0x05800083 ; Entry 842 (0xD2800000 - 0xD2BFFFFF) mapped to 0x05800000 - 0x05BFFFFF
-    DD 0x05C00083 ; Entry 843 (0xD2C00000 - 0xD2FFFFFF) mapped to 0x05C00000 - 0x05FFFFFF
-    DD 0x06000083 ; Entry 844 (0xD3000000 - 0xD33FFFFF) mapped to 0x06000000 - 0x063FFFFF
-    DD 0x06400083 ; Entry 845 (0xD3400000 - 0xD37FFFFF) mapped to 0x06400000 - 0x067FFFFF
-    DD 0x06800083 ; Entry 846 (0xD3800000 - 0xD3BFFFFF) mapped to 0x06800000 - 0x06BFFFFF
-    DD 0x06C00083 ; Entry 847 (0xD3C00000 - 0xD3FFFFFF) mapped to 0x06C00000 - 0x06FFFFFF
-    DD 0x07000083 ; Entry 848 (0xD4000000 - 0xD43FFFFF) mapped to 0x07000000 - 0x073FFFFF
-    DD 0x07400083 ; Entry 849 (0xD4400000 - 0xD47FFFFF) mapped to 0x07400000 - 0x077FFFFF
-    DD 0x07800083 ; Entry 850 (0xD4800000 - 0xD4BFFFFF) mapped to 0x07800000 - 0x07BFFFFF
-    DD 0x07C00083 ; Entry 851 (0xD4C00000 - 0xD4FFFFFF) mapped to 0x07C00000 - 0x07FFFFFF
-    DD 0x08000083 ; Entry 852 (0xD5000000 - 0xD53FFFFF) mapped to 0x08000000 - 0x083FFFFF
-    DD 0x08400083 ; Entry 853 (0xD5400000 - 0xD57FFFFF) mapped to 0x08400000 - 0x087FFFFF
-    DD 0x08800083 ; Entry 854 (0xD5800000 - 0xD5BFFFFF) mapped to 0x08800000 - 0x08BFFFFF
-    DD 0x08C00083 ; Entry 855 (0xD5C00000 - 0xD5FFFFFF) mapped to 0x08C00000 - 0x08FFFFFF
     
-	TIMES 64-24 DD 0 ; Fill up to entry 896
-
-    ; Mapping für den Framebuffer (virtuelle Adresse 0xE0000000)
+    TIMES 64-8 DD 0
+    ; Framebuffer Mapping bei 0xFD000000
     DD 0xFD000083 ; Entry 896 (0xE0000000 - 0xE03FFFFF) mapped to 0xFD000000 - 0xFD3FFFFF
 
-    TIMES 1024-897 DD 0 ; Fill up to entry 1024
+	TIMES 1024-897 DD 0 ; Fill up the rest of the Page Directory
 
 
 
