@@ -103,6 +103,12 @@ void anotherprocessfunction()
     thread_exit();
 }
 
+void anotherprocessfunction2()
+{
+    printf("THREAD FROM THE OTHER PROCESSES THREAD:)\n");
+    thread_exit();
+}
+
 
 
 struct vbe_info vbeinfo;
@@ -164,6 +170,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     struct pcb* second_process = (struct pcb*) kmalloc(sizeof(struct pcb));
     add_process(second_process);
     create_kernel_thread(second_process, anotherprocessfunction);
+    create_kernel_thread(second_process, anotherprocessfunction2);
 
 
     schedule();
