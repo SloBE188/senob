@@ -40,7 +40,8 @@ enum state{
     RUNNING,
     READY,
     BLOCKED,
-    TERMINATED
+    TERMINATED,
+    IDLET
 };
 
 

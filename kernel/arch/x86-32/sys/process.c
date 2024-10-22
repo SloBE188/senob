@@ -39,6 +39,7 @@ void init_processes(struct pcb* process)
     pcb_head = process;
     pcb_tail = process;
     current_pcb = process;
+
 }
 
 void add_process(struct pcb* new_process)
@@ -73,41 +74,44 @@ void add_thread_to_process(struct pcb* process, struct thread* new_thread)
 }
 
 void schedule() {
-    if (current_thread == NULL || current_thread->state == TERMINATED) {
-        // Suche den nächsten READY Thread
-        struct pcb* pcb = pcb_head;
-        struct thread* thread = NULL;
+    struct pcb* pcb = pcb_head;
+    struct thread* next_thread = NULL;
 
-        while (pcb) {
-            thread = pcb->thread_head;
-            while (thread) {
-                if (thread->state == READY) {
-                    break;
-                }
-                thread = thread->next;
-            }
-            if (thread && thread->state == READY) {
+    // searching for a thread which is READY
+    while (pcb) {
+        struct thread* thread = pcb->thread_head;
+        while (thread) {
+            if (thread->state == READY) {
+                next_thread = thread;
                 break;
             }
-            pcb = pcb->next;
+            thread = thread->next;
         }
-
-        // Fallback zum Idle Thread, falls kein anderer READY Thread gefunden wurde
-        if (thread == NULL) {
-            current_pcb = pcb_head;  // Idle Process sollte immer an erster Stelle sein
-            current_thread = current_pcb->thread_head;
-        } else {
-            current_thread = thread;
-            current_pcb = current_thread->owner;
+        if (next_thread) {
+            break;
         }
+        pcb = pcb->next;
     }
 
-    if (current_thread != NULL) {
-        current_thread->state = RUNNING;
-        printf("Switching to Thread ID: %u of Process %u\n", current_thread->id, current_thread->owner->pid);
-        context_switch(current_thread);
+    // if there is no READY thread in any process, use the idle thread
+    if (next_thread == NULL) {
+        pcb = pcb_head;  // idle process should always be the first one (head)
+        next_thread = pcb->thread_head;  // choose idle thread
+    }
+
+    if (next_thread != NULL) {
+        if (next_thread->state == IDLET) {
+            // the idle thread keeps his special state IDLET
+            printf("Switching to Idle Thread\n");
+        } else {
+            next_thread->state = RUNNING; // set the next thread which it will switch to to RUNNING
+            printf("Switching to Thread ID: %u of Process %u\n", next_thread->id, next_thread->owner->pid);
+        }
+        context_switch(next_thread);
     }
 }
+
+
 
 
 
@@ -158,13 +162,14 @@ void context_switch(struct thread* next_thread)
 
 void idle_thread() 
 {
-    printf("hey, hier ist der idle thread");
+    printf("hey, hier ist der idle thread\n");
     while (1) {
-        asm volatile("hlt"); // CPU in den Ruhezustand versetzen
+        asm volatile("hlt");
     }
 }
 
-void thread_exit() {
+void thread_exit() 
+{
     printf("Thread %u is exiting\n", current_thread->id);
     current_thread->state = TERMINATED;
     schedule();

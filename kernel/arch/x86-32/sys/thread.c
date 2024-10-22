@@ -63,6 +63,7 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     new_thread->owner = process;
     thread_id++;
     new_thread->id = thread_id;
+    new_thread->state = READY;
 
     uint32_t code_selector = iskernelthreadornot ? KERNEL_CODE_SEGMENT : (USER_CODE_SEGMENT | RPL_USER);
     uint32_t data_selector = iskernelthreadornot ? KERNEL_DATA_SEGMENT : (USER_DATA_SEGMENT | RPL_USER);

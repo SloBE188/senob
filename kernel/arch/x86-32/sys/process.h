@@ -22,6 +22,7 @@ void add_process(struct pcb* new_process);
 void add_thread_to_process(struct pcb* process, struct thread* new_thread);
 void schedule();
 void idle_thread();
+void thread_exit();
 
 
 #endif

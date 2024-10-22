@@ -86,14 +86,15 @@ void panic()
 void dummyfunction1()
 {
     printf("Hallo, ich bin Kernel Thread Nr.1\n");
-    //thread_exit();
+    thread_exit();
     
 }
 
 
 void dummyfunction2()
 {
-    printf("Hallo, ich bin Kernel Thread Nr.2");
+    printf("Hallo, ich bin Kernel Thread Nr.2\n");
+    thread_exit();
 }
 
 
@@ -139,11 +140,22 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
 
     struct pcb* idle_process = (struct pcb*) kmalloc(sizeof(struct pcb));
-    printf("created first process successfully");
+    printf("created idle process successfully\n");
     init_processes(idle_process);
     printf("Idle process initialization successfull\n");
     create_kernel_thread(idle_process, idle_thread);
+    idle_process->thread_head->state = IDLET;
     printf("kernel thread for idle process created\n");
+
+
+    struct pcb* new_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    add_process(new_process);
+    printf("new process created successfully\n");
+    create_kernel_thread(new_process, dummyfunction1);
+    create_kernel_thread(new_process, dummyfunction2);
+    printf("kernel thread for new process created\n");
+
+
     schedule();
     
     
