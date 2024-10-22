@@ -97,6 +97,12 @@ void dummyfunction2()
     thread_exit();
 }
 
+void anotherprocessfunction()
+{
+    printf("THREAD FROM ANOTHER PROCESS\n");
+    thread_exit();
+}
+
 
 
 struct vbe_info vbeinfo;
@@ -154,6 +160,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     create_kernel_thread(new_process, dummyfunction1);
     create_kernel_thread(new_process, dummyfunction2);
     printf("kernel thread for new process created\n");
+
+    struct pcb* second_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    add_process(second_process);
+    create_kernel_thread(second_process, anotherprocessfunction);
 
 
     schedule();
