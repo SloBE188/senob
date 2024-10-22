@@ -31,6 +31,7 @@
 #include "mm/PMM/pmm.h"
 #include "sys/process.h"
 #include "sys/thread.h"
+#include "../../libk/memory.h"
 
 
 extern void rust_testfunction();
@@ -136,6 +137,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     printf("starting process and thread test\n");
 
     struct pcb* first_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    memset(first_process, 0x00, sizeof(struct pcb));
     if (first_process == NULL)
     {
         printf("failed to allocate memory for the first pcb struct\n");
@@ -144,7 +146,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     init_processes(first_process);
     printf("first process initialization successfull\n");
     create_kernel_thread(first_process, dummyfunction1);
-    printf("kernel thread for first process created");
+    printf("kernel thread for first process created\n");
     schedule();
     
     

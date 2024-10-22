@@ -139,3 +139,13 @@ void context_switch(struct thread* next_thread)
         : "m" (current_thread->regs.eip)
     );
 }
+
+
+/*
+    asm volatile (
+        "assembly code"            // der eigentliche Assembly-Code
+        : output operands           // Ausgabewerte -> werte werden vom asm code in eine c variable gespeichert
+        : input operands            // Eingabewerte -> wert einer c variable wird in den asm code geladen
+        : clobbered registers       // verwendete Register (optional)
+    );
+*/
