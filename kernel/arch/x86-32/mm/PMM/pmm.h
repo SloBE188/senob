@@ -1,7 +1,7 @@
 #ifndef PMM_H
 #define PMM_H
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 
 
 #define CEIL_DIV(a, b) (((a) + (b) - 1) / (b));

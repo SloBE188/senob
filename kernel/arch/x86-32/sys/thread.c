@@ -23,19 +23,6 @@
 #include "../interrupts/idt.h"
 #include "../gdt/gdt.h"
 
-#define KERNEL_CODE_SEGMENT 0x08
-#define KERNEL_DATA_SEGMENT 0x10
-#define USER_CODE_SEGMENT 0x18
-#define USER_DATA_SEGMENT 0x20
-#define INTERRUPTS_ENABLED 0x200
-#define RPL_USER 3
-
-#define USER_STACK_TOP 0xB0000000
-#define USER_STACK_BOTTOM 0xAFFFE000
-#define USER_STACK_PAGES 16
-
-#define KERNEL_STACK_SIZE 0x4000
-#define USER_STACK_SIZE 0x4000
 
 uint32_t thread_id = 0;
 
@@ -69,20 +56,23 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     uint32_t data_selector = iskernelthreadornot ? KERNEL_DATA_SEGMENT : (USER_DATA_SEGMENT | RPL_USER);
 
     // Allocate kernel stack for the new thread
-    /*new_thread->kernel_stack = (uint32_t*) kmalloc(KERNEL_STACK_SIZE);
+    new_thread->kernel_stack = (uint32_t*) kmalloc(KERNEL_STACK_SIZE);
     if (new_thread->kernel_stack == NULL) {
         printf("Failed to allocate memory for kernel stack\n");
         kfree(new_thread);
         return;
-    }*/
+    }
     memset(new_thread->kernel_stack, 0x00, KERNEL_STACK_SIZE);
 
+    // Set stack pointer to the top of the new stack
     if (iskernelthreadornot) {
-        //new_thread->regs.esp = (uint32_t)(new_thread->kernel_stack + KERNEL_STACK_SIZE);
+        new_thread->regs.esp = (uint32_t)(new_thread->kernel_stack + (KERNEL_STACK_SIZE / sizeof(uint32_t)));
+        new_thread->regs.ebp = new_thread->regs.esp;
         new_thread->user_stack = NULL;
     } else {
         new_thread->user_stack = (uint32_t*) USER_STACK_TOP;
         new_thread->regs.esp = USER_STACK_TOP;
+        new_thread->regs.ebp = USER_STACK_TOP;
         for (int i = 0; i < USER_STACK_PAGES; i++) {
             mem_map_page(USER_STACK_TOP - (i * PAGE_SIZE), pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
         }
@@ -97,6 +87,14 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     new_thread->regs.eip = (uint32_t)start_function;
     new_thread->regs.e_flags = INTERRUPTS_ENABLED;
 
+    // set tss for user threads directly
+    if (!iskernelthreadornot) {
+        // Update TSS to point to the new kernel stack for this user thread
+        tss.esp0 = (uint32_t)(new_thread->kernel_stack + KERNEL_STACK_SIZE / sizeof(uint32_t));
+        tss.ss0 = KERNEL_DATA_SEGMENT;
+    }
+
     // Add thread to the specific process's thread list
     add_thread_to_process(process, new_thread);
 }
+

@@ -26,8 +26,22 @@
 #include "process.h"
 
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 #include <stdbool.h>
+
+#define KERNEL_CODE_SEGMENT 0x08
+#define KERNEL_DATA_SEGMENT 0x10
+#define USER_CODE_SEGMENT 0x18
+#define USER_DATA_SEGMENT 0x20
+#define INTERRUPTS_ENABLED 0x200
+#define RPL_USER 3
+
+#define USER_STACK_TOP 0xB0000000
+#define USER_STACK_BOTTOM 0xAFFFE000
+#define USER_STACK_PAGES 16
+
+#define KERNEL_STACK_SIZE 0x4000
+#define USER_STACK_SIZE 0x4000
 
 #define PAGE_SIZE 4096
 #define PAGE_FLAG_PRESENT (1 << 0)
@@ -83,6 +97,6 @@ void mem_map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags);
 void create_thread(struct pcb* process, void (*start_function)(), bool iskernelthreadornot);
 void create_kernel_thread(struct pcb* process, void(*start_function)());
 void create_user_thread(struct pcb* process, void(*start_function)());
-
+void userland(uint32_t* esp, uint32_t* eip);
 
 #endif

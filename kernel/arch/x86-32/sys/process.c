@@ -19,6 +19,7 @@
 #include "../../../libk/stdiok.h"
 #include "../kernel.h"
 #include "../../../libk/memory.h"
+#include "../gdt/gdt.h"
 
 
 struct pcb* pcb_head = NULL;
@@ -73,7 +74,7 @@ void add_thread_to_process(struct pcb* process, struct thread* new_thread)
     process->thread_count++;
 }
 
-void schedule() {
+/*void schedule() {
     struct pcb* pcb = pcb_head;
     struct thread* next_thread = NULL;
 
@@ -109,46 +110,16 @@ void schedule() {
         }
         context_switch(next_thread);
     }
-}
+}*/
 
 
 
 
 
-void context_switch(struct thread* next_thread)
-{
-    if (next_thread == NULL || next_thread->state == TERMINATED) {
-        printf("Next thread is NULL, unable to perform context switch\n");
-        return;
-    }
 
-    // if i switch from the current thread, save his state
-    if (current_thread != NULL) {
-        asm volatile (
-            "mov %%esp, %0\n"
-            "mov %%ebp, %1\n"
-            : "=m" (current_thread->regs.esp), "=m" (current_thread->regs.ebp)
-        );
-    }
 
-    // switch to the next thread
-    current_thread = next_thread;
 
-    // load the stack from the new thread
-    asm volatile (
-        "mov %0, %%esp\n"
-        "mov %1, %%ebp\n"
-        : 
-        : "m" (current_thread->regs.esp), "m" (current_thread->regs.ebp)
-    );
 
-    // jump to the next instruction (from the thread EIP)
-    asm volatile (
-        "jmp *%0\n"
-        : 
-        : "m" (current_thread->regs.eip)
-    );
-}
 
 
 /*
@@ -172,5 +143,37 @@ void thread_exit()
 {
     printf("Thread %u is exiting\n", current_thread->id);
     current_thread->state = TERMINATED;
-    schedule();
+    //schedule();
+}
+
+
+void proc_enter_usermode()
+{
+    if (!current_pcb)
+    {
+        return;
+    }
+
+    update_tss_esp0(current_pcb->thread_head->kernel_stack + KERNEL_STACK_SIZE);
+
+
+    asm volatile (
+        "cli\n"
+        "mov $0x23, %%eax\n"
+        "mov %%eax, %%ds\n"
+        "mov %%eax, %%es\n"
+        "mov %%eax, %%fs\n"
+        "mov %%eax, %%gs\n"
+
+        "push %%eax\n"       // %ss
+        "mov %0, %%eax\n"
+        "push %%eax\n"       // %esp
+        "push $0x202\n"      // %eflags with IF set
+        "push $0x1B\n"       // %cs
+        "mov %1, %%eax\n"
+        "push %%eax\n" // %eip
+        "iret\n"
+        :
+        : "r" (current_pcb->thread_head->regs.esp), "r" (current_pcb->thread_head->regs.eip)
+        : "%eax");
 }

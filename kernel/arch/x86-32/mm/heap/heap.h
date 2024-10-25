@@ -12,7 +12,7 @@
 #define HEAP_BLOCK_HAS_NEXT 0b10000000
 #define HEAP_BLOCK_IS_FIRST 0b01000000
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 #include <stddef.h>
 #include "../../../../libk/stdiok.h"
 

@@ -1,7 +1,7 @@
 #ifndef GDT_H
 #define GDT_H
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 
 extern struct tss tss;
 

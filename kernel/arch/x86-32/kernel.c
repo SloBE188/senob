@@ -85,8 +85,9 @@ void panic()
 
 void dummyfunction1()
 {
-    printf("Hallo, ich bin Kernel Thread Nr.1\n");
-    thread_exit();
+    
+    while(1){}
+    //thread_exit();
     
 }
 
@@ -94,20 +95,10 @@ void dummyfunction1()
 void dummyfunction2()
 {
     printf("Hallo, ich bin Kernel Thread Nr.2\n");
-    thread_exit();
+    //thread_exit();
 }
 
-void anotherprocessfunction()
-{
-    printf("THREAD FROM ANOTHER PROCESS\n");
-    thread_exit();
-}
 
-void anotherprocessfunction2()
-{
-    printf("THREAD FROM THE OTHER PROCESSES THREAD:)\n");
-    thread_exit();
-}
 
 
 
@@ -118,7 +109,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     heap_init();
     idt_init();
     init_keyboard();
-    //init_pit(50);
     if (magic_value != 0x2BADB002)
     {
         printf("Invalid magic value: %x\n", magic_value);
@@ -151,29 +141,28 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
 
 
-    struct pcb* idle_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    /*struct pcb* idle_process = (struct pcb*) kmalloc(sizeof(struct pcb));
     printf("created idle process successfully\n");
     init_processes(idle_process);
     printf("Idle process initialization successfull\n");
     create_kernel_thread(idle_process, idle_thread);
     idle_process->thread_head->state = IDLET;
-    printf("kernel thread for idle process created\n");
+    printf("kernel thread for idle process created\n");*/
 
 
-    struct pcb* new_process = (struct pcb*) kmalloc(sizeof(struct pcb));
-    add_process(new_process);
-    printf("new process created successfully\n");
-    create_kernel_thread(new_process, dummyfunction1);
-    create_kernel_thread(new_process, dummyfunction2);
-    printf("kernel thread for new process created\n");
+    //context_switch(idle_process->thread_head);
+    struct pcb* user_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    printf("Creating user process\n");
+    init_processes(user_process);
+    create_user_thread(user_process, dummyfunction1);
+    proc_enter_usermode();
+   
 
-    struct pcb* second_process = (struct pcb*) kmalloc(sizeof(struct pcb));
-    add_process(second_process);
-    create_kernel_thread(second_process, anotherprocessfunction);
-    create_kernel_thread(second_process, anotherprocessfunction2);
+    //context_switch(user_process->thread_head);
 
+    //init_pit(50);
 
-    schedule();
+    //schedule();
     
     
 

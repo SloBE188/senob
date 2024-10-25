@@ -1,7 +1,7 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 
 struct idt_entry_t{
 	uint16_t    isr_low;      // The lower 16 bits of the ISR's address

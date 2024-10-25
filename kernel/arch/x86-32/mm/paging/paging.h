@@ -1,7 +1,7 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 
 extern uint32_t kernel_directory[1024];
 

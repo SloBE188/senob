@@ -221,7 +221,6 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
 uint32_t* mem_alloc_page_dir() {
 
     for (int i = 0; i < NUM_PAGE_DIRS; i++) {
-        // searches for a unused entry in the pageDirsUsed array
         if (!pageDirsUsed[i]) {
             pageDirsUsed[i] = true;
 
@@ -229,15 +228,13 @@ uint32_t* mem_alloc_page_dir() {
             memset(page_dir, 0, 0x1000);
 
             // first 768 entries are user page tables
-                for (int i = 0; i < 768; i++) {
-                    uint32_t phys_addr = pmm_alloc_pageframe() * 1024; // Allokiere 4 MiB Page (1024 * 4 KiB)
-                    page_dir[i] = phys_addr | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_4MB;
-                }
+            for (int i = 0; i < 768; i++) {
+                page_dir[i] = 0;
+            }
 
-
-            // next 256 are kernel (except last, this is the recursive mapping)
+            // next 256 are kernel (except last)
             for (int i = 768; i < 1023; i++) {
-                page_dir[i] = kernel_directory[i] & ~PAGE_FLAG_OWNER; // don't own these though
+                page_dir[i] = kernel_directory[i] & ~PAGE_FLAG_OWNER; // we don't own these though
             }
 
             // recursive mapping

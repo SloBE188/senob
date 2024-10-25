@@ -19,6 +19,8 @@
 #include "../../../../drivers/video/vga/vga.h"
 #include "../io/io.h"
 #include <stdint-gcc.h>
+#include "../../../libk/stdiok.h"
+#include "../sys/process.h"
 
 #define PIT_IRQ 0
 
@@ -35,7 +37,8 @@ uint64_t ticks;
 void irq0_handler(struct Interrupt_registers *regs)
 {
     ticks += 1;
-    print("testing irq0");
+    //schedule();
+    //printf("testing irq0");
 
 }
 

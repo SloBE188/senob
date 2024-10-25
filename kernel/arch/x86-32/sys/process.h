@@ -1,7 +1,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
-#include <stdint.h>
+#include <stdint-gcc.h>
 #include "thread.h"
 
 
@@ -23,6 +23,7 @@ void add_thread_to_process(struct pcb* process, struct thread* new_thread);
 void schedule();
 void idle_thread();
 void thread_exit();
-
+void context_switch(struct thread* next_thread);
+void proc_enter_usermode();
 
 #endif
