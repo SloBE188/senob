@@ -28,3 +28,14 @@ void* memset(void* ptr, int c, size_t size)
 
     return ptr;
 }
+
+void* memcpy(void* dest, void* src, int len)
+{
+    char *d = dest;
+    char *s = src;
+    while(len--)
+    {
+        *d++ = *s++;
+    }
+    return dest;
+}
