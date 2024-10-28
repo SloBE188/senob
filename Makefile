@@ -1,7 +1,7 @@
-FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o ./build/blank_bin.o
 
 
-all: $(FILES) ./senob/boot/senob.bin user_programs
+all: user_programs $(FILES) ./senob/boot/senob.bin 
 	grub-mkrescue -o senob.iso senob/
 
 

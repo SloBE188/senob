@@ -2,9 +2,9 @@
 section .text
 
 
-global _start
+global _userstart
 
-_start:
+_userstart:
 
 label:
     jmp $

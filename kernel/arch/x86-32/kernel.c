@@ -102,7 +102,10 @@ void dummyfunction2()
 
 
 extern uint8_t _userland_start[];
-exter uint8_t _userland_end[];
+extern uint8_t _userland_end[];
+
+extern uint8_t _binary_userland_build_blank_bin_start;
+extern uint8_t _binary_userland_build_blank_bin_end;
 
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
@@ -140,9 +143,17 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     uint32_t* new_dir = mem_alloc_page_dir();
     //mem_change_page_directory(new_dir);
 
+    uint8_t* start = &_binary_userland_build_blank_bin_start;
+    uint8_t* end = &_binary_userland_build_blank_bin_end;
 
-    uint32_t program_size = &_userland_end - &_userland_start;
-    void* target_address = (void*)0x00400000;
+    size_t program_size = end - start;
+
+    uint8_t* user_program_address = (uint8_t*) 0x00400000;
+
+    for (size_t i = 0; i < program_size; i++) {
+        user_program_address[i] = start[i];
+    }
+    
 
     /*struct pcb* idle_process = (struct pcb*) kmalloc(sizeof(struct pcb));
     printf("created idle process successfully\n");
