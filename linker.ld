@@ -36,4 +36,10 @@ SECTIONS
 
     _kernel_end = .;
 
+        /* Sektion, um das Userland-Programm ins Kernel-Image einzubinden */
+    .userland_bin ALIGN(4K): {
+        _userland_start = .;  /* Markiert den Anfang des Userland-Programms */
+        KEEP(*(.userland_bin)) /* Fügt die Binärdatei blank.bin ein */
+        _userland_end = .;    /* Markiert das Ende des Userland-Programms */
+    }
 }

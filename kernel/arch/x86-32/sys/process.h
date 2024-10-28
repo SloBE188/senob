@@ -25,5 +25,6 @@ void idle_thread();
 void thread_exit();
 void context_switch(struct thread* next_thread);
 void proc_enter_usermode();
+struct pcb* create_process(uint32_t* page_directory, struct thread* first_thread);
 
 #endif

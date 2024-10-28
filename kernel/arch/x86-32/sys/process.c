@@ -74,6 +74,18 @@ void add_thread_to_process(struct pcb* process, struct thread* new_thread)
     process->thread_count++;
 }
 
+struct pcb* create_process(uint32_t* page_directory, struct thread* first_thread)
+{
+    struct pcb* new_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    add_process(new_process);
+    add_thread_to_process(new_process, first_thread);
+
+    new_process->page_directory = page_directory;
+
+    return new_process;
+
+}
+
 /*void schedule() {
     struct pcb* pcb = pcb_head;
     struct thread* next_thread = NULL;
@@ -112,6 +124,40 @@ void add_thread_to_process(struct pcb* process, struct thread* new_thread)
     }
 }*/
 
+void context_switch(struct thread* next_thread)
+{
+    if (next_thread == NULL || next_thread->state == TERMINATED) {
+        printf("Next thread is NULL, unable to perform context switch\n");
+        return;
+    }
+
+    // if i switch from the current thread, save his state
+    if (current_thread != NULL) {
+        asm volatile (
+            "mov %%esp, %0\n"
+            "mov %%ebp, %1\n"
+            : "=m" (current_thread->regs.esp), "=m" (current_thread->regs.ebp)
+        );
+    }
+
+    // switch to the next thread
+    current_thread = next_thread;
+
+    // load the stack from the new thread
+    asm volatile (
+        "mov %0, %%esp\n"
+        "mov %1, %%ebp\n"
+        : 
+        : "m" (current_thread->regs.esp), "m" (current_thread->regs.ebp)
+    );
+
+    // jump to the next instruction (from the thread EIP)
+    asm volatile (
+        "jmp *%0\n"
+        : 
+        : "m" (current_thread->regs.eip)
+    );
+}
 
 
 

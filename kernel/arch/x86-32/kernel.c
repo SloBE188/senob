@@ -94,7 +94,8 @@ void dummyfunction1()
 
 void dummyfunction2()
 {
-    printf("Hallo, ich bin Kernel Thread Nr.2\n");
+    printf("Hallo, ich bin Kernel Thread Nr.1\n");
+    while(1){}
     //thread_exit();
 }
 
@@ -151,11 +152,17 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
 
     //context_switch(idle_process->thread_head);
-    struct pcb* user_process = (struct pcb*) kmalloc(sizeof(struct pcb));
+    /*struct pcb* user_process = (struct pcb*) kmalloc(sizeof(struct pcb));
     printf("Creating user process\n");
     init_processes(user_process);
     create_user_thread(user_process, dummyfunction1);
-    proc_enter_usermode();
+    //proc_enter_usermode();
+    struct pcb* kernelprocess = (struct pcb*) kmalloc(sizeof(struct pcb));
+    create_kernel_thread(kernelprocess, dummyfunction2);
+    printf("Ich bin der Thread Nr: %d vom Prozess %d", kernelprocess->thread_count, kernelprocess->pid);
+    context_switch(kernelprocess->thread_head);*/
+
+    
    
 
     //context_switch(user_process->thread_head);
