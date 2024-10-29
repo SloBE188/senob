@@ -64,22 +64,13 @@ kernel_directory:
     DD 0x02800083 ; Entry 778 (0xC2800000 - 0xC2BFFFFF) mapped to 0x02800000 - 0x02BFFFFF
     DD 0x02C00083 ; Entry 779 (0xC2C00000 - 0xC2FFFFFF) mapped to 0x02C00000 - 0x02FFFFFF
 
-    TIMES 64-12 DD 0
-    ; Heap Mapping: Mapping ab 0xD0000000
-    DD 0x03000083 ; Entry 832 (0xD0000000 - 0xD03FFFFF) mapped to 0x03000000 - 0x033FFFFF
-    DD 0x03400083 ; Entry 833 (0xD0400000 - 0xD07FFFFF) mapped to 0x03400000 - 0x037FFFFF
-    DD 0x03800083 ; Entry 834 (0xD0800000 - 0xD0BFFFFF) mapped to 0x03800000 - 0x03BFFFFF
-    DD 0x03C00083 ; Entry 835 (0xD0C00000 - 0xD0FFFFFF) mapped to 0x03C00000 - 0x03FFFFFF
-    DD 0x04000083 ; Entry 836 (0xD1000000 - 0xD13FFFFF) mapped to 0x04000000 - 0x043FFFFF
-    DD 0x04400083 ; Entry 837 (0xD1400000 - 0xD17FFFFF) mapped to 0x04400000 - 0x047FFFFF
-    DD 0x04800083 ; Entry 838 (0xD1800000 - 0xD1BFFFFF) mapped to 0x04800000 - 0x04BFFFFF
-    DD 0x04C00083 ; Entry 839 (0xD1C00000 - 0xD1FFFFFF) mapped to 0x04C00000 - 0x04FFFFFF
-    
-    TIMES 64-8 DD 0
+    TIMES 128-12 DD 0
+
     ; Framebuffer Mapping bei 0xFD000000
     DD 0xFD000083 ; Entry 896 (0xE0000000 - 0xE03FFFFF) mapped to 0xFD000000 - 0xFD3FFFFF
 
-	TIMES 1024-897 DD 0 ; Fill up the rest of the Page Directory
+    TIMES 1024-897 DD 0 ; Fill up the rest of the Page Directory
+
 
 
 

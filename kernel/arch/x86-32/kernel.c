@@ -104,7 +104,6 @@ struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
     init_gdt();
-    heap_init();
     idt_init();
     init_keyboard();
     if (magic_value != 0x2BADB002)
@@ -130,7 +129,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
-
+    heap_init();
     //rust_testfunction();
 
     uint32_t* new_dir = mem_alloc_page_dir();

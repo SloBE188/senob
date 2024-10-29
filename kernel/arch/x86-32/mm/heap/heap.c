@@ -17,12 +17,26 @@
 
 #include "heap.h"
 #include "../../../../libk/memory.h"
+#include "../paging/paging.h"
+#include "../PMM/pmm.h"
 
 
 struct heap kernel_heap;
 struct heap_table kernel_heap_table;
 
+uint32_t heap_size = 0;
+uint32_t heap_start = HEAP_START_ADDRESS;
+
 void heap_init() {
+
+    //map the kernel heap
+    for (int i = 0; i < HEAP_SIZE; i++)
+    {
+        uint32_t phys_addr = pmm_alloc_pageframe();
+        mem_map_page(HEAP_START_ADDRESS, phys_addr, PAGE_FLAG_WRITE | PAGE_FLAG_PRESENT);
+    }
+    
+
     kernel_heap_table.total_blocks = HEAP_SIZE / HEAP_BLOCK_SIZE;
     kernel_heap_table.entries = (HEAP_BLOCK_TABLE_ENTRY*)HEAP_START_ADDRESS;
 
@@ -32,6 +46,7 @@ void heap_init() {
     for (size_t i = 0; i < kernel_heap_table.total_blocks; i++) {
         kernel_heap_table.entries[i] = HEAP_BLOCK_TABLE_ENTRY_FREE;
     }
+
 }
 
 

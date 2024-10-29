@@ -3,7 +3,10 @@ FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./
 
 all: $(FILES) ./senob/boot/senob.bin 
 	grub-mkrescue -o senob.iso senob/
-
+	dd if=/dev/zero of=ramdisk.img bs=4M count=1
+	mkfs.vfat ramdisk.img
+	sudo mount -o loop ramdisk.img /mnt
+	sudo umount /mnt
 
 
 ./senob/boot/senob.bin:
