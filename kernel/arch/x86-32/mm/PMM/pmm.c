@@ -18,6 +18,7 @@
 #include "pmm.h"
 #include "../../../../libk/memory.h"
 #include <stdbool.h>
+#include "../../kernel.h"
 
 
 #define PAGE_FRAMES (0x100000000 / 0x1000 / 8) // dez 131072
@@ -86,11 +87,12 @@ void pmm_free_pageframe(uint32_t addr) {
 	uint32_t pf_index = addr / PAGE_FRAME_SIZE;
 
 
-    if (is_page_frame_used(pf_index))
+    if (!is_page_frame_used(pf_index))
     {
         printf("Page is already free");
         return;
     }
+	
 
 	set_page_frame_used_or_free(pf_index, 0);
 	total_allocated--;

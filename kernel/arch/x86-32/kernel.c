@@ -77,10 +77,10 @@ void trigger_overflow() {
     );
 }
 
-void panic()
+void kernel_panic(const char* message) 
 {
-    print("Kernel Panic");
-    while (1){}
+    printf("Kernel Panic: %s\n", message);
+    while (1);
 }
 
 void dummyfunction1()
@@ -99,7 +99,6 @@ void dummyfunction2()
     //thread_exit();
 }
 
-
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
@@ -109,7 +108,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     if (magic_value != 0x2BADB002)
     {
         printf("Invalid magic value: %x\n", magic_value);
-        panic();
+        kernel_panic("Invalid magic value");
     }
     
 
@@ -121,18 +120,19 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_vbe(&vbeinfo);
     set_vbe_info(&vbeinfo);
-    draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
-    draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
+    //draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
+    //draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
 
 
-    uint32_t mod1 = *(uint32_t*)(multibootinfo->mods_addr + 4);
-    uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
+    uint32_t physicalAllocStart = 0x100000 * 16;
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
     heap_init();
+    //printf("Its gonna be alright.\n");
+
     //rust_testfunction();
 
-    uint32_t* new_dir = mem_alloc_page_dir();
+    //uint32_t* new_dir = mem_alloc_page_dir();
     //mem_change_page_directory(new_dir);
     
 
