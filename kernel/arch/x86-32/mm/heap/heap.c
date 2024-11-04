@@ -156,3 +156,41 @@ void* heap_free(struct heap* heap, void* ptr) {
 void kfree(void* ptr) {
     heap_free(&kernel_heap, ptr);
 }
+
+
+#define ALLOC_SIZE 16384
+#define ALLOC_COUNT 1000
+#define REUSE_COUNT 10
+
+void test_heap_shrink_and_reuse() {
+    printf("Starting heap shrink and reuse test...\n");
+
+    void* blocks[ALLOC_COUNT];
+    int i;
+    for (i = 0; i < ALLOC_COUNT; i++) {
+        blocks[i] = kmalloc(ALLOC_SIZE);
+        if (blocks[i] == NULL) {
+            printf("Allocation failed at index %d\n", i);
+            break;
+        }
+    }
+    int allocated_count = i;
+    printf("Allocated %d blocks to trigger expansion.\n", allocated_count);
+
+    for (i = 0; i < allocated_count; i++) {
+        kfree(blocks[i]);
+    }
+    printf("Freed all %d blocks to trigger contraction.\n", allocated_count);
+
+    void* reused_blocks[REUSE_COUNT];
+    printf("Reallocating %d blocks to check address reuse:\n", REUSE_COUNT);
+    for (i = 0; i < REUSE_COUNT; i++) {
+        reused_blocks[i] = kmalloc(ALLOC_SIZE);
+        printf("Reallocated block %d at address: %p\n", i, reused_blocks[i]);
+        if (reused_blocks[i] != blocks[i]) {
+            printf("Unexpected address for reallocated block %d. Got: %p, expected: %p\n", i, reused_blocks[i], blocks[i]);
+        }
+    }
+
+    printf("Heap shrink and multiple address reuse test completed.\n");
+}

@@ -128,6 +128,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
     heap_init();
+    test_heap_shrink_and_reuse();
     //printf("Its gonna be alright.\n");
 
     //rust_testfunction();
