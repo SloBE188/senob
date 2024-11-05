@@ -36,24 +36,27 @@ void pmm_init(uint32_t mem_low, uint32_t mem_high)
     page_frame_min_index = CEIL_DIV(mem_low, PAGE_FRAME_SIZE);
     page_frame_max_index = mem_high / PAGE_FRAME_SIZE;
     total_allocated = 0;
-
+	
     memset(physical_memory_bitmap, 0, sizeof(physical_memory_bitmap));
     
 }
 
-bool is_page_frame_used(uint32_t pf_index) {
+bool is_page_frame_used(uint32_t pf_index) 
+{
     uint8_t byte = physical_memory_bitmap[pf_index >> 3];
     return byte >> (pf_index & 7) & 1;
 }
 
-void set_page_frame_used_or_free(uint32_t pf_index, bool used) {
+void set_page_frame_used_or_free(uint32_t pf_index, bool used) 
+{
     uint8_t byte = physical_memory_bitmap[pf_index >> 3];
     byte ^= (-used ^ byte) & (1 << (pf_index & 7));
 
     physical_memory_bitmap[pf_index >> 3] = byte;
 }
 
-uint32_t pmm_alloc_pageframe() {
+uint32_t pmm_alloc_pageframe() 
+{
 
 	uint32_t start = page_frame_min_index / 8 + ((page_frame_min_index & 7) != 0 ? 1 : 0);
 	uint32_t end = page_frame_max_index / 8 - ((page_frame_max_index & 7) != 0 ? 1 : 0);
@@ -83,7 +86,8 @@ uint32_t pmm_alloc_pageframe() {
 	return 0;
 }
 
-void pmm_free_pageframe(uint32_t addr) {
+void pmm_free_pageframe(uint32_t addr) 
+{
 	uint32_t pf_index = addr / PAGE_FRAME_SIZE;
 
 
@@ -98,6 +102,7 @@ void pmm_free_pageframe(uint32_t addr) {
 	total_allocated--;
 }
 
-uint32_t pmm_get_total_allocated_pages() {
+uint32_t pmm_get_total_allocated_pages() 
+{
     return total_allocated;
 }

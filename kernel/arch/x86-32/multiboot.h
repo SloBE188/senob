@@ -20,6 +20,14 @@
 
 #include <stdint.h>
 
+
+struct multiboot_module {
+    uint32_t mod_start;   // physical start address of the module
+    uint32_t mod_end;
+    uint32_t string;
+    uint32_t reserved;
+};
+
 struct multiboot_aout_symbol_table
 {
   uint32_t tabsize;

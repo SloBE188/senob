@@ -1,16 +1,19 @@
 FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
-all: $(FILES) ./senob/boot/senob.bin 
+all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 	grub-mkrescue -o senob.iso senob/
-	dd if=/dev/zero of=ramdisk.img bs=4M count=1
-	mkfs.vfat ramdisk.img
-	sudo mount -o loop ramdisk.img /mnt
-	sudo umount /mnt
 
 
 ./senob/boot/senob.bin:
 	i686-elf-gcc -T linker.ld -o ./senob/boot/senob.bin -ffreestanding -O2 -nostdlib $(FILES) -lgcc
+
+./senob/boot/ramdisk.img:
+	dd if=/dev/zero of=./senob/boot/ramdisk.img bs=4M count=1
+	mkfs.vfat ./senob/boot/ramdisk.img
+	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
+	# Hier könntest du Dateien nach /mnt kopieren, falls nötig
+	sudo umount /mnt
 
 ./build/kernel.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/kernel.c -o ./build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra

@@ -49,7 +49,8 @@ void add_process(struct pcb* new_process)
     new_process->next = NULL;
     new_process->prev = pcb_tail;
     new_process->pid = ++process_id;
-    if (pcb_tail) {
+    if (pcb_tail) 
+    {
         pcb_tail->next = new_process;
     }
     pcb_tail = new_process;
@@ -57,7 +58,8 @@ void add_process(struct pcb* new_process)
 
 void add_thread_to_process(struct pcb* process, struct thread* new_thread)
 {
-    if (process->thread_head == NULL) {
+    if (process->thread_head == NULL) 
+    {
         // if there are no threads in the process it will be the first one
         process->thread_head = new_thread;
         process->thread_tail = new_thread;
@@ -126,13 +128,15 @@ struct pcb* create_process(uint32_t* page_directory, struct thread* first_thread
 
 void context_switch(struct thread* next_thread)
 {
-    if (next_thread == NULL || next_thread->state == TERMINATED) {
+    if (next_thread == NULL || next_thread->state == TERMINATED) 
+    {
         printf("Next thread is NULL, unable to perform context switch\n");
         return;
     }
 
     // if i switch from the current thread, save his state
-    if (current_thread != NULL) {
+    if (current_thread != NULL) 
+    {
         asm volatile (
             "mov %%esp, %0\n"
             "mov %%ebp, %1\n"

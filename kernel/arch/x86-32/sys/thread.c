@@ -42,7 +42,8 @@ void create_user_thread(struct pcb* process, void(*start_function)())
 void create_thread(struct pcb* process, void (*start_function)(), bool iskernelthreadornot)
 {
     struct thread* new_thread = (struct thread*) kmalloc(sizeof(struct thread));
-    if (new_thread == NULL) {
+    if (new_thread == NULL) 
+    {
         printf("Failed to allocate memory for new thread\n");
         return;
     }
@@ -57,7 +58,8 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
 
     // Allocate kernel stack for the new thread
     new_thread->kernel_stack = (uint32_t*) kmalloc(KERNEL_STACK_SIZE);
-    if (new_thread->kernel_stack == NULL) {
+    if (new_thread->kernel_stack == NULL) 
+    {
         printf("Failed to allocate memory for kernel stack\n");
         kfree(new_thread);
         return;
@@ -65,7 +67,8 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     memset(new_thread->kernel_stack, 0x00, KERNEL_STACK_SIZE);
 
     // Set stack pointer to the top of the new stack
-    if (iskernelthreadornot) {
+    if (iskernelthreadornot) 
+    {
         new_thread->regs.esp = (uint32_t)(new_thread->kernel_stack + (KERNEL_STACK_SIZE / sizeof(uint32_t)));
         new_thread->regs.ebp = new_thread->regs.esp;
         new_thread->user_stack = NULL;
@@ -88,7 +91,8 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     new_thread->regs.e_flags = INTERRUPTS_ENABLED;
 
     // set tss for user threads directly
-    if (!iskernelthreadornot) {
+    if (!iskernelthreadornot) 
+    {
         // Update TSS to point to the new kernel stack for this user thread
         tss.esp0 = (uint32_t)(new_thread->kernel_stack + KERNEL_STACK_SIZE / sizeof(uint32_t));
         tss.ss0 = KERNEL_DATA_SEGMENT;

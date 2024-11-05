@@ -45,7 +45,8 @@ void heap_init() {
 }
 
 //get the starting block for a new mapping
-int heap_get_start_block(struct heap* heap, int total_blocks) {
+int heap_get_start_block(struct heap* heap, int total_blocks) 
+{
     int current_run_start = -1;
     int current_run_length = 0;
 

@@ -183,16 +183,19 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
     // checks if all entrys in the page table are free, if yes, remove = true
     bool remove = true;
     for (uint32_t i = 0; i < 1024; i++) {
-        if (pt[i] & PAGE_FLAG_PRESENT) {
+        if (pt[i] & PAGE_FLAG_PRESENT) 
+        {
             remove = false;
             break;
         }
     }
 
-    if (remove) {
+    if (remove) 
+    {
         // table is empty, destroy its physical frame if im the page owner.
         uint32_t pde = page_dir[pd_index];
-        if (pde & PAGE_FLAG_OWNER) {
+        if (pde & PAGE_FLAG_OWNER) 
+        {
             uint32_t pt_paddr = P_PHYS_ADDR(pde);
             pmm_free_pageframe(pt_paddr);
             page_dir[pd_index] = 0;
@@ -202,7 +205,8 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
     invalidate(virt_addr);
 
     // free it here
-    if (pte & PAGE_FLAG_OWNER) {
+    if (pte & PAGE_FLAG_OWNER) 
+    {
         pmm_free_pageframe(P_PHYS_ADDR(pte));
     }
 
@@ -218,7 +222,8 @@ uint32_t mem_unmap_page(uint32_t virt_addr) {
     return pte;
 }
 
-uint32_t* mem_alloc_page_dir() {
+uint32_t* mem_alloc_page_dir() 
+{
 
     for (int i = 0; i < NUM_PAGE_DIRS; i++) {
         if (!pageDirsUsed[i]) {
@@ -248,7 +253,8 @@ uint32_t* mem_alloc_page_dir() {
 
 
 // frees the user page tables from the give page dir
-void mem_free_page_dir(uint32_t* page_dir) {
+void mem_free_page_dir(uint32_t* page_dir) 
+{
 
     uint32_t* prev_pagedir = mem_get_current_page_directory();
     mem_change_page_directory(page_dir);
@@ -267,13 +273,13 @@ void mem_free_page_dir(uint32_t* page_dir) {
         for (int j = 0; j < 1024; j++) {
             uint32_t pte = ptable[j];
 
-            if (pte & PAGE_FLAG_OWNER) {
+            if (pte & PAGE_FLAG_OWNER) 
                 pmm_free_pageframe(P_PHYS_ADDR(pte));
-            }
         }
         memset(ptable, 0, 4096);
 
-        if (pde & PAGE_FLAG_OWNER) {
+        if (pde & PAGE_FLAG_OWNER) 
+        {
             // created this pagetable, free it now
             pmm_free_pageframe(P_PHYS_ADDR(pde));
         }
@@ -286,7 +292,8 @@ void mem_free_page_dir(uint32_t* page_dir) {
 }
 
 // sync the kernel portions of all in-use pagedirs
-void sync_page_dirs() {
+void sync_page_dirs() 
+{
 
     for (int i = 0; i < NUM_PAGE_DIRS; i++) {
         if (pageDirsUsed[i]) {
@@ -299,7 +306,8 @@ void sync_page_dirs() {
     }
 }
 
-uint32_t mem_get_phys_from_virt(uint32_t virt_addr) {
+uint32_t mem_get_phys_from_virt(uint32_t virt_addr) 
+{
 
     uint32_t pd_index = virt_addr >> 22;
     uint32_t* page_dir = REC_PAGEDIR;
@@ -313,7 +321,8 @@ uint32_t mem_get_phys_from_virt(uint32_t virt_addr) {
     return P_PHYS_ADDR(pt[pt_index]);
 }
 
-bool mem_is_valid_vaddr(uint32_t vaddr) {
+bool mem_is_valid_vaddr(uint32_t vaddr) 
+{
     
     uint32_t pd_index = vaddr >> 22;
     uint32_t pt_index = vaddr >> 12 & 0x3FF;

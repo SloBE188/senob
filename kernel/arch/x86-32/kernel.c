@@ -38,45 +38,6 @@ extern void rust_testfunction();
 
 #define magic 0x1BADB002
 
-void trigger_breakpoint() {
-    asm volatile("int $3");
-}
-
-void trigger_general_protection_fault() {
-    asm volatile (
-        "mov $0x10, %ax\n\t"
-        "ltr %ax"
-    );
-}
-
-void trigger_division_by_zero() {
-    asm volatile (
-        "movl $1, %eax\n\t"
-        "movl $0, %ebx\n\t"
-        "divl %ebx"
-    );
-}
-
-
-void trigger_bound_range_exceeded() {
-    int array[2] = {1, 2};
-    asm volatile (
-        "movl %0, %%eax\n\t"
-        "movl $2, %%ecx\n\t"
-        "bound %%ecx, (%%eax)"
-        :
-        : "r"(array)
-    );
-}
-
-void trigger_overflow() {
-    asm volatile (
-        "add $0x7FFFFFFF, %eax\n\t"
-        "add $1, %eax\n\t"
-        "into"
-    );
-}
-
 void kernel_panic(const char* message) 
 {
     printf("Kernel Panic: %s\n", message);
@@ -126,7 +87,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     uint32_t physicalAllocStart = 0x100000 * 16;
 
-    init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);
+    init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);       //mem_upper comes in KiB (hex 0x1fb80), so it gets multiplied by 1024 so i got it in bytes
     heap_init();
     test_heap_shrink_and_reuse();
     //printf("Its gonna be alright.\n");
