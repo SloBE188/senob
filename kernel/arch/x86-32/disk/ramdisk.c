@@ -19,6 +19,7 @@
 #include "../mm/paging/paging.h"
 #include "../mm/PMM/pmm.h"
 #include <stdbool.h>
+#include "../../../libk/memory.h"
 
 bool using_ramdisk = false;
 struct ramdisk ramdisk;
@@ -32,8 +33,37 @@ void create_ramdisk()
     for (int i = 0; i < pages_needed_for_ramdisk; i++)
         {
             uint32_t offset = i * PAGE_SIZE;
-            mem_map_page(RAMDISKVIRTUALADRESS + offset, ramdisk.phys_addr + offset, 0);
+            mem_map_page(RAMDISKVIRTUALADRESS + offset, ramdisk.phys_addr + offset, PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
         }
     
     
+}
+
+
+void init_ramdisk_disk(struct multiboot_info* mbinfo)
+{
+
+    struct multiboot_module* mod;
+    if (mbinfo->mods_count > 0)
+    {
+        mod = (struct multiboot_module*)mbinfo->mods_addr;
+        printf("Ram Disk module loaded at physical addr: %x\n", mod->mod_start);
+    }
+    using_ramdisk = true;
+    
+    memset(&ramdisk, 0x00, sizeof(struct ramdisk));
+    ramdisk.phys_addr = mod->mod_start;
+    ramdisk.size = mod->mod_end - mod->mod_start;
+
+}
+
+void dis_read_sector(void* buffer, uint32_t sector)
+{
+    if (sector * SECTOR_SIZE >= ramdisk.size)
+    {
+        printf("Not able to read sector, its out of space from the ramdisk.\n");
+        return;
+    }
+    
+    memcpy(buffer, RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, SECTOR_SIZE);
 }
