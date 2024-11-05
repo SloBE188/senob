@@ -85,12 +85,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     //draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
 
-
-    uint32_t physicalAllocStart = 0x100000 * 16;
-
-    init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);       //mem_upper comes in KiB (hex 0x1fb80), so it gets multiplied by 1024 so i got it in bytes
-    heap_init();
-    //test_heap_shrink_and_reuse();
     
     if (multibootinfo->mods_count > 0)
     {
@@ -98,13 +92,19 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
         printf("Ram Disk module loaded at physical addr: %x\n", module1->mod_start);
     }
     
+    uint32_t physicalAllocStart = 0x100000 * 16;
 
     if (using_ramdisk)
     {
-        
-    }
-    
+        physicalAllocStart = (ramdisk.phys_addr + ramdisk.size + 0xFFF) & 0xFFFFF000;
 
+    }
+
+
+    init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);       //mem_upper comes in KiB (hex 0x1fb80), so it gets multiplied by 1024 so i got it in bytes
+    heap_init();
+    
+    test_heap_shrink_and_reuse();
     //rust_testfunction();
 
     //uint32_t* new_dir = mem_alloc_page_dir();
