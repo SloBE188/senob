@@ -32,6 +32,7 @@
 #include "sys/process.h"
 #include "sys/thread.h"
 #include "../../libk/memory.h"
+#include "disk/ramdisk.h"
 
 
 extern void rust_testfunction();
@@ -89,8 +90,20 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);       //mem_upper comes in KiB (hex 0x1fb80), so it gets multiplied by 1024 so i got it in bytes
     heap_init();
-    test_heap_shrink_and_reuse();
-    //printf("Its gonna be alright.\n");
+    //test_heap_shrink_and_reuse();
+    
+    if (multibootinfo->mods_count > 0)
+    {
+        struct multiboot_module* module1 = multibootinfo->mods_addr;
+        printf("Ram Disk module loaded at physical addr: %x\n", module1->mod_start);
+    }
+    
+
+    if (using_ramdisk)
+    {
+        
+    }
+    
 
     //rust_testfunction();
 

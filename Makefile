@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 
 
 all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
@@ -12,7 +12,7 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 	dd if=/dev/zero of=./senob/boot/ramdisk.img bs=4M count=1
 	mkfs.vfat ./senob/boot/ramdisk.img
 	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
-	# Hier könntest du Dateien nach /mnt kopieren, falls nötig
+	# here i can copy files to /mnt (ramdisk)
 	sudo umount /mnt
 
 ./build/kernel.o:
@@ -20,6 +20,9 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 
 ./build/boot.o:
 	nasm -f elf ./kernel/arch/x86-32/boot/boot.s -o ./build/boot.o
+
+./build/disk/ramdisk.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/disk/ramdisk.c -o ./build/disk/ramdisk.o
 
 ./build/gdt/gdt.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/gdt/gdt.c -o ./build/gdt/gdt.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
