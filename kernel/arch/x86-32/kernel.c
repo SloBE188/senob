@@ -100,7 +100,8 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);       //mem_upper comes in KiB (hex 0x1fb80), so it gets multiplied by 1024 so i got it in bytes
     heap_init();
     
-    test_heap_shrink_and_reuse();
+    
+    //test_heap_shrink_and_reuse();
     //rust_testfunction();
 
     //uint32_t* new_dir = mem_alloc_page_dir();

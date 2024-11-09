@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "../multiboot.h"
 
-#define RAMDISKVIRTUALADRESS 0xE0000000
+#define RAMDISKVIRTUALADRESS 0xE0400000
 #define SECTOR_SIZE 512
 
 struct ramdisk
@@ -16,6 +16,7 @@ struct ramdisk
 
 void create_ramdisk();
 void init_ramdisk_disk(struct multiboot_info* mbinfo);
+void disk_read_sector(void* buffer, uint32_t sector);
 
 extern bool using_ramdisk;
 extern struct ramdisk ramdisk;

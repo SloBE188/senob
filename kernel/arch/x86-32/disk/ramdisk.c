@@ -57,7 +57,7 @@ void init_ramdisk_disk(struct multiboot_info* mbinfo)
 
 }
 
-void dis_read_sector(void* buffer, uint32_t sector)
+void disk_read_sector(void* buffer, uint32_t sector)
 {
     if (sector * SECTOR_SIZE >= ramdisk.size)
     {
