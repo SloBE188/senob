@@ -89,7 +89,14 @@ void disk_read_from_offset(void* buffer, uint32_t offset, uint32_t size)
 //  UINT count        /* [IN] Number of sectors to write */
 //);
 
-void disk_write(void* buffer, uint32_t sector, uint32_t count)
+void disk_write_sector(void* buffer, uint32_t sector, uint32_t count)
 {
+    if (sector + count * SECTOR_SIZE >= ramdisk.size)
+    {
+        printf("You wanna write out of the ramdisk, isnt possible.\n");
+        return;
+    }
+    
     memcpy(RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, buffer, count * SECTOR_SIZE);
 }
+

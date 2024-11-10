@@ -111,7 +111,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     char buffer2 = 'A';
     
-    disk_write(buffer2, 75, 1);
+    disk_write_sector(buffer2, 75, 1);
     disk_read_sector(buffer2, 75);
     printf("Wurde gelesen: %c\n", buffer2);
 
