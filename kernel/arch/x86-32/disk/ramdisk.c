@@ -80,3 +80,16 @@ void disk_read_from_offset(void* buffer, uint32_t offset, uint32_t size)
     printf("Reading from address %x with size %u\n", address, size);
     memcpy(buffer, (void*)address, size);
 }
+
+
+//DRESULT disk_write (
+//  BYTE pdrv,        /* [IN] Physical drive number */
+//  const BYTE* buff, /* [IN] Pointer to the data to be written */
+//  LBA_t sector,     /* [IN] Sector number to write from */
+//  UINT count        /* [IN] Number of sectors to write */
+//);
+
+void disk_write(void* buffer, uint32_t sector, uint32_t count)
+{
+    memcpy(RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, buffer, count * SECTOR_SIZE);
+}

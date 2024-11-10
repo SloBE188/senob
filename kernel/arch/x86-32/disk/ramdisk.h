@@ -18,6 +18,7 @@ void create_ramdisk();
 void init_ramdisk_disk(struct multiboot_info* mbinfo);
 void disk_read_from_offset(void* buffer, uint32_t offset, uint32_t size);
 void disk_read_sector(void* buffer, uint32_t sector);
+void disk_write(void* buffer, uint32_t sector, uint32_t count);
 
 extern bool using_ramdisk;
 extern struct ramdisk ramdisk;
