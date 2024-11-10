@@ -105,7 +105,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     char buffer[512];
     
-    disk_read_sector(buffer, 0x6200, 512);
+    disk_read_from_offset(buffer, 0x6200, 512);
     printf("Wurde gelesen: %s", buffer);
 
     

@@ -57,7 +57,17 @@ void init_ramdisk_disk(struct multiboot_info* mbinfo)
 
 }
 
-void disk_read_sector(void* buffer, uint32_t offset, uint32_t size)
+void disk_read_sector(void* buffer, uint32_t sector)
+{
+    if(sector + SECTOR_SIZE >= ramdisk.size)
+    {
+        printf("Not able to read sector, its out of space from the ramdisk.\n");
+        return;
+    }
+    memcpy(buffer, RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, SECTOR_SIZE);
+}
+
+void disk_read_from_offset(void* buffer, uint32_t offset, uint32_t size)
 {
     if (offset>= ramdisk.size)
     {
