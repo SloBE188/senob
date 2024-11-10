@@ -99,6 +99,15 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart);       //mem_upper comes in KiB (hex 0x1fb80), so it gets multiplied by 1024 so i got it in bytes
     heap_init();
+    printf("Module: %d\n", multibootinfo->mods_count);
+    create_ramdisk();
+
+
+    char buffer[512];
+    
+    disk_read_sector(buffer, 0x6200, 512);
+    printf("Wurde gelesen: %s", buffer);
+
     
     
     //test_heap_shrink_and_reuse();

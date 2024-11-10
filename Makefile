@@ -13,6 +13,7 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 	mkfs.vfat ./senob/boot/ramdisk.img
 	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
 	# here i can copy files to /mnt (ramdisk)
+	sudo cp test.txt /mnt
 	sudo umount /mnt
 
 ./build/kernel.o:
@@ -89,3 +90,4 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 clean:
 	rm -rf ${FILES}
 	rm -rf ./senob/boot/senob.bin
+	rm -rf ./senob/boot/ramdisk.img

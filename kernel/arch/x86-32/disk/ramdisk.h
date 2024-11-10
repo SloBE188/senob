@@ -16,7 +16,7 @@ struct ramdisk
 
 void create_ramdisk();
 void init_ramdisk_disk(struct multiboot_info* mbinfo);
-void disk_read_sector(void* buffer, uint32_t sector);
+void disk_read_sector(void* buffer, uint32_t offset, uint32_t size);
 
 extern bool using_ramdisk;
 extern struct ramdisk ramdisk;
