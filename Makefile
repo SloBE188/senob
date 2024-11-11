@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/thread.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/libk/string.o ./build/sys/thread.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 FLAGS= -std=gnu99 -O2 -Wall -Wextra -ffreestanding -fpermissive -nostdlib -lgcc
 
 all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
@@ -41,6 +41,9 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 ./build/libk/stdiok.o:
 	i686-elf-gcc -g -c ./kernel/libk/stdiok.c -o ./build/libk/stdiok.o $(FLAGS)
 
+./build/libk/string.o:
+	i686-elf-gcc -g -c ./kernel/libk/string.c -o ./build/libk/string.o $(FLAGS)
+
 
 ./build/interrupts/idt.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/interrupts/idt.c -o ./build/interrupts/idt.o $(FLAGS)
@@ -53,7 +56,6 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 
 ./build/io/io.s.o:
 	nasm -f elf ./kernel/arch/x86-32/io/io.s -o ./build/io/io.s.o
-
 
 ./build/drivers/keyboard.o:
 	i686-elf-gcc -g -c ./drivers/keyboard/keyboard.c -o ./build/drivers/keyboard.o $(FLAGS)
@@ -85,6 +87,12 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 
 ./build/sys/process.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/process.c -o ./build/sys/process.o $(FLAGS)
+
+./build/fatfs/diskio.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/fatfs/diskio.c -o ./build/fatfs/diskio.o $(FLAGS)
+
+./build/fatfs/ff.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/fatfs/ff.c -o ./build/fatfs/ff.o $(FLAGS)
 
 
 clean:

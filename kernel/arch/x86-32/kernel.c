@@ -33,6 +33,8 @@
 #include "sys/thread.h"
 #include "../../libk/memory.h"
 #include "disk/ramdisk.h"
+#include "fatfs/ff.h"
+#include "fatfs/diskio.h"
 
 
 extern void rust_testfunction();
@@ -106,14 +108,32 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     char buffer[512];
     
     //disk_read_from_offset(buffer, 0x6200, 512);
-    disk_read_sector(buffer, 49, 1);
+    //disk_read_sector(buffer, 49, 1);
+    disk_read(0, buffer, 49, 1);
     printf("Wurde gelesen: %s\n", buffer);
 
-    char buffer2 = 'A';
+    disk_initialize(0);
+
+    FATFS fs;
+    FRESULT res;
+
+    res = f_mount(&fs, "", 1);
+    printf("result of mount: %d\n", res);
+    
+    if (res != FR_OK)
+    {
+        printf("Filesystem mount failed.\n");
+    }else
+    {
+        printf("Filesystem mounted successfully!\n");
+    }
+    
+
+    /*char buffer2 = 'A';
     
     disk_write_sector(buffer2, 75, 1);
     disk_read_sector(buffer2, 75, 1);
-    printf("Wurde gelesen: %c\n", buffer2);
+    printf("Wurde gelesen: %c\n", buffer2);*/
 
     
     

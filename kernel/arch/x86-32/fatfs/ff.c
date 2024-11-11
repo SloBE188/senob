@@ -19,9 +19,11 @@
 /----------------------------------------------------------------------------*/
 
 
-#include <string.h>
+//#include <string.h>
 #include "ff.h"			/* Declarations of FatFs API */
 #include "diskio.h"		/* Declarations of device I/O functions */
+#include "../../../libk/memory.h"
+#include "../../../libk/string.h"
 
 
 /*--------------------------------------------------------------------------
@@ -29,6 +31,11 @@
    Module Private Definitions
 
 ---------------------------------------------------------------------------*/
+
+DWORD get_fattime(void)
+{
+	return 0;
+}
 
 #if FF_DEFINED != 80286	/* Revision ID */
 #error Wrong include file (ff.h).
@@ -3035,7 +3042,7 @@ static FRESULT create_name (	/* FR_OK: successful, FR_INVALID_NAME: could not cr
 	if (i == 0) return FR_INVALID_NAME;	/* Reject nul string */
 
 	if (sfn[0] == DDEM) sfn[0] = RDDEM;	/* If the first character collides with DDEM, replace it with RDDEM */
-	sfn[NSFLAG] = (c <= ' ' || p[si] <= ' ') ? NS_LAST : 0;	/* Set last segment flag if end of the path */
+	sfn[NSFLAG] = (c <= ' ' || p[si] <= ' ') ? NS_LAST : 0;	/* Set last segment flag if end   of the path */
 
 	return FR_OK;
 #endif /* FF_USE_LFN */

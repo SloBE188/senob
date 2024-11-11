@@ -25,7 +25,15 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive nmuber to identify the drive */
 )
 {
-	return 0; 	//always ok because i use ramdisk
+	if (pdrv == 0)
+	{
+		return FR_OK;
+	}else
+	{
+		return STA_NOINIT;
+	}
+	
+	
 	/*DSTATUS stat;
 	int result;
 
@@ -64,7 +72,13 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber to identify the drive */
 )
 {
-	return 0;	//Already done because i use a ramdisk
+	if (pdrv == 0)
+	{
+		return FR_OK;
+	}else
+	{
+		return STA_NOINIT;
+	}
 	/*DSTATUS stat;
 	int result;
 
@@ -119,7 +133,7 @@ DRESULT disk_read (
 
 		return res;
 
-	case DEV_MMC :
+	/*case DEV_MMC :
 		// translate the arguments here
 
 		result = MMC_disk_read(buff, sector, count);
@@ -135,7 +149,7 @@ DRESULT disk_read (
 
 		// translate the reslut code here
 
-		return res;
+		return res;*/
 	}
 
 	return RES_PARERR;
@@ -169,7 +183,7 @@ DRESULT disk_write (
 
 		return res;
 
-	case DEV_MMC :
+	/*case DEV_MMC :
 		// translate the arguments here
 
 		result = MMC_disk_write(buff, sector, count);
@@ -185,7 +199,7 @@ DRESULT disk_write (
 
 		// translate the reslut code here
 
-		return res;
+		return res;*/
 	}
 
 	return RES_PARERR;
