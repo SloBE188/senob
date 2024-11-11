@@ -106,13 +106,13 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     char buffer[512];
     
     //disk_read_from_offset(buffer, 0x6200, 512);
-    disk_read_sector(buffer, 49);
+    disk_read_sector(buffer, 49, 1);
     printf("Wurde gelesen: %s\n", buffer);
 
     char buffer2 = 'A';
     
     disk_write_sector(buffer2, 75, 1);
-    disk_read_sector(buffer2, 75);
+    disk_read_sector(buffer2, 75, 1);
     printf("Wurde gelesen: %c\n", buffer2);
 
     

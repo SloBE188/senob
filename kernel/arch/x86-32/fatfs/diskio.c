@@ -9,6 +9,7 @@
 
 #include "ff.h"			/* Obtains integer types */
 #include "diskio.h"		/* Declarations of disk functions */
+#include "../disk/ramdisk.h"
 
 /* Definitions of physical drive number for each drive */
 #define DEV_RAM		0	/* Example: Map Ramdisk to physical drive 0 */
@@ -24,7 +25,8 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive nmuber to identify the drive */
 )
 {
-	DSTATUS stat;
+	return 0; 	//always ok because i use ramdisk
+	/*DSTATUS stat;
 	int result;
 
 	switch (pdrv) {
@@ -49,7 +51,7 @@ DSTATUS disk_status (
 
 		return stat;
 	}
-	return STA_NOINIT;
+	return STA_NOINIT;*/
 }
 
 
@@ -62,7 +64,8 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber to identify the drive */
 )
 {
-	DSTATUS stat;
+	return 0;	//Already done because i use a ramdisk
+	/*DSTATUS stat;
 	int result;
 
 	switch (pdrv) {
@@ -87,7 +90,7 @@ DSTATUS disk_initialize (
 
 		return stat;
 	}
-	return STA_NOINIT;
+	return STA_NOINIT;*/
 }
 
 
@@ -110,7 +113,7 @@ DRESULT disk_read (
 	case DEV_RAM :
 		// translate the arguments here
 
-		result = RAM_disk_read(buff, sector, count);
+		result = disk_read_sector(buff, sector, count);
 
 		// translate the reslut code here
 
@@ -160,7 +163,7 @@ DRESULT disk_write (
 	case DEV_RAM :
 		// translate the arguments here
 
-		result = RAM_disk_write(buff, sector, count);
+		result = disk_write_sector(buff, sector, count);
 
 		// translate the reslut code here
 

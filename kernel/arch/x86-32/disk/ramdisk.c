@@ -20,6 +20,7 @@
 #include "../mm/PMM/pmm.h"
 #include <stdbool.h>
 #include "../../../libk/memory.h"
+//#include "../fatfs"
 
 bool using_ramdisk = false;
 struct ramdisk ramdisk;
@@ -57,14 +58,16 @@ void init_ramdisk_disk(struct multiboot_info* mbinfo)
 
 }
 
-void disk_read_sector(void* buffer, uint32_t sector)
+int disk_read_sector(void* buffer, uint32_t sector, uint32_t count)
 {
     if(sector + SECTOR_SIZE >= ramdisk.size)
     {
         printf("Not able to read sector, its out of space from the ramdisk.\n");
         return;
     }
-    memcpy(buffer, RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, SECTOR_SIZE);
+    memcpy(buffer, RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, count * SECTOR_SIZE);
+
+    return 0;
 }
 
 void disk_read_from_offset(void* buffer, uint32_t offset, uint32_t size)
@@ -89,7 +92,7 @@ void disk_read_from_offset(void* buffer, uint32_t offset, uint32_t size)
 //  UINT count        /* [IN] Number of sectors to write */
 //);
 
-void disk_write_sector(void* buffer, uint32_t sector, uint32_t count)
+int disk_write_sector(void* buffer, uint32_t sector, uint32_t count)
 {
     if (sector + count * SECTOR_SIZE >= ramdisk.size)
     {
@@ -98,5 +101,7 @@ void disk_write_sector(void* buffer, uint32_t sector, uint32_t count)
     }
     
     memcpy(RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, buffer, count * SECTOR_SIZE);
+
+    return 0; 
 }
 
