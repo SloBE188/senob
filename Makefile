@@ -9,7 +9,7 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 	i686-elf-gcc -T linker.ld -o ./senob/boot/senob.bin -ffreestanding -O2 -nostdlib $(FILES) -lgcc
 
 ./senob/boot/ramdisk.img:
-	dd if=/dev/zero of=./senob/boot/ramdisk.img bs=4M count=1
+	dd if=/dev/zero of=./senob/boot/ramdisk.img bs=8M count=1
 	mkfs.vfat ./senob/boot/ramdisk.img
 	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
 	# here i can copy files to /mnt (ramdisk)

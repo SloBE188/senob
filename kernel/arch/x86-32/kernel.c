@@ -47,22 +47,6 @@ void kernel_panic(const char* message)
     while (1);
 }
 
-void dummyfunction1()
-{
-    
-    while(1){}
-    //thread_exit();
-    
-}
-
-
-void dummyfunction2()
-{
-    printf("Hallo, ich bin Kernel Thread Nr.1\n");
-    while(1){}
-    //thread_exit();
-}
-
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 {
@@ -87,8 +71,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
     //draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
 
-
-
     init_ramdisk_disk(multibootinfo);
 
     uint32_t physicalAllocStart = 0x100000 * 16;
@@ -104,20 +86,28 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     printf("Module: %d\n", multibootinfo->mods_count);
     create_ramdisk();
 
+    disk_initialize(0);
+    disk_status(0);
 
     char buffer[512];
-    
+    char readin[20] = "nilsnilsnilsnilsnils";
     //disk_read_from_offset(buffer, 0x6200, 512);
     //disk_read_sector(buffer, 49, 1);
-    disk_read(0, buffer, 49, 1);
+    disk_read(0, buffer, 64, 1);
     printf("Wurde gelesen: %s\n", buffer);
+    //disk_write_sector(readin, 75, 1);
+    disk_write(0, readin, 75, 1);
 
-    disk_initialize(0);
+    char result[20];
+    disk_read(0, result, 75, 1);
+    printf("2Wurde gelesen: %s\n", result);
+
+
 
     FATFS fs;
     FRESULT res;
 
-    res = f_mount(&fs, "", 1);
+    res = f_mount(&fs, "0:", 1);
     printf("result of mount: %d\n", res);
     
     if (res != FR_OK)
@@ -128,50 +118,27 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
         printf("Filesystem mounted successfully!\n");
     }
     
+    FIL fil;        // File object
+    FRESULT res1;
+    char buffer4[64]; 
 
+    res1 = f_open(&fil, "0:test.txt", FA_READ);
+    if (res1 == FR_OK) {
+        UINT br;
+        res1 = f_read(&fil, buffer4, sizeof(buffer4) - 1, &br);
+        if (res1 == FR_OK) {
+            buffer4[br] = '\0'; // Null-terminating string
+            printf("File content: %s\n", buffer4);
+        }
+        f_close(&fil);
+    } else {
+        printf("Failed to open file with error code: %d\n", res1);
+    }
     /*char buffer2 = 'A';
     
     disk_write_sector(buffer2, 75, 1);
     disk_read_sector(buffer2, 75, 1);
     printf("Wurde gelesen: %c\n", buffer2);*/
-
-    
-    
-    //test_heap_shrink_and_reuse();
-    //rust_testfunction();
-
-    //uint32_t* new_dir = mem_alloc_page_dir();
-    //mem_change_page_directory(new_dir);
-    
-
-    /*struct pcb* idle_process = (struct pcb*) kmalloc(sizeof(struct pcb));
-    printf("created idle process successfully\n");
-    init_processes(idle_process);
-    printf("Idle process initialization successfull\n");
-    create_kernel_thread(idle_process, idle_thread);
-    idle_process->thread_head->state = IDLET;
-    printf("kernel thread for idle process created\n");*/
-
-
-    //context_switch(idle_process->thread_head);
-    /*struct pcb* user_process = (struct pcb*) kmalloc(sizeof(struct pcb));
-    printf("Creating user process\n");
-    init_processes(user_process);
-    create_user_thread(user_process, dummyfunction1);
-    //proc_enter_usermode();
-    struct pcb* kernelprocess = (struct pcb*) kmalloc(sizeof(struct pcb));
-    create_kernel_thread(kernelprocess, dummyfunction2);
-    printf("Ich bin der Thread Nr: %d vom Prozess %d", kernelprocess->thread_count, kernelprocess->pid);
-    context_switch(kernelprocess->thread_head);*/
-
-    
-   
-
-    //context_switch(user_process->thread_head);
-
-    //init_pit(50);
-
-    //schedule();
     
     
 

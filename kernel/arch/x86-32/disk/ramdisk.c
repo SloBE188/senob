@@ -55,6 +55,7 @@ void init_ramdisk_disk(struct multiboot_info* mbinfo)
     memset(&ramdisk, 0x00, sizeof(struct ramdisk));
     ramdisk.phys_addr = mod->mod_start;
     ramdisk.size = mod->mod_end - mod->mod_start;
+    printf("Ram Disk size: %x\n", ramdisk.size);
 
 }
 
