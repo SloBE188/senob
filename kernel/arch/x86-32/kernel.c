@@ -124,7 +124,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     res1 = f_open(&fil, "0:test.txt", FA_READ);
     if (res1 == FR_OK) {
-        UINT br;
+        UINT br;    //referenzparameter
         res1 = f_read(&fil, buffer4, sizeof(buffer4) - 1, &br);
         if (res1 == FR_OK) {
             buffer4[br] = '\0'; // Null-terminating string
@@ -133,6 +133,80 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
         f_close(&fil);
     } else {
         printf("Failed to open file with error code: %d\n", res1);
+    }
+
+
+    FIL logfile;
+    UINT byteswritten;
+
+    f_open(&logfile, "logs.txt", FA_WRITE | FA_CREATE_ALWAYS);
+    char* logstarttext = "The start of the logs";
+    f_write(&logfile, logstarttext, strlen(logstarttext), &byteswritten);
+    f_close(&logfile);
+
+
+
+    DIR dir;
+    FILINFO fno;
+
+    if (f_opendir(&dir, "0:/") == FR_OK) {
+        while (f_readdir(&dir, &fno) == FR_OK && fno.fname[0] != 0) {
+            printf("Gefunden: %s\n", fno.fname);
+        }
+        f_closedir(&dir);
+    }
+
+
+    //FRESULT f_read
+	//FIL* fp, 	/* Open file to be read */
+	//void* buff,	/* Data buffer to store the read data */
+	//UINT btr,	/* Number of bytes to read */
+	//UINT* br	/* Number of bytes read */
+
+    FIL readlog;
+    FRESULT check;
+    
+    char buffrrr[512];
+    UINT bytesreadd;
+
+    check = f_open(&readlog, "0:logs.txt", FA_READ);
+    if (check == FR_OK)
+    {
+        check = f_read(&readlog, &buffrrr, strlen(buffrrr) - 1, &bytesreadd);
+        if (check == FR_OK)
+        {
+            buffrrr[bytesreadd] = '\0';
+            printf("Read: %s\n", buffrrr);
+        }
+        f_close(&readlog);        
+    }else{
+        printf("cry\n");
+    }
+    
+
+    
+    FRESULT check2;
+    check2 = f_mkdir("0:/senob");
+
+
+    FIL fnfile;
+    UINT byteswritten2;
+
+    f_open(&fnfile, "0:/senob/fnfile.txt", FA_WRITE | FA_CREATE_ALWAYS);
+    char* fn = "it is what it is";
+    f_write(&fnfile, logstarttext, strlen(logstarttext), &byteswritten2);
+    f_close(&fnfile);
+
+
+
+    DIR dir2;
+    FILINFO fno2;
+
+    if (f_opendir(&dir2, "0:/senob") == FR_OK) {
+        while (f_readdir(&dir2, &fno2) == FR_OK && fno2.fname[0] != 0) {
+            printf("Gefunden: %s\n", fno2.fname);
+        }
+        f_closedir(&dir2);
     }
     /*char buffer2 = 'A';
     

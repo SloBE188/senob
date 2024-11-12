@@ -4,6 +4,7 @@
 
 
 char* strchr(const char* str, int c);
+int strlen(const char* ptr);
 
 
 #endif
