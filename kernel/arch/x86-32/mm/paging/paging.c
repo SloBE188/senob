@@ -91,17 +91,6 @@ uint32_t* mem_get_current_page_directory() {
     return (uint32_t*) pd;
 }
 
-/*void map_user_program(uint32_t* page_dir, uint32_t user_program_size, uint32_t phys_addr_start) {
-    uint32_t virt_addr = 0x00400000;  // startadress for userprogramm
-    uint32_t num_pages = CEIL_DIV(user_program_size, PAGE_SIZE);
-
-    for (uint32_t i = 0; i < num_pages; i++) {
-        uint32_t phys_addr = pmm_alloc_pageframe();  // get physical page
-        mem_map_page(virt_addr, phys_addr, PAGE_FLAG_USER | PAGE_FLAG_WRITE);
-        virt_addr += PAGE_SIZE;  // go to the next virtual address depending on the size of the userprogramm i need more than 1 page so the adress wil go from 0x00400000 - 0x00400000 + size of the userprogramm
-    }
-}*/
-
 
 // addresses need to be page aligned (4096)
 void mem_map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags) {

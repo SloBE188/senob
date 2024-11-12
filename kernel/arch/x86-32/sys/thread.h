@@ -93,10 +93,9 @@ struct thread
 };
 
 
-void mem_map_page(uint32_t virt_addr, uint32_t phys_addr, uint32_t flags);
-void create_thread(struct pcb* process, void (*start_function)(), bool iskernelthreadornot);
-void create_kernel_thread(struct pcb* process, void(*start_function)());
-void create_user_thread(struct pcb* process, void(*start_function)());
+struct thread *create_user_thread(const char *path, struct pcb *process);
+//void create_kernel_thread(struct pcb* process, void(*start_function)());
+//void create_user_thread(struct pcb* process, void(*start_function)());
 void userland(uint32_t* esp, uint32_t* eip);
 
 #endif

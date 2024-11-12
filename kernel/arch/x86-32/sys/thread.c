@@ -22,14 +22,13 @@
 #include "../../../libk/memory.h"
 #include "../interrupts/idt.h"
 #include "../gdt/gdt.h"
-
+#include "../fatfs/ff.h"
 
 uint32_t thread_id = 0;
 
 extern uint32_t kernel_directory[1024];
 
-
-void create_kernel_thread(struct pcb* process, void(*start_function)())
+/*void create_kernel_thread(struct pcb* process, void(*start_function)())
 {
     create_thread(process, start_function, true);
 }
@@ -37,12 +36,12 @@ void create_kernel_thread(struct pcb* process, void(*start_function)())
 void create_user_thread(struct pcb* process, void(*start_function)())
 {
     create_thread(process, start_function, false);
-}
+}*/
 
-void create_thread(struct pcb* process, void (*start_function)(), bool iskernelthreadornot)
+struct thread *create_user_thread(const char *path, struct pcb *process)
 {
-    struct thread* new_thread = (struct thread*) kmalloc(sizeof(struct thread));
-    if (new_thread == NULL) 
+    struct thread *new_thread = (struct thread *)kmalloc(sizeof(struct thread));
+    if (new_thread == NULL)
     {
         printf("Failed to allocate memory for new thread\n");
         return;
@@ -53,12 +52,9 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     new_thread->id = thread_id;
     new_thread->state = READY;
 
-    uint32_t code_selector = iskernelthreadornot ? KERNEL_CODE_SEGMENT : (USER_CODE_SEGMENT | RPL_USER);
-    uint32_t data_selector = iskernelthreadornot ? KERNEL_DATA_SEGMENT : (USER_DATA_SEGMENT | RPL_USER);
-
     // Allocate kernel stack for the new thread
-    new_thread->kernel_stack = (uint32_t*) kmalloc(KERNEL_STACK_SIZE);
-    if (new_thread->kernel_stack == NULL) 
+    new_thread->kernel_stack = (uint32_t *)kmalloc(KERNEL_STACK_SIZE);
+    if (new_thread->kernel_stack == NULL)
     {
         printf("Failed to allocate memory for kernel stack\n");
         kfree(new_thread);
@@ -66,39 +62,55 @@ void create_thread(struct pcb* process, void (*start_function)(), bool iskernelt
     }
     memset(new_thread->kernel_stack, 0x00, KERNEL_STACK_SIZE);
 
-    // Set stack pointer to the top of the new stack
-    if (iskernelthreadornot) 
+    update_tss_esp0(new_thread->kernel_stack + KERNEL_STACK_SIZE / sizeof(uint32_t));
+
+    new_thread->user_stack = (uint32_t *)USER_STACK_TOP;
+    new_thread->regs.esp = USER_STACK_TOP;
+    new_thread->regs.ebp = USER_STACK_TOP;
+    for (int i = 0; i < USER_STACK_PAGES; i++)
     {
-        new_thread->regs.esp = (uint32_t)(new_thread->kernel_stack + (KERNEL_STACK_SIZE / sizeof(uint32_t)));
-        new_thread->regs.ebp = new_thread->regs.esp;
-        new_thread->user_stack = NULL;
-    } else {
-        new_thread->user_stack = (uint32_t*) USER_STACK_TOP;
-        new_thread->regs.esp = USER_STACK_TOP;
-        new_thread->regs.ebp = USER_STACK_TOP;
-        for (int i = 0; i < USER_STACK_PAGES; i++) {
-            mem_map_page(USER_STACK_TOP - (i * PAGE_SIZE), pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
-        }
+        mem_map_page(USER_STACK_TOP - (i * PAGE_SIZE), pmm_alloc_pageframe(), PAGE_FLAG_OWNER | PAGE_FLAG_USER | PAGE_FLAG_WRITE);
     }
 
-    new_thread->regs.cs = code_selector;
-    new_thread->regs.ds = data_selector;
-    new_thread->regs.es = data_selector;
-    new_thread->regs.fs = data_selector;
-    new_thread->regs.gs = data_selector;
-    new_thread->regs.ss = data_selector;
-    new_thread->regs.eip = (uint32_t)start_function;
+    new_thread->regs.cs = USER_CODE_SEGMENT;
+    new_thread->regs.ds = USER_DATA_SEGMENT;
+    new_thread->regs.es = USER_DATA_SEGMENT;
+    new_thread->regs.fs = USER_DATA_SEGMENT;
+    new_thread->regs.gs = USER_DATA_SEGMENT;
+    new_thread->regs.ss = USER_DATA_SEGMENT;
+    new_thread->regs.eip = 0x00400000;
     new_thread->regs.e_flags = INTERRUPTS_ENABLED;
 
-    // set tss for user threads directly
-    if (!iskernelthreadornot) 
+    FIL userprogramfile;
+    FILINFO userprograminfo;
+
+    FRESULT res = f_stat(path, &userprograminfo);
+    uint32_t program_size = userprograminfo.fsize;
+
+
+    //mapping the pages for the new userprogram at address 0x00400000
+    uint32_t pages_needed = CEIL_DIV(program_size, PAGE_SIZE);
+    for (uint32_t i = 0; i < pages_needed; i++)
     {
-        // Update TSS to point to the new kernel stack for this user thread
-        tss.esp0 = (uint32_t)(new_thread->kernel_stack + KERNEL_STACK_SIZE / sizeof(uint32_t));
-        tss.ss0 = KERNEL_DATA_SEGMENT;
+        uint32_t virt_addr = 0x00400000 + (i * PAGE_SIZE);
+        uint32_t phys_addr = pmm_alloc_pageframe();
+        mem_map_page(virt_addr, phys_addr, PAGE_FLAG_USER | PAGE_FLAG_WRITE | PAGE_FLAG_PRESENT);
     }
+
+    //copy the userprogram from the ramdisk to the mapped addresses starting by 0x00400000
+    uint8_t buffer[PAGE_SIZE];
+    uint32_t bytes_read;
+    for (uint32_t i = 0; i < pages_needed; i++)
+    {
+        uint32_t virt_addr = 0x00400000 + (i * PAGE_SIZE);
+        f_read(&userprogramfile, buffer, PAGE_SIZE, &bytes_read);
+        memcpy((void *)virt_addr, buffer, bytes_read); 
+    }
+
+    f_close(&userprogramfile);
 
     // Add thread to the specific process's thread list
     add_thread_to_process(process, new_thread);
-}
 
+    return new_thread;
+}

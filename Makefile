@@ -1,7 +1,7 @@
 FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/libk/string.o ./build/sys/thread.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 FLAGS= -std=gnu99 -O2 -Wall -Wextra -ffreestanding -fpermissive -nostdlib -lgcc
 
-all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
+all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 	grub-mkrescue -o senob.iso senob/
 
 
@@ -12,8 +12,9 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 	dd if=/dev/zero of=./senob/boot/ramdisk.img bs=8M count=1
 	mkfs.vfat ./senob/boot/ramdisk.img
 	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
-	# here i can copy files to /mnt (ramdisk)
-	sudo cp test.txt /mnt
+	# here i c1an copy files to /mnt (ramdisk)
+	sudo cp ./test.txt /mnt
+	# sudo cp ./programs/blank/bin/blank.bin /mnt
 	sudo umount /mnt
 
 ./build/kernel.o:
@@ -95,7 +96,14 @@ all: $(FILES) ./senob/boot/senob.bin ./senob/boot/ramdisk.img
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/fatfs/ff.c -o ./build/fatfs/ff.o $(FLAGS)
 
 
-clean:
+programs:
+	cd ./programs/blank && $(MAKE) all
+
+
+programs_clean:
+	cd ./programs/blank && $(MAKE) clean
+
+clean: programs_clean
 	rm -rf ${FILES}
 	rm -rf ./senob/boot/senob.bin
 	rm -rf ./senob/boot/ramdisk.img

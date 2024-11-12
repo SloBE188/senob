@@ -134,7 +134,7 @@ DRESULT disk_read (
 		// translate the reslut code here
 
 		if (result == 0) {
-    	res = RES_OK;
+    		res = RES_OK;
 		} else {
 			res = RES_ERROR;
 		}
@@ -188,7 +188,7 @@ DRESULT disk_write (
 		// translate the reslut code here
 
 		if (result == 0) {
-    	res = RES_OK;
+    		res = RES_OK;
 		} else {
 			res = RES_ERROR;
 		}
