@@ -14,7 +14,7 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
 	# here i c1an copy files to /mnt (ramdisk)
 	sudo cp ./test.txt /mnt
-	# sudo cp ./programs/blank/bin/blank.bin /mnt
+	# sudo cp ./programs/blank/blank.bin /mnt
 	sudo umount /mnt
 
 ./build/kernel.o:
@@ -95,13 +95,14 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 ./build/fatfs/ff.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/fatfs/ff.c -o ./build/fatfs/ff.o $(FLAGS)
 
-
+.PHONY: programs
 programs:
-	cd ./programs/blank && $(MAKE) all
+	@echo "Running make in programs/blank..."
+	cd ./programs/blank/ && $(MAKE) all
 
 
 programs_clean:
-	cd ./programs/blank && $(MAKE) clean
+	cd ./programs/blank/ && $(MAKE) clean
 
 clean: programs_clean
 	rm -rf ${FILES}
