@@ -16,6 +16,15 @@ struct process
 
 } __attribute__((packed));
 
+struct registers
+{
+        uint32_t eax, ecx, edx, ebx;
+        uint32_t esp, ebp, esi, edi;
+        uint32_t eip, eflags;
+        uint32_t cs:16, ss:16, ds:16, es:16, fs:16, gs:16;
+        uint32_t cr3;
+};
+
 struct thread
 {
     uint32_t thread_id;
@@ -39,6 +48,8 @@ struct thread
 
 };
 
-
+struct process* create_process(char* filename);
+extern void task_switch(struct registers* regs);
+void switch_to_thread(struct thread* thread);
 
 #endif

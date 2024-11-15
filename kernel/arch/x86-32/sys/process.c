@@ -110,33 +110,45 @@ struct process* create_process(char* filename)
 
    void* end_of_stack = USER_STACK_TOP - (PAGE_SIZE * count_stack_pages);
    uint32_t physical_frames[count_stack_pages];
+   for (uint32_t i = 0; i < count_stack_pages; i++)
+   {
+        physical_frames[i] = pmm_alloc_pageframe();
+        mem_map_page(end_of_stack, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
+   }
+
+    uint32_t segment_selector = 0x23;
+    new_thread->regs.ss = segment_selector;
+    new_thread->regs.eflags = 0x202;
+    new_thread->regs.cs = 0x1B;
+    new_thread->regs.eip = PROGRAMM_VIRTUAL_ADDRESS_START;
+    new_thread->regs.ds = segment_selector;
+    new_thread->regs.es = segment_selector;
+    new_thread->regs.fs = segment_selector;
+    new_thread->regs.gs = segment_selector;
+
+   
+   
+    uint32_t user_stack_pointer = USER_STACK_TOP - 4;
+    new_thread->regs.esp = user_stack_pointer;
 
 
+    //kernel stack
+    new_thread->kstack.ss0 = 0x10;
+    uint8_t* kernel_stack = (uint8_t*)kmalloc(sizeof(4096));
+    new_thread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
+    new_thread->kstack.stack_start = (uint32_t)kernel_stack;
 
 
+    return new_process;
+
+}
 
 
+void switch_to_thread(struct thread* thread)
+{
+    struct registers* regs = &thread->regs;
 
-    /*uint32_t selector = 0x23;
-
-    thread->regs.ss = selector;
-    thread->regs.eflags = 0x0;
-    thread->regs.cs = 0x1B;
-    thread->regs.eip = (uint32_t)func;
-    thread->regs.ds = selector;
-    thread->regs.es = selector;
-    thread->regs.fs = selector;
-    thread->regs.gs = selector; //48 | 3;
-
-    uint32_t stack_pointer = USER_STACK - 4;
-
-    thread->regs.esp = stack_pointer;
-
-
-
-    thread->kstack.ss0 = 0x10;
-    uint8_t* stack = (uint8_t*)kmalloc(KERN_STACK_SIZE);
-    thread->kstack.esp0 = (uint32_t)(stack + KERN_STACK_SIZE - 4);
-    thread->kstack.stack_start = (uint32_t)stack;*/
-
+    tss.ss0 = 0x10;
+    tss.esp0 = thread->kstack.esp0;
+    task_switch(regs);
 }
