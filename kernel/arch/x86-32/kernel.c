@@ -30,7 +30,6 @@
 #include "mm/paging/paging.h"
 #include "mm/PMM/pmm.h"
 #include "sys/process.h"
-#include "sys/thread.h"
 #include "../../libk/memory.h"
 #include "disk/ramdisk.h"
 #include "fatfs/ff.h"
