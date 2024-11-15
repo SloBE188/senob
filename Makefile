@@ -14,7 +14,7 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
 	# here i c1an copy files to /mnt (ramdisk)
 	sudo cp ./test.txt /mnt
-	# sudo cp ./programs/blank/blank.bin /mnt
+	sudo cp ./programs/blank/blank.bin /mnt
 	sudo umount /mnt
 
 ./build/kernel.o:

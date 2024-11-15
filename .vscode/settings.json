@@ -5,6 +5,7 @@
         "stdint-gcc.h": "c",
         "idt.h": "c",
         "cstdlib": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "ff.h": "c"
     }
 }
