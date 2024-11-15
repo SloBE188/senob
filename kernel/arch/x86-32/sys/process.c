@@ -39,7 +39,7 @@ uint32_t get_thread_id()
     return current_threadid++;
 }
 
-struct process* create_process(char* filename)
+struct process* create_process(const char* filename)
 {
     struct process* new_process = (struct process*) kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
@@ -55,13 +55,19 @@ struct process* create_process(char* filename)
         return;
     }
 
+    //new pagedir for process
+    new_process->page_directory = mem_alloc_page_dir();
+    mem_change_page_directory(new_process->page_directory);
+
+
+
     uint32_t file_size = filestat.fsize;
     uint32_t pages_needed = CEIL_DIV(file_size, PAGE_SIZE);
 
     for (uint32_t i = 0; i < pages_needed; i++)
     {
         void* vaddr = PROGRAMM_VIRTUAL_ADDRESS_START + (i * PAGE_SIZE);
-        mem_map_page(vaddr, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
+        mem_map_page(vaddr, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
 
     }
 
@@ -75,9 +81,9 @@ struct process* create_process(char* filename)
         f_read(&program, buffer, PAGE_SIZE, &bytes_read);
         memcpy(PROGRAMM_VIRTUAL_ADDRESS_START, buffer, bytes_read);
     }
+
+    res = f_close(&program);
     
-    //new pagedir for process
-    new_process->page_directory = mem_alloc_page_dir();
 
 
     struct thread* new_thread = (struct thread*) kmalloc(sizeof(struct thread));
@@ -86,7 +92,6 @@ struct process* create_process(char* filename)
     new_thread->owner = new_process;
     new_thread->regs.cr3 = new_process->page_directory;
 
-    mem_change_page_directory(new_process->page_directory);
 
 
     /*const uint32_t stack_page_count = 50;
@@ -113,7 +118,7 @@ struct process* create_process(char* filename)
    for (uint32_t i = 0; i < count_stack_pages; i++)
    {
         physical_frames[i] = pmm_alloc_pageframe();
-        mem_map_page(end_of_stack, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
+        mem_map_page(end_of_stack, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
    }
 
     uint32_t segment_selector = 0x23;
@@ -134,7 +139,7 @@ struct process* create_process(char* filename)
 
     //kernel stack
     new_thread->kstack.ss0 = 0x10;
-    uint8_t* kernel_stack = (uint8_t*)kmalloc(sizeof(4096));
+    uint8_t* kernel_stack = (uint8_t*)kmalloc(4096);
     new_thread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
     new_thread->kstack.stack_start = (uint32_t)kernel_stack;
 
@@ -146,9 +151,6 @@ struct process* create_process(char* filename)
 
 void switch_to_thread(struct thread* thread)
 {
-    struct registers* regs = &thread->regs;
-
-    tss.ss0 = 0x10;
-    tss.esp0 = thread->kstack.esp0;
-    task_switch(regs);
+    update_tss_esp0(thread->kstack.esp0);
+    //switch_task(thread->regs);
 }

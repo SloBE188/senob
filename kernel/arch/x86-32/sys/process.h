@@ -48,8 +48,8 @@ struct thread
 
 };
 
-struct process* create_process(char* filename);
-extern void task_switch(struct registers* regs);
+struct process* create_process(const char* filename);
+extern void switch_task(struct thread* regs);
 void switch_to_thread(struct thread* thread);
 
 #endif

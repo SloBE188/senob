@@ -207,11 +207,25 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
         }
         f_closedir(&dir2);
     }
-    /*char buffer2 = 'A';
-    
-    disk_write_sector(buffer2, 75, 1);
-    disk_read_sector(buffer2, 75, 1);
-    printf("Wurde gelesen: %c\n", buffer2);*/
+
+
+    struct process* first_process = create_process("0:/BLANK.BIN");
+    switch_to_thread(first_process->thread);
+
+    /*const char* filename = "0:/BLANK.BIN";
+
+    FRESULT resssss;
+    FILINFO filestat;
+
+    resssss = f_stat(filename, &filestat);
+    if (resssss != FR_OK)
+    {
+        printf("Error looking for the stats from the file\n");
+        return;
+    }
+
+    uint32_t file_size = filestat.fsize;
+    printf("Size of blank.bin: %x", file_size);*/
     
     
 
