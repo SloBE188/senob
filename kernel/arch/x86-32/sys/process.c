@@ -149,8 +149,15 @@ struct process* create_process(const char* filename)
 }
 
 
+    /*uint32_t kernel_stack = ((uint32_t) kmalloc(4096)) + 4096;
+    uint8_t* kesp = (uint8_t*) (kernel_stack);
+    update_tss_esp0(kernel_stack);*/
+
+
 void switch_to_thread(struct thread* thread)
 {
+    //struct registers* regs = &thread->regs;
+
     update_tss_esp0(thread->kstack.esp0);
-    //switch_task(thread->regs);
+    //switch_task(regs);
 }

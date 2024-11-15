@@ -210,7 +210,12 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
 
     struct process* first_process = create_process("0:/BLANK.BIN");
-    switch_to_thread(first_process->thread);
+    //switch_to_thread(first_process->thread);
+
+    
+    uint8_t* kernel_stack = (uint8_t*)kmalloc(4096);
+    uint32_t esp0_stack = (uint32_t)kernel_stack + 4096 - 4;
+    update_tss_esp0(esp0_stack);
 
     /*const char* filename = "0:/BLANK.BIN";
 
