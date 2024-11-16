@@ -209,28 +209,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     }
 
 
-    struct process* first_process = create_process("0:/BLANK.BIN");
-    //switch_to_thread(first_process->thread);
-
+    uint32_t pages_needed = map_program_to_address("0:/blank.bin", 0x00400000);
+    copy_program_to_address("0:/blank.bin", pages_needed, 0x00400000);
     
-    uint8_t* kernel_stack = (uint8_t*)kmalloc(4096);
-    uint32_t esp0_stack = (uint32_t)kernel_stack + 4096 - 4;
-    update_tss_esp0(esp0_stack);
 
-    /*const char* filename = "0:/BLANK.BIN";
-
-    FRESULT resssss;
-    FILINFO filestat;
-
-    resssss = f_stat(filename, &filestat);
-    if (resssss != FR_OK)
-    {
-        printf("Error looking for the stats from the file\n");
-        return;
-    }
-
-    uint32_t file_size = filestat.fsize;
-    printf("Size of blank.bin: %x", file_size);*/
     
     
 

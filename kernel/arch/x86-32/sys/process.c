@@ -39,51 +39,81 @@ uint32_t get_thread_id()
     return current_threadid++;
 }
 
-struct process* create_process(const char* filename)
+//returns needed pages
+uint32_t map_program_to_address(const char* filename, uint32_t program_address)
 {
-    struct process* new_process = (struct process*) kmalloc(sizeof(struct process));
-    memset(new_process, 0x00, sizeof(struct process));
-    new_process->pid = get_process_id();
-
     FRESULT res;
     FILINFO filestat;
 
     res = f_stat(filename, &filestat);
     if (res != FR_OK)
     {
-        printf("Error looking for the stats from the file\n");
-        return;
+        printf("Error looking for the stats from the file: %d\n", res);
+        return 0;
     }
-
-    //new pagedir for process
-    new_process->page_directory = mem_alloc_page_dir();
-    mem_change_page_directory(new_process->page_directory);
-
-
 
     uint32_t file_size = filestat.fsize;
     uint32_t pages_needed = CEIL_DIV(file_size, PAGE_SIZE);
 
     for (uint32_t i = 0; i < pages_needed; i++)
     {
-        void* vaddr = PROGRAMM_VIRTUAL_ADDRESS_START + (i * PAGE_SIZE);
-        mem_map_page(vaddr, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
-
+        void* vaddr = (void*)(program_address + (i * PAGE_SIZE));
+        mem_map_page((uint32_t)vaddr, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
     }
 
-    FIL program;
-    uint32_t buffer[PAGE_SIZE];
-    uint32_t bytes_read;
+    return pages_needed;
+}
 
-    //copy the programm from the ramdisk into the mapped address space
+
+void copy_program_to_address(const char* filename, uint32_t pages_needed, uint32_t program_address)
+{
+    FIL program;
+    FRESULT res;
+    BYTE buffer[PAGE_SIZE];
+    UINT bytes_read;
+    
+    res = f_open(&program, filename, FA_READ);
+    if (res != FR_OK)
+    {
+        printf("Error opening the file: %d\n", res);
+        return;
+    }
+
+    // copy the program into the mapped adressspace for it
     for (uint32_t i = 0; i < pages_needed; i++)
     {
-        f_read(&program, buffer, PAGE_SIZE, &bytes_read);
-        memcpy(PROGRAMM_VIRTUAL_ADDRESS_START, buffer, bytes_read);
+        res = f_read(&program, buffer, PAGE_SIZE, &bytes_read);
+        if (res != FR_OK)
+        {
+            printf("Error reading the file: %d\n", res);
+            f_close(&program);
+            return;
+        }
+
+        void* dest_address = (void*)(program_address + (i * PAGE_SIZE));
+        memcpy(dest_address, buffer, bytes_read);
     }
 
     res = f_close(&program);
-    
+    if (res != FR_OK)
+    {
+        printf("Error closing the file: %d\n", res);
+    }
+}
+
+
+struct process* create_process(const char* filename)
+{
+    struct process* new_process = (struct process*) kmalloc(sizeof(struct process));
+    memset(new_process, 0x00, sizeof(struct process));
+    new_process->pid = get_process_id();
+
+
+
+    //new pagedir for process
+    new_process->page_directory = mem_alloc_page_dir();
+    mem_change_page_directory(new_process->page_directory);
+
 
 
     struct thread* new_thread = (struct thread*) kmalloc(sizeof(struct thread));
