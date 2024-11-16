@@ -110,9 +110,7 @@ struct process* create_process(const char* filename)
 
 
 
-    //new pagedir for process
-    new_process->page_directory = mem_alloc_page_dir();
-    mem_change_page_directory(new_process->page_directory);
+
 
 
 
@@ -120,26 +118,13 @@ struct process* create_process(const char* filename)
     memset(new_thread, 0x00, sizeof(struct thread));
     new_thread->thread_id = get_thread_id();
     new_thread->owner = new_process;
-    new_thread->regs.cr3 = new_process->page_directory;
+
+    //new pagedir for process
+    new_process->page_directory = mem_alloc_page_dir();
+    //mem_change_page_directory(new_process->page_directory);
+    new_thread->regs->cr3;
 
 
-
-    /*const uint32_t stack_page_count = 50;
-    char* v_address_stack_page = (char *) (USER_STACK - PAGESIZE_4K * stack_page_count);
-    uint32_t stack_frames[stack_page_count];
-    for (uint32_t i = 0; i < stack_page_count; ++i)
-    {
-        stack_frames[i] = vmm_acquire_page_frame_4k();
-    }
-    void* stack_v_mem = vmm_map_memory(process, (uint32_t)v_address_stack_page, stack_frames, stack_page_count, TRUE);
-    if (NULL == stack_v_mem)
-    {
-        for (uint32_t i = 0; i < stack_page_count; ++i)
-        {
-            vmm_release_page_frame_4k(stack_frames[i]);
-        }
-    }   
-    */
 
    uint32_t count_stack_pages = 40;
 
@@ -152,19 +137,19 @@ struct process* create_process(const char* filename)
    }
 
     uint32_t segment_selector = 0x23;
-    new_thread->regs.ss = segment_selector;
-    new_thread->regs.eflags = 0x202;
-    new_thread->regs.cs = 0x1B;
-    new_thread->regs.eip = PROGRAMM_VIRTUAL_ADDRESS_START;
-    new_thread->regs.ds = segment_selector;
-    new_thread->regs.es = segment_selector;
-    new_thread->regs.fs = segment_selector;
-    new_thread->regs.gs = segment_selector;
+    new_thread->regs->ss = segment_selector;
+    new_thread->regs->eflags = 0x202;
+    new_thread->regs->cs = 0x1B;
+    new_thread->regs->eip = PROGRAMM_VIRTUAL_ADDRESS_START;
+    new_thread->regs->ds = segment_selector;
+    new_thread->regs->es = segment_selector;
+    new_thread->regs->fs = segment_selector;
+    new_thread->regs->gs = segment_selector;
 
    
    
     uint32_t user_stack_pointer = USER_STACK_TOP - 4;
-    new_thread->regs.esp = user_stack_pointer;
+    new_thread->regs->esp = user_stack_pointer;
 
 
     //kernel stack

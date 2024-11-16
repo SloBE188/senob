@@ -18,11 +18,27 @@ struct process
 
 struct registers
 {
-        uint32_t eax, ecx, edx, ebx;
-        uint32_t esp, ebp, esi, edi;
-        uint32_t eip, eflags;
-        uint32_t cs:16, ss:16, ds:16, es:16, fs:16, gs:16;
-        uint32_t cr3;
+    uint32_t eax;
+    uint32_t ebx;
+    uint32_t ecx;
+    uint32_t edx;
+
+    uint32_t esp;
+    uint32_t ebp;
+    uint32_t esi;
+    uint32_t edi;
+
+    uint32_t eip;
+    uint32_t eflags;
+
+    uint32_t cs;
+    uint32_t ss;
+    uint32_t ds;
+    uint32_t es;
+    uint32_t fs;
+    uint32_t gs;
+
+    uint32_t cr3;
 };
 
 struct thread
@@ -30,14 +46,7 @@ struct thread
     uint32_t thread_id;
     struct process* owner;
 
-    struct
-    {
-        uint32_t eax, ecx, edx, ebx;
-        uint32_t esp, ebp, esi, edi;
-        uint32_t eip, eflags;
-        uint32_t cs:16, ss:16, ds:16, es:16, fs:16, gs:16;
-        uint32_t cr3;
-    } regs __attribute__ ((packed));
+    struct registers* regs;
 
     struct
     {
