@@ -16,29 +16,28 @@ struct process
 
 } __attribute__((packed));
 
-struct registers
-{
-    uint32_t eax;
-    uint32_t ebx;
-    uint32_t ecx;
-    uint32_t edx;
+struct registers {
+    uint32_t eax;     //  0
+    uint32_t ebx;     //  4
+    uint32_t ecx;     //  8
+    uint32_t edx;     //  12
 
-    uint32_t esp;
-    uint32_t ebp;
-    uint32_t esi;
-    uint32_t edi;
+    uint32_t esp;     //  16
+    uint32_t ebp;     //  20
 
-    uint32_t eip;
-    uint32_t eflags;
+    uint32_t esi;     //  24
+    uint32_t edi;     //  28
+    uint32_t eip;     //  32
+    uint32_t eflags;  //  36
 
-    uint32_t cs;
-    uint32_t ss;
-    uint32_t ds;
-    uint32_t es;
-    uint32_t fs;
-    uint32_t gs;
+    uint32_t cs;      //  40
+    uint32_t ss;      //  44
+    uint32_t ds;      //  48
+    uint32_t es;      //  52
+    uint32_t fs;      //  56
+    uint32_t gs;      //  60
 
-    uint32_t cr3;
+    uint32_t cr3;     //  64
 };
 
 struct thread
@@ -58,7 +57,7 @@ struct thread
 };
 
 struct process* create_process(const char* filename);
-extern void switch_task(struct thread* regs);
+extern void switch_task(struct registers* regs);
 void switch_to_thread(struct thread* thread);
 void copy_program_to_address(const char* filename, uint32_t pages_needed, uint32_t program_address);
 uint32_t map_program_to_address(const char* filename, uint32_t program_address);

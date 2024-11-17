@@ -210,10 +210,9 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
 
     struct process* new_process = create_process("0:/blank.bin");
-
-    uint32_t pages_needed = map_program_to_address("0:/blank.bin", 0x00400000);
-    copy_program_to_address("0:/blank.bin", pages_needed, 0x00400000);
-    
+    new_process->page_directory = mem_alloc_page_dir();
+    mem_change_page_directory(new_process->page_directory);
+    switch_task(new_process->thread->regs);
 
     
     

@@ -109,21 +109,16 @@ struct process* create_process(const char* filename)
     new_process->pid = get_process_id();
 
 
-
-
-
-
-
     struct thread* new_thread = (struct thread*) kmalloc(sizeof(struct thread));
     memset(new_thread, 0x00, sizeof(struct thread));
+    new_thread->regs = (struct registers*) kmalloc(sizeof(struct registers));
+    memset(new_thread->regs, 0x00, sizeof(struct registers));
     new_thread->thread_id = get_thread_id();
     new_thread->owner = new_process;
 
-    //new pagedir for process
-    new_process->page_directory = mem_alloc_page_dir();
-    //mem_change_page_directory(new_process->page_directory);
-    new_thread->regs->cr3;
 
+    uint32_t pages_needed = map_program_to_address("0:/blank.bin", 0x00400000);
+    copy_program_to_address("0:/blank.bin", pages_needed, 0x00400000);
 
 
    uint32_t count_stack_pages = 40;
@@ -157,6 +152,8 @@ struct process* create_process(const char* filename)
     uint8_t* kernel_stack = (uint8_t*)kmalloc(4096);
     new_thread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
     new_thread->kstack.stack_start = (uint32_t)kernel_stack;
+
+    new_process->thread = new_thread;
 
 
     return new_process;

@@ -1,39 +1,38 @@
 global switch_task
 
+section .text
 switch_task:
-        mov esi, [esp]
-        pop eax			; *current thread
+    ; ebx points to the register struct
+    mov ebx, [esp + 4]      ; address from the register struct
 
-        ; get values from thread->regs structure
+    ; load pd
+    ;mov eax, [esi + 64]
+    ;mov cr3, eax
 
-        push dword [esi+4]	; eax
-        push dword [esi+8]	; ecx
-        push dword [esi+12]	; edx
-        push dword [esi+16]	; ebx
-        push dword [esi+24]	; ebp
-        push dword [esi+28]	; esi
-        push dword [esi+32]	; edi
-        push dword [esi+48]	; ds
-        push dword [esi+50]	; es
-        push dword [esi+52]	; fs
-        push dword [esi+54]	; gs
+    ; load segment register
+    mov eax, [ebx + 48]      ; ds
+    mov ds, eax
+    mov eax, [ebx + 52]      ; es
+    mov es, eax
+    mov eax, [ebx + 56]      ; fs
+    mov fs, eax
+    mov eax, [ebx + 60]      ; gs
+    mov gs, eax
 
-        mov al, 0x20
-        out 0x20, al
+    ; load general purpose regs
+    mov eax, [ebx + 0]      ; eax
+    mov ebx, [ebx + 4]     ; ebx
+    mov ecx, [ebx + 8]      ; ecx
+    mov edx, [ebx + 12]      ; edx
+    mov esi, [ebx + 24]     ; esi
+    mov edi, [ebx + 28]     ; edi
+    mov ebp, [ebx + 20]     ; ebp
 
-        mov eax, [esi+56]
-        mov cr3, eax
-
-        pop gs
-        pop fs
-        pop es
-        pop ds
-        pop edi
-        pop esi
-        pop ebp
-        pop ebx
-        pop edx
-        pop ecx
-        pop eax
-
-        iret
+    ; push stack pointer, eip etc
+    mov esp, [ebx + 16]     ; esp
+    push dword [ebx + 36]   ; eflags
+    push dword [ebx + 40]   ; cs
+    push dword [ebx + 32]   ; eip
+    push dword [ebx + 44]   ; ss (Stack Segment)
+    push dword [ebx + 16]   ; esp
+    iret
