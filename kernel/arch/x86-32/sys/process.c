@@ -128,15 +128,18 @@ struct process* create_process(const char* filename)
     copy_program_to_address("0:/blank.bin", pages_needed, 0x00400000);
 
 
-   uint32_t count_stack_pages = 40;
+    uint32_t count_stack_pages = 40;
 
-   void* end_of_stack = USER_STACK_TOP - (PAGE_SIZE * count_stack_pages);
-   uint32_t physical_frames[count_stack_pages];
-   for (uint32_t i = 0; i < count_stack_pages; i++)
-   {
+    // untere grenze vom stack
+    void* end_of_stack = (void*)(USER_STACK_TOP - (PAGE_SIZE * count_stack_pages));
+
+    uint32_t physical_frames[count_stack_pages];
+    for (uint32_t i = 0; i < count_stack_pages; i++) {
+        void* vaddr = (void*)((uint32_t)end_of_stack + (i * PAGE_SIZE));
         physical_frames[i] = pmm_alloc_pageframe();
-        mem_map_page(end_of_stack, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
-   }
+        mem_map_page((uint32_t)vaddr, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
+    }
+
 
     uint32_t segment_selector = 0x23;
     new_thread->regs->ss = segment_selector;
