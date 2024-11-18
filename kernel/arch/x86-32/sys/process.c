@@ -106,6 +106,10 @@ struct process* create_process(const char* filename)
 {
     struct process* new_process = (struct process*) kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
+
+    new_process->page_directory = mem_alloc_page_dir();
+    mem_change_page_directory(new_process->page_directory);
+    
     new_process->pid = get_process_id();
 
 
@@ -115,6 +119,9 @@ struct process* create_process(const char* filename)
     memset(new_thread->regs, 0x00, sizeof(struct registers));
     new_thread->thread_id = get_thread_id();
     new_thread->owner = new_process;
+    
+
+    new_thread->regs->cr3 = new_process->page_directory;
 
 
     uint32_t pages_needed = map_program_to_address("0:/blank.bin", 0x00400000);
@@ -155,6 +162,7 @@ struct process* create_process(const char* filename)
 
     new_process->thread = new_thread;
 
+    update_tss_esp0(new_thread->kstack.esp0);
 
     return new_process;
 

@@ -235,7 +235,7 @@ uint32_t* mem_alloc_page_dir()
 
             // first 768 entries are user page tables
             for (int i = 0; i < 768; i++) {
-                page_dir[i] = 0;
+                page_dir[i] = 0 | PAGE_FLAG_PRESENT;
             }
 
             // next 256 are kernel (except last)

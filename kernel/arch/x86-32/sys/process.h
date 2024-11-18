@@ -25,19 +25,18 @@ struct registers {
     uint32_t esp;     //  16
     uint32_t ebp;     //  20
 
-    uint32_t esi;     //  24
-    uint32_t edi;     //  28
-    uint32_t eip;     //  32
-    uint32_t eflags;  //  36
+    uint32_t edi;     //  24
+    uint32_t eip;     //  28
+    uint32_t eflags;  //  32
 
-    uint32_t cs;      //  40
-    uint32_t ss;      //  44
-    uint32_t ds;      //  48
-    uint32_t es;      //  52
-    uint32_t fs;      //  56
-    uint32_t gs;      //  60
+    uint32_t cs;      //  36
+    uint32_t ss;      //  40
+    uint32_t ds;      //  44
+    uint32_t es;      //  48
+    uint32_t fs;      //  52
+    uint32_t gs;      //  56
 
-    uint32_t cr3;     //  64
+    uint32_t cr3;     //  60
 };
 
 struct thread
