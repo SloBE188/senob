@@ -120,13 +120,16 @@ struct process *create_process(const char *filename)
     struct thread *new_thread = (struct thread *)kmalloc(sizeof(struct thread));
     memset(new_thread, 0x00, sizeof(struct thread));
     printf("Allocated thread structure at: %p\n", new_thread);
-    new_thread->regs = (struct registers *)kmalloc(sizeof(struct registers));
-    memset(new_thread->regs, 0x00, sizeof(struct registers));
-    printf("Allocated registers at: %p\n", new_thread->regs);
+    
+    
+    //new_thread->regs = (struct regss *)kmalloc(sizeof(struct regss));
+    //memset(new_thread->regs, 0x00, sizeof(struct regss));
+    
+    
     new_thread->thread_id = get_thread_id();
     new_thread->owner = new_process;
 
-    new_thread->regs->cr3 = new_process->page_directory;
+    //new_thread->regs->cr3 = new_process->page_directory;
 
     uint32_t pages_needed = map_program_to_address("0:/blank.bin", 0x00400000);
     copy_program_to_address("0:/blank.bin", pages_needed, 0x00400000);
@@ -145,17 +148,17 @@ struct process *create_process(const char *filename)
     }
 
     uint32_t segment_selector = 0x23;
-    new_thread->regs->ss = segment_selector;
-    new_thread->regs->eflags = 0x202;
-    new_thread->regs->cs = 0x1B;
-    new_thread->regs->eip = PROGRAMM_VIRTUAL_ADDRESS_START;
-    new_thread->regs->ds = segment_selector;
-    new_thread->regs->es = segment_selector;
-    new_thread->regs->fs = segment_selector;
-    new_thread->regs->gs = segment_selector;
+    new_thread->regs.ss = segment_selector;
+    new_thread->regs.eflags = 0x202;
+    new_thread->regs.cs = 0x1B;
+    new_thread->regs.eip = PROGRAMM_VIRTUAL_ADDRESS_START;
+    new_thread->regs.ds = segment_selector;
+    new_thread->regs.es = segment_selector;
+    new_thread->regs.fs = segment_selector;
+    new_thread->regs.gs = segment_selector;
 
     uint32_t user_stack_pointer = USER_STACK_TOP - 4;
-    new_thread->regs->esp = user_stack_pointer;
+    new_thread->regs.esp = user_stack_pointer;
 
     // kernel stack
     new_thread->kstack.ss0 = 0x10;
@@ -174,10 +177,52 @@ struct process *create_process(const char *filename)
 uint8_t* kesp = (uint8_t*) (kernel_stack);
 update_tss_esp0(kernel_stack);*/
 
+/*    uint32_t eax;     //  0
+    uint32_t ebx;     //  4
+    uint32_t ecx;     //  8
+    uint32_t edx;     //  12
+
+    uint32_t esp;     //  16
+    uint32_t ebp;     //  20
+
+    uint32_t edi;     //  24
+    uint32_t eip;     //  28
+    uint32_t eflags;  //  32
+
+    uint32_t cs;      //  36
+    uint32_t ss;      //  40
+    uint32_t ds;      //  44
+    uint32_t es;      //  48
+    uint32_t fs;      //  52
+    uint32_t gs;      //  56
+
+    uint32_t cr3;     //  60*/
+
+
 void switch_to_thread(struct thread *thread)
 {
-    // struct registers* regs = &thread->regs;
+    struct registers_save* registers = (struct registers_save*)kmalloc(sizeof(struct registers_save));
 
-    update_tss_esp0(thread->kstack.esp0);
-    // switch_task(regs);
+    registers->eax = thread->regs.eax;
+    registers->ebx = thread->regs.ebx;
+    registers->ecx = thread->regs.ecx;
+    registers->edx = thread->regs.edx;
+
+    registers->esp = thread->regs.esp;
+    registers->ebp = thread->regs.ebp;
+
+    registers->edi = thread->regs.edi;
+    registers->eip = thread->regs.eip;
+    registers->eflags = thread->regs.eflags;
+
+    registers->cs = thread->regs.cs;
+    registers->ss = thread->regs.ss;
+    registers->ds = thread->regs.ds;
+    registers->es = thread->regs.es;
+    registers->fs = thread->regs.fs;
+    registers->gs = thread->regs.gs;
+
+    registers->cr3 = thread->regs.cr3;
+
+    switch_task(registers);
 }

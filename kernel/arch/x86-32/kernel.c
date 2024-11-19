@@ -210,7 +210,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
 
     struct process* new_process = create_process("0:/blank.bin");
-    switch_task(new_process->thread->regs);
+
+    switch_to_thread(new_process->thread);
+    //switch_task(new_process->thread->regs);
+    //test_heap_shrink_and_reuse();
 
     
     
