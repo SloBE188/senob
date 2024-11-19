@@ -199,8 +199,9 @@ update_tss_esp0(kernel_stack);*/
     uint32_t cr3;     //  60*/
 
 
-void switch_to_thread(struct thread *thread)
+struct registers_save* save_thread_state(struct thread* thread)
 {
+
     struct registers_save* registers = (struct registers_save*)kmalloc(sizeof(struct registers_save));
 
     registers->eax = thread->regs.eax;
@@ -224,5 +225,12 @@ void switch_to_thread(struct thread *thread)
 
     registers->cr3 = thread->regs.cr3;
 
+    return registers;
+}
+
+void switch_to_thread(struct thread *thread)
+{
+
+    struct registers_save* registers = save_thread_state(thread);
     switch_task(registers);
 }

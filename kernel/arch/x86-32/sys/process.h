@@ -84,5 +84,7 @@ extern void switch_task(struct registers_save* regs);
 void switch_to_thread(struct thread* thread);
 void copy_program_to_address(const char* filename, uint32_t pages_needed, uint32_t program_address);
 uint32_t map_program_to_address(const char* filename, uint32_t program_address);
+struct registers_save* save_thread_state(struct thread* thread);
+
 
 #endif
