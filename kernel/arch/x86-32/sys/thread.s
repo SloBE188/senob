@@ -2,7 +2,7 @@ global switch_task
 
 section .text
 switch_task:
-    ; ebx points to the register struct
+    ; esi points to the register struct
     mov esi, [esp + 4]      ; address from the register struct
 
     ; load pd
