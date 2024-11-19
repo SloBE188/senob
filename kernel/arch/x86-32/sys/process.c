@@ -147,6 +147,26 @@ struct process *create_process(const char *filename)
         mem_map_page((uint32_t)vaddr, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
     }
 
+    for (uint32_t addr = (USER_STACK_TOP - (PAGE_SIZE * count_stack_pages)); addr < USER_STACK_TOP; addr += PAGE_SIZE) 
+    {
+    uint32_t phys = mem_get_phys_from_virt(addr);
+    if (phys == -1) 
+    {
+        printf("address 0x%x is not mapped\n", addr);
+    } else {
+        printf("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
+    }
+    }   
+
+    mem_map_page(0xb0000000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
+
+    if (!mem_is_valid_vaddr(0xb0000000)) 
+    {
+        printf("address 0xb0000000 is not mapped\n");
+    }
+
+
+
     uint32_t segment_selector = 0x23;
     new_thread->regs.ss = segment_selector;
     new_thread->regs.eflags = 0x202;

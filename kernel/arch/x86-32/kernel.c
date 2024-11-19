@@ -87,7 +87,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     disk_initialize(0);
     disk_status(0);
-
+    
     char buffer[512];
     char readin[20] = "nilsnilsnilsnilsnils";
     //disk_read_from_offset(buffer, 0x6200, 512);
