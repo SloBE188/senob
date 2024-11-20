@@ -29,9 +29,9 @@ switch_task:
 
     ; push stack pointer, eip etc
     mov esp, [esi + 16]     ; esp
+    push dword [esi + 40]   ; ss (Stack Segment)
+    push dword [esi + 16]   ; esp
     push dword [esi + 32]   ; eflags
     push dword [esi + 36]   ; cs
     push dword [esi + 28]   ; eip
-    push dword [esi + 40]   ; ss (Stack Segment)
-    push dword [esi + 16]   ; esp
     iret

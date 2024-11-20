@@ -4,7 +4,9 @@ section .text
 
 global _userstart
 
+
 _userstart:
- 
-.loop:
-    jmp .loop
+
+label:
+    jmp label
+    
