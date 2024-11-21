@@ -92,10 +92,9 @@ extern void irq15();
 
 
 //Syscalls
-extern void isr128();
-extern void isr177();
+extern void isr80();
 
-void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr);
+void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr, uint8_t dpl);
 void idt_init();
 void isr_handler(struct Interrupt_registers *regs);
 void irq_add_handler(int irq_number, void (*handler)(struct Interrupt_registers *regs));

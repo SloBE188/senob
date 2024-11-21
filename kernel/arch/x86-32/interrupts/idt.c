@@ -20,6 +20,9 @@
 #include "../io/io.h"
 #include "../../../../drivers/video/vga/vga.h"
 #include "../../../libk/stdiok.h"
+#include "../mm/paging/paging.h"
+
+
 struct idt_entry_t idt_descriptors[256];
 struct idtr_t idtr;
 
@@ -27,14 +30,17 @@ extern void idt_flush(uint32_t);
 
 
 
-void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr) {
+
+void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr, uint8_t dpl) 
+{
     struct idt_entry_t *descriptor = &idt_descriptors[interrupt_number];
     descriptor->isr_low = isr & 0xFFFF;
     descriptor->kernel_cs = 0x08;
     descriptor->reserved = 0x00;
-    descriptor->type = 0x8E; // Present, DPL=0, Type=0xE (32-bit interrupt gate)
+    descriptor->type = 0x8E | (dpl << 5); // Set DPL in bits 5-6, Present, DPL=0, Type=0xE (32-bit interrupt gate)
     descriptor->isr_high = (isr >> 16) & 0xFFFF;
 }
+
 
 
 
@@ -71,60 +77,59 @@ void idt_init()
     init_pic();
 
     //Exceptions
-    idt_set_descriptor(0, (uint32_t)isr0);
-    idt_set_descriptor(1, (uint32_t)isr1);
-    idt_set_descriptor(2, (uint32_t)isr2);
-    idt_set_descriptor(3, (uint32_t)isr3);
-    idt_set_descriptor(4, (uint32_t)isr4);
-    idt_set_descriptor(5, (uint32_t)isr5);
-    idt_set_descriptor(6, (uint32_t)isr6);
-    idt_set_descriptor(7, (uint32_t)isr7);
-    idt_set_descriptor(8, (uint32_t)isr8);
-    idt_set_descriptor(9, (uint32_t)isr9);
-    idt_set_descriptor(10, (uint32_t)isr10);
-    idt_set_descriptor(11, (uint32_t)isr11);
-    idt_set_descriptor(12, (uint32_t)isr12);
-    idt_set_descriptor(13, (uint32_t)isr13);
-    idt_set_descriptor(14, (uint32_t)isr14);
-    idt_set_descriptor(15, (uint32_t)isr15);
-    idt_set_descriptor(16, (uint32_t)isr16);
-    idt_set_descriptor(17, (uint32_t)isr17);
-    idt_set_descriptor(18, (uint32_t)isr18);
-    idt_set_descriptor(19, (uint32_t)isr19);
-    idt_set_descriptor(20, (uint32_t)isr20);
-    idt_set_descriptor(21, (uint32_t)isr21);
-    idt_set_descriptor(22, (uint32_t)isr22);
-    idt_set_descriptor(23, (uint32_t)isr23);
-    idt_set_descriptor(24, (uint32_t)isr24);
-    idt_set_descriptor(25, (uint32_t)isr25);
-    idt_set_descriptor(26, (uint32_t)isr26);
-    idt_set_descriptor(27, (uint32_t)isr27);
-    idt_set_descriptor(28, (uint32_t)isr28);
-    idt_set_descriptor(29, (uint32_t)isr29);
-    idt_set_descriptor(30, (uint32_t)isr30);
-    idt_set_descriptor(31, (uint32_t)isr31);
+    idt_set_descriptor(0, (uint32_t)isr0, 1);
+    idt_set_descriptor(1, (uint32_t)isr1, 1);
+    idt_set_descriptor(2, (uint32_t)isr2, 1);
+    idt_set_descriptor(3, (uint32_t)isr3, 1);
+    idt_set_descriptor(4, (uint32_t)isr4, 1);
+    idt_set_descriptor(5, (uint32_t)isr5, 1);
+    idt_set_descriptor(6, (uint32_t)isr6, 1);
+    idt_set_descriptor(7, (uint32_t)isr7, 1);
+    idt_set_descriptor(8, (uint32_t)isr8, 1);
+    idt_set_descriptor(9, (uint32_t)isr9, 1);
+    idt_set_descriptor(10, (uint32_t)isr10, 1);
+    idt_set_descriptor(11, (uint32_t)isr11, 1);
+    idt_set_descriptor(12, (uint32_t)isr12, 1);
+    idt_set_descriptor(13, (uint32_t)isr13, 1);
+    idt_set_descriptor(14, (uint32_t)isr14, 1);
+    idt_set_descriptor(15, (uint32_t)isr15, 1);
+    idt_set_descriptor(16, (uint32_t)isr16, 1);
+    idt_set_descriptor(17, (uint32_t)isr17, 1);
+    idt_set_descriptor(18, (uint32_t)isr18, 1);
+    idt_set_descriptor(19, (uint32_t)isr19, 1);
+    idt_set_descriptor(20, (uint32_t)isr20, 1);
+    idt_set_descriptor(21, (uint32_t)isr21, 1);
+    idt_set_descriptor(22, (uint32_t)isr22, 1);
+    idt_set_descriptor(23, (uint32_t)isr23, 1);
+    idt_set_descriptor(24, (uint32_t)isr24, 1);
+    idt_set_descriptor(25, (uint32_t)isr25, 1);
+    idt_set_descriptor(26, (uint32_t)isr26, 1);
+    idt_set_descriptor(27, (uint32_t)isr27, 1);
+    idt_set_descriptor(28, (uint32_t)isr28, 1);
+    idt_set_descriptor(29, (uint32_t)isr29, 1);
+    idt_set_descriptor(30, (uint32_t)isr30, 1);
+    idt_set_descriptor(31, (uint32_t)isr31, 1);
 
     //irqs
-    idt_set_descriptor(32, (uint32_t)irq0);
-    idt_set_descriptor(33, (uint32_t)irq1);
-    idt_set_descriptor(34, (uint32_t)irq2);
-    idt_set_descriptor(35, (uint32_t)irq3);
-    idt_set_descriptor(36, (uint32_t)irq4);
-    idt_set_descriptor(37, (uint32_t)irq5);
-    idt_set_descriptor(38, (uint32_t)irq6);
-    idt_set_descriptor(39, (uint32_t)irq7);
-    idt_set_descriptor(40, (uint32_t)irq8);
-    idt_set_descriptor(41, (uint32_t)irq9);
-    idt_set_descriptor(42, (uint32_t)irq10);
-    idt_set_descriptor(43, (uint32_t)irq11);
-    idt_set_descriptor(44, (uint32_t)irq12);
-    idt_set_descriptor(45, (uint32_t)irq13);
-    idt_set_descriptor(46, (uint32_t)irq14);
-    idt_set_descriptor(47, (uint32_t)irq15);
+    idt_set_descriptor(32, (uint32_t)irq0, 1);
+    idt_set_descriptor(33, (uint32_t)irq1, 1);
+    idt_set_descriptor(34, (uint32_t)irq2, 1);
+    idt_set_descriptor(35, (uint32_t)irq3, 1);
+    idt_set_descriptor(36, (uint32_t)irq4, 1);
+    idt_set_descriptor(37, (uint32_t)irq5, 1);
+    idt_set_descriptor(38, (uint32_t)irq6, 1);
+    idt_set_descriptor(39, (uint32_t)irq7, 1);
+    idt_set_descriptor(40, (uint32_t)irq8, 1);
+    idt_set_descriptor(41, (uint32_t)irq9, 1);
+    idt_set_descriptor(42, (uint32_t)irq10, 1);
+    idt_set_descriptor(43, (uint32_t)irq11, 1);
+    idt_set_descriptor(44, (uint32_t)irq12, 1);
+    idt_set_descriptor(45, (uint32_t)irq13, 1);
+    idt_set_descriptor(46, (uint32_t)irq14, 1);
+    idt_set_descriptor(47, (uint32_t)irq15, 1);
 
     //Syscalls
-    idt_set_descriptor(128, (uint32_t)isr128);
-    idt_set_descriptor(177, (uint32_t)isr177);
+    idt_set_descriptor(80, (uint32_t)isr80, 3);
 
     idt_flush((uint32_t)&idtr);
 
@@ -182,6 +187,12 @@ void page_fault_handler(struct Interrupt_registers* r) {
     while (1) {}  // System anhalten oder Recovery-Mechanismus implementieren
 }
 
+
+void syscall_handler(struct Interrupt_registers* regs, uint32_t syscall_number)
+{
+    printf("hallo");
+}
+
 void isr_handler(struct Interrupt_registers *regs)
 {
     if(regs->interrupt_number < 32)
@@ -196,6 +207,12 @@ void isr_handler(struct Interrupt_registers *regs)
         printf("Exception occured!\n");
         for(;;);
     }
+
+    if (regs->interrupt_number == 80)
+    {
+        syscall_handler(regs, regs->eax);
+    }
+    
 }
 
 void *irq_handlers[16] = {
