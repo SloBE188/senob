@@ -24,19 +24,25 @@ void init_gdt()
     memset(&tss, 0, sizeof(tss));
     tss.ss0 = 0x10;
     // User mode segment registers
-    tss.cs = 0x1B;  // 0x1B = User Code Segment Selector | RPL 3
-    tss.ss = 0x23;  // 0x23 = User Data Segment Selector | RPL 3
-    tss.ds = 0x23;
-    tss.es = 0x23;
-    tss.fs = 0x23;
-    tss.gs = 0x23;
+    // These fields don't need to be set unless you are  using hardware
+    //     task switching which you are not.
+    //tss.cs = 0x1B;  // 0x1B = User Code Segment Selector | RPL 3
+    //tss.ss = 0x23;  // 0x23 = User Data Segment Selector | RPL 3
+    //tss.ds = 0x23;
+    //tss.es = 0x23;
+    //tss.fs = 0x23;
+    //tss.gs = 0x23;
+    tss.io_map = sizeof(tss);
+                    // Setting io_map to one more than the limit specified
+                    // in the TSS entry below disables io_map
 
     setGdtEntry(0, 0, 0, 0, 0);                  // Null segment
     setGdtEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);   // Kernel code segment
     setGdtEntry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);   // Kernel data segment
     setGdtEntry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);   // User code segment
     setGdtEntry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);   // User data segment
-    setGdtEntry(5, (uint32_t) &tss, sizeof(tss), 0x89, 0x40);
+    // Set TSS limit to sizeof tss MINUS 1
+    setGdtEntry(5, (uint32_t) &tss, sizeof(tss)-1, 0x89, 0x40);
 
     gdt_flush((uint32_t)&gdt_ptr);
     tss_flush();

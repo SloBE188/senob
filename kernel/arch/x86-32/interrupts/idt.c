@@ -190,6 +190,7 @@ void page_fault_handler(struct Interrupt_registers* r) {
 
 void syscall_handler(struct Interrupt_registers* regs, uint32_t syscall_number)
 {
+    __asm__("xchg %bx, %bx");
     printf("hallo");
 }
 
