@@ -34,6 +34,7 @@
 #include "disk/ramdisk.h"
 #include "fatfs/ff.h"
 #include "fatfs/diskio.h"
+#include "syscalls/syscalls.h"
 
 
 extern void rust_testfunction();
@@ -87,7 +88,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     disk_initialize(0);
     disk_status(0);
-    
+
     char buffer[512];
     char readin[20] = "nilsnilsnilsnilsnils";
     //disk_read_from_offset(buffer, 0x6200, 512);
@@ -208,6 +209,8 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
         f_closedir(&dir2);
     }
 
+
+    init_syscalls();
 
     struct process* new_process = create_process("0:/blank.bin");
 

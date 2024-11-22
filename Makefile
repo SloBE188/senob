@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/libk/string.o ./build/sys/thread.s.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/libk/string.o ./build/sys/thread.s.o ./build/syscalls/syscalls.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 FLAGS= -std=gnu99 -O2 -Wall -Wextra -ffreestanding -fpermissive -nostdlib -lgcc
 
 all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
@@ -94,6 +94,9 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 
 ./build/sys/thread.s.o:
 	nasm -f elf ./kernel/arch/x86-32/sys/thread.s -o ./build/sys/thread.s.o
+
+./build/syscalls/syscalls.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/syscalls/syscalls.c -o ./build/syscalls/syscalls.o $(FLAGS)
 
 .PHONY: programs
 programs:

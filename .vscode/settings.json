@@ -6,6 +6,8 @@
         "idt.h": "c",
         "cstdlib": "c",
         "string.h": "c",
-        "ff.h": "c"
+        "ff.h": "c",
+        "syscalls.h": "c",
+        "kernel.h": "c"
     }
 }

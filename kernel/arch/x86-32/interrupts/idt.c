@@ -21,6 +21,7 @@
 #include "../../../../drivers/video/vga/vga.h"
 #include "../../../libk/stdiok.h"
 #include "../mm/paging/paging.h"
+#include "../syscalls/syscalls.h"
 
 
 struct idt_entry_t idt_descriptors[256];
@@ -174,24 +175,31 @@ void page_fault_handler(struct Interrupt_registers* r) {
     uint32_t faulting_address;
     asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
 
-    // Fehlercode analysieren
     printf("Page fault at address: 0x%x, error code: 0x%x\n", faulting_address, r->err_code);
 
-    // Je nach Fehlercode weiter analysieren
     if (!(r->err_code & 0x1)) {
         printf("Page not present.\n");
     } else {
         printf("Page protection violation.\n");
     }
 
-    while (1) {}  // System anhalten oder Recovery-Mechanismus implementieren
+    while (1) {} 
 }
 
 
-void syscall_handler(struct Interrupt_registers* regs, uint32_t syscall_number)
+void syscall_handler(struct Interrupt_registers* regs)
 {
-    printf("hallo");
+    uint32_t syscall_number = regs->eax;
+
+    if (syscall_number >= 1024)
+    {
+        printf("not a valid syscall nr: %u\n", syscall_number);
+        return;
+    }
+
+    syscall_functions[syscall_number](regs);
 }
+
 
 void isr_handler(struct Interrupt_registers *regs)
 {
@@ -210,7 +218,7 @@ void isr_handler(struct Interrupt_registers *regs)
 
     if (regs->interrupt_number == 128)
     {
-        syscall_handler(regs, regs->eax);
+        syscall_handler(regs);
     }
     
 }

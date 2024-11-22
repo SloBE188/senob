@@ -4,7 +4,7 @@ section .text
 global _userstart
 
 _userstart:
-    mov eax, 1
+    mov eax, 0
     mov ebx, 30
     int 0x80
 
