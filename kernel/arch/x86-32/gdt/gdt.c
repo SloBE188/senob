@@ -23,16 +23,19 @@ void init_gdt()
 
     memset((uint8_t)&tss, 0, sizeof(tss));
 
-    tss.debug_flag = 0x00;
-    tss.io_map = 0x00;
     tss.esp0 = 0;   //0x1FFF0;
     tss.ss0 = 0x10; //0x18;
 
-    tss.cs   = 0x0B; //from ring 3 - 0x08 | 3 = 0x0B
-    tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13; //from ring 3 = 0x10 | 3 = 0x13
+    // These don't need to be set when we aren't using hardware
+    // task switching, which we aren't using.
+    //tss.cs   = 0x0B; //from ring 3 - 0x08 | 3 = 0x0B
+    //tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13; //from ring 3 = 0x10 | 3 = 0x13
 
     uint32_t tss_base = (uint32_t) &tss;
-    uint32_t tss_limit = sizeof(tss);
+    // TSS limit is one less than the actual size
+    uint32_t tss_limit = sizeof(tss)-1;
+    // Set io_map to higher than limit to disable io bitmap.
+    tss.io_map = sizeof(tss);
 
     setGdtEntry(0, 0, 0, 0, 0);                  // Null segment
     setGdtEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);   // Kernel code segment
