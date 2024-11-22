@@ -212,7 +212,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_syscalls();
 
-    struct process* new_process = create_process("0:/blank.bin");
+    struct process* new_process = create_process("0:/start.bin");
 
     switch_to_thread(new_process->thread);
     //switch_task(new_process->thread->regs);

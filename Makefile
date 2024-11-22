@@ -14,7 +14,7 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
 	# here i c1an copy files to /mnt (ramdisk)
 	sudo cp ./test.txt /mnt
-	sudo cp ./programs/blank/blank.bin /mnt
+	sudo cp ./userland/programs/start/start.bin /mnt
 	sudo umount /mnt
 
 ./build/kernel.o:
@@ -100,12 +100,12 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 
 .PHONY: programs
 programs:
-	@echo "Running make in programs/blank..."
-	cd ./programs/blank/ && $(MAKE) all
+	@echo "Running make in programs/start..."
+	cd ./userland/programs/start/ && $(MAKE) all
 
 
 programs_clean:
-	cd ./programs/blank/ && $(MAKE) clean
+	cd ./userland/programs/start/ && $(MAKE) clean
 
 clean: programs_clean
 	rm -rf ${FILES}

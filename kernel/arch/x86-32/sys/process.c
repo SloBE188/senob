@@ -131,8 +131,8 @@ struct process *create_process(const char *filename)
 
     //new_thread->regs->cr3 = new_process->page_directory;
 
-    uint32_t pages_needed = map_program_to_address("0:/blank.bin", 0x00400000);
-    copy_program_to_address("0:/blank.bin", pages_needed, 0x00400000);
+    uint32_t pages_needed = map_program_to_address(filename, 0x00400000);
+    copy_program_to_address(filename, pages_needed, 0x00400000);
 
     uint32_t count_stack_pages = 40;
 
