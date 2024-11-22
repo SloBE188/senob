@@ -129,7 +129,7 @@ void idt_init()
     idt_set_descriptor(47, (uint32_t)irq15, 1);
 
     //Syscalls
-    idt_set_descriptor(80, (uint32_t)isr80, 3);
+    idt_set_descriptor(128, (uint32_t)isr128, 3);
 
     idt_flush((uint32_t)&idtr);
 

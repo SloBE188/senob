@@ -92,7 +92,7 @@ extern void irq15();
 
 
 //Syscalls
-extern void isr80();
+extern void isr128();
 
 void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr, uint8_t dpl);
 void idt_init();
