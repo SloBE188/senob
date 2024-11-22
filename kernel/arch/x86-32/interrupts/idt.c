@@ -208,7 +208,7 @@ void isr_handler(struct Interrupt_registers *regs)
         for(;;);
     }
 
-    if (regs->interrupt_number == 80)
+    if (regs->interrupt_number == 128)
     {
         syscall_handler(regs, regs->eax);
     }
