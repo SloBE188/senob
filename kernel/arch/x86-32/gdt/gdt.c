@@ -21,22 +21,25 @@ void init_gdt()
     gdt_ptr.limit = (sizeof(struct gdt_entry_struct) * 6) - 1;
     gdt_ptr.base = (uint32_t)&gdt_entries;
 
-    memset(&tss, 0, sizeof(tss));
-    tss.ss0 = 0x10;
-    // User mode segment registers
-    tss.cs = 0x1B;  // 0x1B = User Code Segment Selector | RPL 3
-    tss.ss = 0x23;  // 0x23 = User Data Segment Selector | RPL 3
-    tss.ds = 0x23;
-    tss.es = 0x23;
-    tss.fs = 0x23;
-    tss.gs = 0x23;
+    memset((uint8_t)&tss, 0, sizeof(tss));
+
+    tss.debug_flag = 0x00;
+    tss.io_map = 0x00;
+    tss.esp0 = 0;   //0x1FFF0;
+    tss.ss0 = 0x10; //0x18;
+
+    tss.cs   = 0x0B; //from ring 3 - 0x08 | 3 = 0x0B
+    tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13; //from ring 3 = 0x10 | 3 = 0x13
+
+    uint32_t tss_base = (uint32_t) &tss;
+    uint32_t tss_limit = sizeof(tss);
 
     setGdtEntry(0, 0, 0, 0, 0);                  // Null segment
     setGdtEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);   // Kernel code segment
     setGdtEntry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);   // Kernel data segment
     setGdtEntry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);   // User code segment
     setGdtEntry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);   // User data segment
-    setGdtEntry(5, (uint32_t) &tss, sizeof(tss), 0x89, 0x40);
+    setGdtEntry(5, tss_base, tss_limit, 0xE9, 0x00);
 
     gdt_flush((uint32_t)&gdt_ptr);
     tss_flush();

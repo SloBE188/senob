@@ -1,7 +1,7 @@
 #ifndef VBE_H
 #define VBE_H
 
-#include <stdint-gcc.h>
+#include <stdint.h>
 
 
 

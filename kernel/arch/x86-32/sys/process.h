@@ -1,7 +1,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
-#include <stdint-gcc.h>
+#include <stdint.h>
 
 #define USER_STACK_TOP 0xB0000000
 #define PROGRAMM_VIRTUAL_ADDRESS_START 0x00400000

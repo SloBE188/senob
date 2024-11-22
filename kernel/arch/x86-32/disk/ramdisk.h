@@ -1,7 +1,7 @@
 #ifndef RAMDISK_H
 #define RAMDISK_H
 
-#include <stdint-gcc.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include "../multiboot.h"
 
