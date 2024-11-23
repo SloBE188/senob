@@ -7,8 +7,8 @@ extern main
 
 _userstart:
     mov eax, 0
-    mov ebx, 30
-    int 0x80
+    ;mov ebx, 30
+    ;int 0x80
     call main
 
 loop:

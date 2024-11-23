@@ -8,6 +8,8 @@
         "string.h": "c",
         "ff.h": "c",
         "syscalls.h": "c",
-        "kernel.h": "c"
+        "kernel.h": "c",
+        "main.h": "c",
+        "print.h": "c"
     }
 }

@@ -17,7 +17,10 @@ void add_syscalls(uint32_t syscal_number, syscalls_fun_ptr sys_function)
 
 void syscall_0_print(struct Interrupt_registers* regs)
 {
-    printf("hey, this should be a print syscall");
+    
+    char* user_string = regs->ebx;
+    printf("%s", user_string);
+    
 }
 
 void register_syscalls()
