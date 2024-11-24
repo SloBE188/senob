@@ -2,7 +2,16 @@
 
 void main()
 {
-    int a = 10;
-    print("heyy, here is the print syscall from main.c");
-    while(1){}
+
+    char input[1024];
+    print("Welcome to senobs shell!\n");
+    while (1)
+    {
+        //shell implementation with a readline of user input comes here
+        //print("$");
+
+        //print("\n");
+
+    }
+    
 }
