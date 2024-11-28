@@ -218,7 +218,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     //switch_to_thread(new_process->thread);
     find_mp_floating_pointer(multibootinfo);
-    print_mp_floatingpointer_structure();
+    print_mp_stats();
     
     //test_heap_shrink_and_reuse();
 

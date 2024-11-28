@@ -53,7 +53,7 @@ struct entry_io_apic {
     uint32_t address; // The memory mapped address of the IO APIC is memory
 };
 
-void print_mp_floatingpointer_structure();
+void print_mp_stats();
 void* find_mp_floating_pointer(struct multiboot_info *mb_info);
 
 #endif

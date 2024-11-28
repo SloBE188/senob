@@ -43,11 +43,17 @@ void* find_mp_floating_pointer(struct multiboot_info *mb_info)
 }
 
 
-void print_mp_floatingpointer_structure()
+void print_mp_stats()
 {
     struct mp_floating_pointer_structure* mp_pointer = (struct mp_floating_pointer_structure*) MP_FLOATING_POINTER_ADDRESS;
     printf("length: %d\n features: %x\n", mp_pointer->length, mp_pointer->features);
     struct mp_configuration_table* table = (struct mp_configuration_table*) MP_CONFIGURATION_TABLE_ADDRESS;
-    printf("entry count: %d\nlocal APIC: %x", table->entry_count, table->lapic_address);
+    printf("entry count: %d\nlocal APIC: %x\n", table->entry_count, table->lapic_address);
+    if(mp_pointer->features & (1 << 7))
+    {
+        printf("APIC is enabled");
+    }else{
+        printf("PIC still active :(");
+    }
 
 }
