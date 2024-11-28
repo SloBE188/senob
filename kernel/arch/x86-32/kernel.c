@@ -35,6 +35,7 @@
 #include "fatfs/ff.h"
 #include "fatfs/diskio.h"
 #include "syscalls/syscalls.h"
+#include "sys/smp.h"
 
 
 extern void rust_testfunction();
@@ -46,6 +47,7 @@ void kernel_panic(const char* message)
     printf("Kernel Panic: %s\n", message);
     while (1);
 }
+
 
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
@@ -212,10 +214,12 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     init_syscalls();
 
-    struct process* new_process = create_process("0:/start.bin");
+    //struct process* new_process = create_process("0:/start.bin");
 
-    switch_to_thread(new_process->thread);
-    //switch_task(new_process->thread->regs);
+    //switch_to_thread(new_process->thread);
+    find_mp_floating_pointer(multibootinfo);
+    print_mp_floatingpointer_structure();
+    
     //test_heap_shrink_and_reuse();
 
     

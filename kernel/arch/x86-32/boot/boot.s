@@ -63,7 +63,6 @@ kernel_directory:
     DD 0x02400083 ; Entry 777 (0xC2400000 - 0xC27FFFFF) mapped to 0x02400000 - 0x027FFFFF
     DD 0x02800083 ; Entry 778 (0xC2800000 - 0xC2BFFFFF) mapped to 0x02800000 - 0x02BFFFFF
     DD 0x02C00083 ; Entry 779 (0xC2C00000 - 0xC2FFFFFF) mapped to 0x02C00000 - 0x02FFFFFF
-
     TIMES 128-12 DD 0
 
     ; Framebuffer Mapping bei 0xFD000000
@@ -110,4 +109,3 @@ start_higher_half_kernel:
 halt:
     hlt
     jmp halt
-
