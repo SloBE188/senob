@@ -42,6 +42,36 @@ void* find_mp_floating_pointer(struct multiboot_info *mb_info)
     return NULL;
 }
 
+void parse_mp_entries(struct mp_configuration_table* table) {
+    uint8_t* entry_ptr = (uint8_t*) table + sizeof(struct mp_configuration_table);
+
+    for (int i = 0; i < table->entry_count; i++) {
+        uint8_t type = *entry_ptr;
+
+        switch (type) {
+            case 0: {  // processor entry
+                struct entry_processor* processor = (struct mp_processor_entry*) entry_ptr;
+                printf("Processor: LAPIC ID=%u, LAPIC Version=%u, Flags=%u\n",
+                       processor->local_apic_id, processor->local_apic_version, processor->flags);
+
+                entry_ptr += 20;  // processor entries are 20 bytes long
+                break;
+            }
+            case 1: {  // I/O-APIC entry
+                struct entry_io_apic* io_apic = (struct mp_io_apic_entry*) entry_ptr;
+                printf("I/O-APIC: ID=%u, Address=0x%x\n", io_apic->id, io_apic->address);
+
+                entry_ptr += 8;  // I/O-APIC entries are 8 bytes long
+                break;
+            }
+            default:
+                printf("Unbekannter Eintragstyp: %u\n", type);
+                entry_ptr += 8;
+                break;
+        }
+    }
+}
+
 
 void print_mp_stats()
 {
@@ -53,7 +83,10 @@ void print_mp_stats()
     {
         printf("APIC is enabled");
     }else{
-        printf("PIC still active :(");
+        printf("PIC still active :(\n");
     }
 
+    parse_mp_entries(table);
+
 }
+
