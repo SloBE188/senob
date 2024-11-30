@@ -1,0 +1,22 @@
+# Bochs Configuration
+romimage: file=/usr/share/bochs/BIOS-bochs-latest
+vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest
+
+# CPU Setup
+cpuid: mmx=true, apic=true
+cpu: count=4  # Anzahl der virtuellen Prozessoren
+
+# Memory Configuration
+megs: 32
+
+# Disk Image (falls benötigt)
+boot: cdrom
+ata0-master: type=cdrom, path="senob.iso", status=inserted
+
+# Log Output
+log: bochs.log
+debug: action=ignore
+
+# Display Configuration
+display_library: sdl
+keyboard_mapping: enabled

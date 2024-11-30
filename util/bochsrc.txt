@@ -1,0 +1,21 @@
+# Dateiname: bochsrc
+
+# Allgemeine Einstellungen
+megs: 64                       # Arbeitsspeicher in MB
+cpu: count=2, ips=100000000    # CPU-Einstellungen, z. B. 2 Kerne
+log: bochs.log                 # Logdatei
+display_library: x           # SDL für Grafik
+romimage: file=/usr/share/bochs/BIOS-bochs-latest  # Pfad zum BIOS
+vgaromimage: file=/usr/share/bochs/VGABIOS-lgpl-latest  # VGA-BIOS
+
+# Boot-Optionen
+boot: cdrom                     # Booten von einer Festplatte
+#floppy_bootsig_check: disabled
+
+# Festplattenkonfiguration
+ata0-master: type=cdrom, path="/home/slobe/senob/senob.iso"
+
+# Debugging und Emulator-Optionen
+debugger_log: bochsdbg.log     # Debugger-Log
+mouse: enabled=0               # Maus deaktivieren
+#keyboard_mapping: de           # Deutsche Tastatur
