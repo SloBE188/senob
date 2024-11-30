@@ -217,8 +217,12 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //struct process* new_process = create_process("0:/start.bin");
 
     //switch_to_thread(new_process->thread);
-    find_mp_floating_pointer(multibootinfo);
-    print_mp_stats();
+
+    //find_mp_floating_pointer(multibootinfo);
+    struct addr* addr = smp_addresses(multibootinfo);
+
+    printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr);
+    print_mp_stats(addr->floating_ptr_addr, addr->mp_config_table_addr);
     
     //test_heap_shrink_and_reuse();
 

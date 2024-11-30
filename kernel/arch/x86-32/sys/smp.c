@@ -32,7 +32,7 @@ void* find_mp_floating_pointer(struct multiboot_info *mb_info)
         char *ptr = (char *)addr;
         if (memcmp(ptr, MP_FLOATING_POINTER_SIGNATURE, 4) == 0) {
             if (validate_mp_checksum((uint8_t *)ptr)) {
-                printf("mp floating pointer found at physical address: 0x%x\n", addr);
+                //printf("mp floating pointer found at physical address: 0x%x\n", addr);
                 return (void *)addr;
             }
         }
@@ -73,11 +73,23 @@ void parse_mp_entries(struct mp_configuration_table* table) {
 }
 
 
-void print_mp_stats()
+struct addr* smp_addresses(struct multiboot_info *mb_info) 
 {
-    struct mp_floating_pointer_structure* mp_pointer = (struct mp_floating_pointer_structure*) MP_FLOATING_POINTER_ADDRESS;
+    struct mp_floating_pointer_structure* mp_pointer = find_mp_floating_pointer(mb_info);
+    
+    struct addr* addr;
+    addr->floating_ptr_addr = (uint32_t*)find_mp_floating_pointer(mb_info);
+    addr->mp_config_table_addr = mp_pointer->configuration_table;
+
+    return addr;
+}
+
+
+void print_mp_stats(uint32_t* floating_pointer_addr, uint32_t* mp_config_table_addr)
+{
+    struct mp_floating_pointer_structure* mp_pointer = (struct mp_floating_pointer_structure*) floating_pointer_addr;
     printf("length: %d\n features: %x\n", mp_pointer->length, mp_pointer->features);
-    struct mp_configuration_table* table = (struct mp_configuration_table*) MP_CONFIGURATION_TABLE_ADDRESS;
+    struct mp_configuration_table* table = (struct mp_configuration_table*) mp_config_table_addr;
     printf("entry count: %d\nlocal APIC: %x\n", table->entry_count, table->lapic_address);
     if(mp_pointer->features & (1 << 7))
     {

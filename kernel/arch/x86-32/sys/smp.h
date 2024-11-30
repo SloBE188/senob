@@ -6,6 +6,11 @@
 #include "../multiboot.h"
 #include "../kernel.h"
 
+struct addr{
+    uint32_t* floating_ptr_addr;
+    uint32_t* mp_config_table_addr;
+};
+
 struct mp_floating_pointer_structure {
     char signature[4];
     uint32_t configuration_table;
@@ -55,5 +60,6 @@ struct entry_io_apic {
 
 void print_mp_stats();
 void* find_mp_floating_pointer(struct multiboot_info *mb_info);
+struct addr* smp_addresses(struct multiboot_info *mb_info);
 
 #endif
