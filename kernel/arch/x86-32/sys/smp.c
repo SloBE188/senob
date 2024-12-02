@@ -54,15 +54,16 @@ void parse_mp_entries(struct mp_configuration_table* table) {
                 printf("Processor: LAPIC ID=%u, LAPIC Version=%u, Flags=%u\n",
                        processor->local_apic_id, processor->local_apic_version, processor->flags);
                 
-                if(processor->flags == 0x02)
+                if(processor->flags & 0x02)
                     printf("AP is active\n");
                 else
                 {
                     printf("processor is disabled\n");
                 }
                 
+                //printf("Processor %d\n", i);
 
-                entry_ptr += 20;short  // processor entries are 20 bytes long
+                entry_ptr += 20;  // processor entries are 20 bytes long
                 break;
             }
             case 1: {  // I/O-APIC entry
