@@ -2,6 +2,7 @@
 #define KERNEL_H
 
 #define NULL 0
+#define MAX_CPUS 24
 
 void dummyfunction1();
 void dummyfunction2();

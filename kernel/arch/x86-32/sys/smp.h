@@ -7,6 +7,8 @@
 #include "../kernel.h"
 #include "process.h"
 
+
+
 struct cpu{
 
     uint32_t id;        //id from the cpu (lapic id)
@@ -14,11 +16,12 @@ struct cpu{
     uint32_t lapic_version;
     uint32_t lapic_flags;   // to check if its the bsp or not
     struct thread* current_thread;
-    uint32_t isbsd;         //1 = yes, 0 = no
+    uint32_t isbsp;         //1 = yes, 0 = no
     char cpu_name;          //CPU 0... for the user
 
 };
 
+extern struct cpu cpus[MAX_CPUS];
 
 struct addr{
     uint32_t* floating_ptr_addr;
