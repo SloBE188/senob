@@ -85,10 +85,12 @@ void parse_mp_entries(struct mp_configuration_table* table) {
 struct addr* smp_addresses(struct multiboot_info *mb_info) 
 {
     struct mp_floating_pointer_structure* mp_pointer = find_mp_floating_pointer(mb_info);
+    struct mp_configuration_table* table = (struct mp_configuration_table*) mp_pointer->configuration_table;
     
     struct addr* addr;
     addr->floating_ptr_addr = (uint32_t*)find_mp_floating_pointer(mb_info);
     addr->mp_config_table_addr = mp_pointer->configuration_table;
+    addr->local_apic = table->lapic_address;
 
     return addr;
 }

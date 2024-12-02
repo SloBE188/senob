@@ -221,7 +221,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //find_mp_floating_pointer(multibootinfo);
     struct addr* addr = smp_addresses(multibootinfo);
 
-    printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr);
+    printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
     print_mp_stats(addr->floating_ptr_addr, addr->mp_config_table_addr);
     
     //test_heap_shrink_and_reuse();

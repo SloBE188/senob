@@ -5,10 +5,25 @@
 #include <stdint.h>
 #include "../multiboot.h"
 #include "../kernel.h"
+#include "process.h"
+
+struct cpu{
+
+    uint32_t id;        //id from the cpu (lapic id)
+    uint32_t lapic_base;    //for the bsp normally 0xfee00000
+    uint32_t lapic_version;
+    uint32_t lapic_flags;   // to check if its the bsp or not
+    struct thread* current_thread;
+    uint32_t isbsd;         //1 = yes, 0 = no
+    char cpu_name;          //CPU 0... for the user
+
+};
+
 
 struct addr{
     uint32_t* floating_ptr_addr;
     uint32_t* mp_config_table_addr;
+    uint32_t* local_apic;
 };
 
 struct mp_floating_pointer_structure {
