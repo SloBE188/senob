@@ -24,7 +24,8 @@
 #define BCAST      0x00080000   // Send to all APICs, including self.
 #define BUSY       0x00001000
 #define FIXED      0x00000000
-#define ICRHI   (0x0310/4)   // Interrupt Command [63:32]
+#define ICR1    (0x0300/4)   //Interrupt Command Reg 0-31
+#define ICR2    (0x0310/4)   // Interrupt Command Reg [32-63]
 #define TIMER   (0x0320/4)   // Local Vector Table 0 (TIMER)
 #define X1         0x0000000B   // divide counts by 1
 #define PERIODIC   0x00020000   // Periodic
@@ -55,5 +56,36 @@ void map_lapic()
 void lapic_init(void)
 {
     map_lapic();
-    IA32_APIC_BASE[SVR] = ENABLE | 0Xff;
+
+    //Enable the APIC threw the SVR Reg
+    lapicw(SVR, ENABLE | 0xFF);
+    uint32_t sivr = IA32_APIC_BASE[SVR];
+    if (sivr & 0x100)
+    {
+        printf("APIC active.\n");
+    }
+
+    //Set TPR to 0x00 -> accept all interrupts (without setting this, the APIC could block every interrupt)
+    lapicw(TPR, 0x00);
+
+    //Timer
+    lapicw(TDCR, X1);
+    lapicw(TICR, 0x1000);
+    lapicw(TIMER, 0x20);     //IRQ0 is 32 and the Timer IRQ is 0
+
+
+    //disable LINT0 and LINT1
+    lapicw(LINT0, MASKED);
+    lapicw(LINT1, MASKED);
+
+
+    //clear error status reg, no idea why you have to do it twice
+    lapicw(ESR, 0);
+    lapicw(ESR, 0);
+
+
+    lapicw(EOI, 0x00);
+
+    
+
 }
