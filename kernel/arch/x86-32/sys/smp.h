@@ -79,5 +79,5 @@ struct entry_io_apic {
 void print_mp_stats();
 void* find_mp_floating_pointer(struct multiboot_info *mb_info);
 struct addr* smp_addresses(struct multiboot_info *mb_info);
-
+void disable_pic(void);
 #endif

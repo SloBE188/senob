@@ -137,3 +137,9 @@ void print_mp_stats(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_a
 
     mp_init(table);
 }
+
+void disable_pic(void)
+{
+    outb(0x20+1, 0xFF);     //master pic
+    outb(0xA0+1, 0xFF);     //slave pic
+}
