@@ -2,5 +2,7 @@
 #define APIC_H
 
 
+void lapic_init(void);
+
 
 #endif

@@ -36,6 +36,7 @@
 #include "fatfs/diskio.h"
 #include "syscalls/syscalls.h"
 #include "sys/smp.h"
+#include "sys/apic.h"
 
 
 extern void rust_testfunction();
@@ -223,6 +224,9 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
     print_mp_stats(addr->floating_ptr_addr, addr->mp_config_table_addr);
+
+    disable_pic();
+    lapic_init();
     
     //test_heap_shrink_and_reuse();
 
