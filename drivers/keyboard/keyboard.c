@@ -159,7 +159,8 @@ void add_key_to_buffer(uint32_t key) {
 }
 
 
-uint32_t get_key_from_buffer() {
+uint32_t get_key_from_buffer() 
+{
     if (key_buffer_head == key_buffer_tail) {
         return 0;  // no key avaiable
     }

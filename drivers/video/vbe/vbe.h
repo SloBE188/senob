@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-
+extern struct vbe_info* globalvbeinfo;
 
 //Farben
 #define COLOR_BLACK         0x000000
@@ -27,5 +27,7 @@ void draw_pixel(uint32_t x, uint32_t y, uint32_t color, struct vbe_info* vbeinfo
 void draw_rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color, struct vbe_info* vbeinfo);
 void draw_string(uint32_t x, uint32_t y, const char* str, uint32_t color, struct vbe_info* vbeinfo);
 void draw_char(uint32_t x, uint32_t y, char c, uint32_t color, struct vbe_info* vbeinfo);
+void clear_screen(uint32_t color, struct vbe_info* vbeinfo);
+
 
 #endif

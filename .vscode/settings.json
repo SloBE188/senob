@@ -10,6 +10,10 @@
         "syscalls.h": "c",
         "kernel.h": "c",
         "main.h": "c",
-        "print.h": "c"
+        "print.h": "c",
+        "vbe.h": "c",
+        "stdint.h": "c",
+        "keyboard.h": "c",
+        "doomgeneric.h": "c"
     }
 }
