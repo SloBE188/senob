@@ -61,9 +61,16 @@
 #define ALTGR   0xFFFFFFDF
 #define NUMLCK  0xFFFFFFC0
 #define BACKSPACE 0xFFFFFFBF
+#define KEY_BUFFER_SIZE 128
 
 bool capsOn;
 bool capsLock;
+
+
+static uint32_t key_buffer[KEY_BUFFER_SIZE];
+static int key_buffer_head = 0;
+static int key_buffer_tail = 0;
+
 
 const uint32_t lowercase[128] = {
     UNKNOWN, ESC, '1', '2', '3', '4', '5', '6', '7', '8',
@@ -141,6 +148,27 @@ bool is_special_key(uint32_t key) {
     }
 }
 
+
+// function for adding a key to the buffer
+void add_key_to_buffer(uint32_t key) {
+    int next_head = (key_buffer_head + 1) % KEY_BUFFER_SIZE;
+    if (next_head != key_buffer_tail) {  // buffer isnt full
+        key_buffer[key_buffer_head] = key;
+        key_buffer_head = next_head;
+    }
+}
+
+
+uint32_t get_key_from_buffer() {
+    if (key_buffer_head == key_buffer_tail) {
+        return 0;  // no key avaiable
+    }
+    uint32_t key = key_buffer[key_buffer_tail];
+    key_buffer_tail = (key_buffer_tail + 1) % KEY_BUFFER_SIZE;
+    return key;
+}
+
+
 void irq1_handler(struct Interrupt_registers *regs) {
     char scancode = insb(KEYBOARD_PORT) & 0x7F;  // Scan-Code without highest Bit
     char shiftpressed = insb(KEYBOARD_PORT) & 0x80;  // Status from highest Bits
@@ -151,11 +179,9 @@ void irq1_handler(struct Interrupt_registers *regs) {
         handle_special_key(lowercase[scancode], pressed);
     } else {
         if (pressed) {
-            if (capsOn || capsLock) {
-                printf("%c", uppercase[scancode]);
-            } else {
-                printf("%c", lowercase[scancode]);
-            }
+            uint32_t key = capsOn || capsLock ? uppercase[scancode] : lowercase[scancode];
+            printf("%c", key);
+            add_key_to_buffer(key);
         }
     }
 }
