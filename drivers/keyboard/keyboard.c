@@ -111,7 +111,7 @@ void handle_special_key(uint32_t key, bool pressed) {
             break;
         case BACKSPACE:  // Backspace
             if (pressed) {
-                handleBackspace();
+                putc('\b');
             }
             break;
         default:

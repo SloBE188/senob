@@ -20,10 +20,11 @@ void putc(char c) {
         cursor_x = 0;
         cursor_y += FONT_HEIGHT;
         if (cursor_y >= global_vbe_info->framebuffer_height) {
-            cursor_y = 0;
+            cursor_y = 0; // line break (kind of scrolling lol)
         }
     } else if (c == '\r') {
         cursor_x = 0;
+
     } else if (c == '\t') {
         cursor_x += 4 * FONT_WIDTH;
         if (cursor_x >= global_vbe_info->framebuffer_width) {
@@ -33,7 +34,18 @@ void putc(char c) {
                 cursor_y = 0;
             }
         }
+    } else if (c == '\b') {
+        // Backspace
+        if (cursor_x >= FONT_WIDTH) {
+            cursor_x -= FONT_WIDTH; // move cursor back
+        } else if (cursor_y >= FONT_HEIGHT) {
+            cursor_y -= FONT_HEIGHT;
+            cursor_x = global_vbe_info->framebuffer_width - FONT_WIDTH;
+        }
+        // delete the font at the cursor position
+        draw_rectangle(cursor_x, cursor_y, FONT_WIDTH, FONT_HEIGHT, COLOR_LIGHT_GREY, global_vbe_info);
     } else {
+        // draw font
         draw_char(cursor_x, cursor_y, c, COLOR_WHITE, global_vbe_info);
         cursor_x += FONT_WIDTH;
         if (cursor_x >= global_vbe_info->framebuffer_width) {
@@ -45,6 +57,7 @@ void putc(char c) {
         }
     }
 }
+
 
 void puts(const char* s) {
     while (*s) {
