@@ -5,6 +5,7 @@
 #include "smp.h"
 #include "apic.h"
 #include "../mm/paging/paging.h"
+#include "../mm/PMM/pmm.h"
 
 
 #define ID      (0x0020/4)      //Local APIC ID Reg
@@ -40,6 +41,11 @@
 
 volatile uint32_t* IA32_APIC_BASE = (volatile uint32_t*)0xFEE00000;
 
+uint32_t lapic_read(int offset) 
+{
+    return IA32_APIC_BASE[offset];
+}
+
 void lapicw(int offset, int value)
 {
     IA32_APIC_BASE[offset] = value;
@@ -50,7 +56,7 @@ void lapicw(int offset, int value)
 
 void map_lapic()
 {
-    mem_map_page(0xFEE00000, 0x90000000, PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
+    mem_map_page(0xFEE00000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
 }
 
 void lapic_init(void)
@@ -85,6 +91,15 @@ void lapic_init(void)
 
 
     lapicw(EOI, 0x00);
+
+    if(lapic_read(SVR) & ENABLE)
+    {
+        printf("APIC ist aktiviert!\n");
+    }else
+    {
+        printf("APIC not activated :(\n");
+    }
+    
 
     
 

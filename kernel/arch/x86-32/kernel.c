@@ -226,7 +226,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     print_mp_stats(addr->floating_ptr_addr, addr->mp_config_table_addr);
 
     //disable_pic();
-    //lapic_init();
+    lapic_init();
     
     //test_heap_shrink_and_reuse();
 

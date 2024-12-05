@@ -19,7 +19,7 @@
 #include "font.h"
 
 
-static struct vbe_info* globalvbeinfo;
+struct vbe_info* globalvbeinfo;
 
 
 void clear_screen(uint32_t color, struct vbe_info* vbeinfo) 
