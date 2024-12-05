@@ -59,6 +59,13 @@ void map_lapic()
     mem_map_page(0xFEE00000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
 }
 
+void lapic_timer_init()
+{
+    lapicw(TDCR, X1);
+    lapicw(TICR, 0x1000);
+    lapicw(TIMER, 0x20);     //IRQ0 is 32 and the Timer IRQ is 0
+}
+
 void lapic_init(void)
 {
     map_lapic();
@@ -66,19 +73,18 @@ void lapic_init(void)
     //Enable the APIC threw the SVR Reg
     lapicw(SVR, ENABLE | 0xFF);
     uint32_t sivr = IA32_APIC_BASE[SVR];
-    if (sivr & 0x100)
+    if(lapic_read(SVR) & ENABLE)
     {
-        printf("APIC active.\n");
+        printf("APIC ist aktiviert!\n");
+    }else
+    {
+        printf("APIC not activated :(\n");
     }
 
     //Set TPR to 0x00 -> accept all interrupts (without setting this, the APIC could block every interrupt)
     lapicw(TPR, 0x00);
 
-    //Timer
-    lapicw(TDCR, X1);
-    lapicw(TICR, 0x1000);
-    lapicw(TIMER, 0x20);     //IRQ0 is 32 and the Timer IRQ is 0
-
+    lapic_timer_init();
 
     //disable LINT0 and LINT1
     lapicw(LINT0, MASKED);
@@ -91,14 +97,6 @@ void lapic_init(void)
 
 
     lapicw(EOI, 0x00);
-
-    if(lapic_read(SVR) & ENABLE)
-    {
-        printf("APIC ist aktiviert!\n");
-    }else
-    {
-        printf("APIC not activated :(\n");
-    }
     
 
     
