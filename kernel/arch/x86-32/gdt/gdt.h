@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 extern struct tss tss;
+extern struct gdt_ptr_struct gdt_ptr;
 
 struct gdt_entry_struct
 {

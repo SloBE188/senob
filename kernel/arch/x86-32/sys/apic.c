@@ -66,6 +66,18 @@ void lapic_timer_init()
     lapicw(TIMER, 0x20);     //IRQ0 is 32 and the Timer IRQ is 0
 }
 
+void sync_arbitratiod_ids()
+{
+    lapicw(ICR1, 0);    //All CPUs
+    lapicw(ICR2, BCAST | INIT | LEVEL); //level triggered INIT IPI
+    while (lapic_read(ICR1) & DELIVS)
+        ;
+    lapicw(ICRLO, BCAST | INIT | LEVEL | DEASSERT); //send deassert
+    while (lapic_read(ICRLO) & DELIVS)
+        ;
+    
+}
+
 void lapic_init(void)
 {
     map_lapic();
@@ -97,8 +109,27 @@ void lapic_init(void)
 
 
     lapicw(EOI, 0x00);
-    
 
-    
+    sync_arbitratiod_ids();
 
+}
+
+void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
+{
+    lapicw(ICR1, APIC_ID << 24);
+
+    //send INIT IPI
+    lapicw(ICR2, INIT | LEVEL | ASSERT);
+    //delay
+    lapicw(ICR2, INIT | LEVEL);
+    //delay
+
+    //send 2 SIPIs
+    for (int i = 0; i < 2; i++)
+    {
+        lapicw(ICR1, APIC_ID << 24);
+        lapicw(ICR2, STARTUP | (trampoline_addr >> 12));
+        //delay
+    }
+    
 }

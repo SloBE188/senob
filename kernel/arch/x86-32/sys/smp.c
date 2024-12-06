@@ -10,6 +10,11 @@ struct cpu cpus[MAX_CPUS];
 uint32_t ncpus;
 uint32_t ioapicid;
 
+
+extern struct idtr_t idtr;
+extern struct gdt_ptr_struct gdt_ptr;
+
+
 // validates mp checksum
 bool validate_mp_checksum(uint8_t *mp)
 {
@@ -120,6 +125,8 @@ struct addr *smp_addresses(struct multiboot_info *mb_info)
     return &addr;
 }
 
+void prepare_trampoline_code();
+
 void print_mp_stats(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr)
 {
     struct mp_floating_pointer_structure *mp_pointer = (struct mp_floating_pointer_structure *)floating_pointer_addr;
@@ -136,10 +143,18 @@ void print_mp_stats(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_a
     }
 
     mp_init(table);
+    void prepare_trampoline_code();
 }
 
 void disable_pic(void)
 {
     outb(0x20+1, 0xFF);     //master pic
     outb(0xA0+1, 0xFF);     //slave pic
+}
+
+//void* trampolinecodeaddr, uint64_t size
+void prepare_trampoline_code()
+{
+    memcpy(&idtr, 0x5000, sizeof(struct idtr_t));
+    memcpy(&gdt_ptr, 0x6000, sizeof(struct gdt_ptr_struct));
 }

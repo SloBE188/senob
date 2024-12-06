@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+extern struct idtr_t idtr;
+
 struct idt_entry_t{
 	uint16_t    isr_low;      // The lower 16 bits of the ISR's address
 	uint16_t    kernel_cs;    // The GDT segment selector that the CPU will load into CS before calling the ISR

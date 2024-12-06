@@ -6,7 +6,11 @@
 #include "../multiboot.h"
 #include "../kernel.h"
 #include "process.h"
+#include "../interrupts/idt.h"
+#include "../gdt/gdt.h"
 
+extern struct idtr_t idtr;
+extern struct gdt_ptr_struct gdt_ptr;
 
 
 struct cpu{
@@ -80,4 +84,5 @@ void print_mp_stats();
 void* find_mp_floating_pointer(struct multiboot_info *mb_info);
 struct addr* smp_addresses(struct multiboot_info *mb_info);
 void disable_pic(void);
+void prepare_trampoline_code();
 #endif
