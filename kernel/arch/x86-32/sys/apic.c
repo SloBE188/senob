@@ -66,7 +66,7 @@ void lapic_timer_init()
     lapicw(TIMER, 0x20);     //IRQ0 is 32 and the Timer IRQ is 0
 }
 
-void sync_arbitratiod_ids()
+void sync_arbitration_ids()
 {
     lapicw(ICR1, 0);    //All CPUs
     lapicw(ICR2, BCAST | INIT | LEVEL); //level triggered INIT IPI
@@ -76,6 +76,10 @@ void sync_arbitratiod_ids()
     while (lapic_read(ICRLO) & DELIVS)
         ;
     
+}
+
+void microdelay(int us)
+{
 }
 
 void lapic_init(void)
@@ -110,7 +114,7 @@ void lapic_init(void)
 
     lapicw(EOI, 0x00);
 
-    sync_arbitratiod_ids();
+    sync_arbitration_ids();
 
 }
 
@@ -120,16 +124,16 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
 
     //send INIT IPI
     lapicw(ICR2, INIT | LEVEL | ASSERT);
-    //delay
+    microdelay(200);
     lapicw(ICR2, INIT | LEVEL);
-    //delay
+    microdelay(10000);
 
     //send 2 SIPIs
     for (int i = 0; i < 2; i++)
     {
         lapicw(ICR1, APIC_ID << 24);
         lapicw(ICR2, STARTUP | (trampoline_addr >> 12));
-        //delay
+        microdelay(200);
     }
     
 }

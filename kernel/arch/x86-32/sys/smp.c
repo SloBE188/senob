@@ -1,5 +1,6 @@
 #include "smp.h"
 #include "../../../libk/stdiok.h"
+#include "../../../libk/memory.h"
 
 #define MP_FLOATING_POINTER_ADDRESS 0xF5BA0
 #define MP_CONFIGURATION_TABLE_ADDRESS 0xF5BB0
@@ -13,6 +14,7 @@ uint32_t ioapicid;
 
 extern struct idtr_t idtr;
 extern struct gdt_ptr_struct gdt_ptr;
+extern uint32_t kernel_directory[1024];
 
 
 // validates mp checksum
@@ -143,7 +145,7 @@ void print_mp_stats(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_a
     }
 
     mp_init(table);
-    void prepare_trampoline_code();
+    prepare_trampoline_code();
 }
 
 void disable_pic(void)
@@ -152,9 +154,23 @@ void disable_pic(void)
     outb(0xA0+1, 0xFF);     //slave pic
 }
 
+struct trampoline_data {
+    struct idtr_t idtr;
+    struct gdt_ptr_struct gdt_ptr;
+    uint32_t kernel_directory[1024];
+};
+
+extern void _startcpu();
+
 //void* trampolinecodeaddr, uint64_t size
 void prepare_trampoline_code()
 {
-    memcpy(&idtr, 0x5000, sizeof(struct idtr_t));
-    memcpy(&gdt_ptr, 0x6000, sizeof(struct gdt_ptr_struct));
+    struct trampoline_data* data = (struct trampoline_data*)0x5000;
+
+    memcpy(&data->idtr, &idtr, sizeof(struct idtr_t));
+    memcpy(&data->gdt_ptr, &gdt_ptr, sizeof(struct gdt_ptr_struct));
+    memcpy(data->kernel_directory, kernel_directory, sizeof(kernel_directory));
+
+    memset((void*)0x7000, 0x00, 512);
+    memcpy((void*)0x7000, _startcpu, 512);
 }

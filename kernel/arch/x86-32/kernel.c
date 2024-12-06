@@ -227,6 +227,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     //disable_pic();
     lapic_init();
+    ap_startup(1, (uint32_t)0x7000);
     
     //test_heap_shrink_and_reuse();
 
