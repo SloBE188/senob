@@ -6,6 +6,7 @@
 #include "apic.h"
 #include "../mm/paging/paging.h"
 #include "../mm/PMM/pmm.h"
+#include "../io/io.h"
 
 #define ID (0x0020 / 4)    // Local APIC ID Reg
 #define VER (0x0030 / 4)   // Local APIC version Reg
@@ -76,11 +77,22 @@ void sync_arbitration_ids()
         ;
 }
 
-void microdelay(int us)
+#define PIT_SCALE 1193180
+#define PIT_CHANNEL_1_PORT 0x40
+#define PIT_COMMAND  0x43
+
+void microdelay(int ms)
 {
-    for (volatile int i = 0; i < us * 100; i++)
-    {
+    uint16_t count = (PIT_SCALE / 1000000) * ms;
+    if(count == 0){
+        count = 1;
     }
+
+    outb(PIT_COMMAND, 0x30);
+    outb(PIT_CHANNEL_1_PORT, count & 0xFF);      // LSB
+    outb(PIT_CHANNEL_1_PORT, (count >> 8) & 0xFF);  // MSB
+
+    while (insb(PIT_CHANNEL_1_PORT) & 0x80);
 }
 
 void lapic_init(void)
@@ -160,11 +172,12 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     {
         lapicw(ICR1, APIC_ID << 24);
         lapicw(ICR2, STARTUP | (trampoline_addr >> 12));
+        printf("SIPI #%d sent. trampoline address: 0x%x\n", i + 1, trampoline_addr >> 12);
         while (lapic_read(ICRLO) & DELIVS)
         {
             printf("waiting for SIPI DELIVS to clear\n");
         }
-        printf("SIPI #%d DELIVS-Bit got deleted.\n");
+        printf("SIPI #%d DELIVS-Bit got deleted.\n", i + 1);
         microdelay(200);
     }
 }

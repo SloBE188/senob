@@ -227,8 +227,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
 
     //disable_pic();
     lapic_init();
-    check_lapic_status();
-    ap_startup(3, (uint32_t)0x7000);
+    ap_startup(2, (uint32_t)0x7000);
     
     /*typedef void (*trampoline_func_t)(void);
     trampoline_func_t trampoline = (trampoline_func_t)0x7000;
