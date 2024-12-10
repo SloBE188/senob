@@ -32,11 +32,21 @@
 #define PIT_MASK 0xFF
 #define PIT_SCALE 1193180
 
-uint64_t ticks;
+
+static volatile uint64_t pit_ticks = 0;
+
+void pit_wait(uint64_t ms)
+{
+    uint64_t target_ticks = pit_ticks + ms;
+
+    // Warten bis die gewünschte Anzahl von Ticks erreicht ist
+    while (pit_ticks < target_ticks)
+        asm volatile("hlt");
+}
 
 void irq0_handler(struct Interrupt_registers *regs)
 {
-    ticks += 1;
+    pit_ticks += 1;
     //schedule();
     //printf("testing irq0");
 

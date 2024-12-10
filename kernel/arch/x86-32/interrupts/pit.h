@@ -5,6 +5,6 @@
 
 void irq0_pit(struct Interrupt_registers *regs);
 void init_pit(uint64_t hz);
-
+void pit_wait(uint64_t ms);
 
 #endif

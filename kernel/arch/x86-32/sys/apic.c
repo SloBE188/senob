@@ -7,6 +7,7 @@
 #include "../mm/paging/paging.h"
 #include "../mm/PMM/pmm.h"
 #include "../io/io.h"
+#include "../interrupts/pit.h"
 
 #define ID (0x0020 / 4)    // Local APIC ID Reg
 #define VER (0x0030 / 4)   // Local APIC version Reg
@@ -81,22 +82,10 @@ void sync_arbitration_ids()
 #define PIT_CHANNEL_1_PORT 0x40
 #define PIT_COMMAND  0x43
 
-void microdelay(int ms)
-{
-    uint16_t count = (PIT_SCALE / 1000000) * ms;
-    if(count == 0){
-        count = 1;
-    }
-
-    outb(PIT_COMMAND, 0x30);
-    outb(PIT_CHANNEL_1_PORT, count & 0xFF);      // LSB
-    outb(PIT_CHANNEL_1_PORT, (count >> 8) & 0xFF);  // MSB
-
-    while (insb(PIT_CHANNEL_1_PORT) & 0x80);
-}
 
 void lapic_init(void)
 {
+    init_pit(1000);
     map_lapic();
 
     // Enable the APIC threw the SVR Reg
@@ -145,7 +134,7 @@ void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
 void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
 {
     printf("starting ap startuf for CPU %d\n", APIC_ID);
-    configure_cmos_and_reset_vector(trampoline_addr);
+    //configure_cmos_and_reset_vector(trampoline_addr);
 
     lapicw(ICR1, APIC_ID << 24);
 
@@ -157,7 +146,7 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("INIT DELIVS Bit got deleted.\n");
 
-    microdelay(200);
+    pit_wait(1000);
     lapicw(ICR2, INIT | LEVEL);
     while (lapic_read(ICRLO) & DELIVS)
     {
@@ -165,7 +154,7 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("DEASSERT DELIVS Bit got deleted.\n");
 
-    microdelay(10000);
+    pit_wait(1000);
 
     // send 2 SIPIs
     for (int i = 0; i < 2; i++)
@@ -178,6 +167,6 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
             printf("waiting for SIPI DELIVS to clear\n");
         }
         printf("SIPI #%d DELIVS-Bit got deleted.\n", i + 1);
-        microdelay(200);
+        pit_wait(1000);
     }
 }

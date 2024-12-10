@@ -225,10 +225,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
     print_mp_stats(addr->floating_ptr_addr, addr->mp_config_table_addr);
 
-    init_pit(1000);
     //disable_pic();
     lapic_init();
-    ap_startup(3, (uint32_t)0x7000);
+    prepare_trampoline_code();
+    ap_startup(1, (uint32_t)0x7000);
     
     /*typedef void (*trampoline_func_t)(void);
     trampoline_func_t trampoline = (trampoline_func_t)0x7000;
