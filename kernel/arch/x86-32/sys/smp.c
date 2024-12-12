@@ -143,7 +143,7 @@ void print_mp_stats(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_a
     {
         printf("PIC still active :(\n");
     }
-
+    //disable_pic();
     mp_init(table);
     prepare_trampoline_code();
 }

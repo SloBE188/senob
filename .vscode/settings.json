@@ -17,6 +17,7 @@
         "doomgeneric.h": "c",
         "pit.h": "c",
         "memory.h": "c",
-        "m_argv.h": "c"
+        "m_argv.h": "c",
+        "stdiok.h": "c"
     }
 }

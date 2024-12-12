@@ -80,8 +80,7 @@ void sync_arbitration_ids()
 
 #define PIT_SCALE 1193180
 #define PIT_CHANNEL_1_PORT 0x40
-#define PIT_COMMAND  0x43
-
+#define PIT_COMMAND 0x43
 
 void lapic_init(void)
 {
@@ -90,6 +89,9 @@ void lapic_init(void)
 
     // Enable the APIC threw the SVR Reg
     lapicw(SVR, ENABLE | 0xFF);
+    uint32_t svr = lapic_read(SVR);
+    printf("SVR: 0x%x\n", svr);
+
     uint32_t sivr = IA32_APIC_BASE[SVR];
     if (lapic_read(SVR) & ENABLE)
     {
@@ -105,9 +107,11 @@ void lapic_init(void)
 
     lapic_timer_init();
 
-    // disable LINT0 and LINT1
+    // disable LINT0, LINT1 & ERROR
     lapicw(LINT0, MASKED);
     lapicw(LINT1, MASKED);
+    lapicw(ERROR, MASKED);
+    //lapicw(TIMER, MASKED);
 
     // clear error status reg, no idea why you have to do it twice
     lapicw(ESR, 0);
@@ -115,12 +119,16 @@ void lapic_init(void)
 
     lapicw(EOI, 0x00);
 
-    sync_arbitration_ids();
+    lapicw(ESR, 0); // Clear ESR
+    uint32_t esr = lapic_read(ESR);
+    printf("LAPIC ESR: 0x%x\n", esr);
+
+    // sync_arbitration_ids();
 }
 
 void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
 {
-    outb(0x70, 0x0F); 
+    outb(0x70, 0x0F);
     outb(0x71, 0x0A);
 
     // set warm reset vector
@@ -131,14 +139,23 @@ void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
            warm_reset_vector[1], warm_reset_vector[0]);
 }
 
+void delay(uint32_t microseconds)
+{
+    volatile uint32_t count = microseconds * 100; // Anpassung je nach CPU-Geschwindigkeit
+    while (count--)
+    {
+        __asm__ volatile("nop");
+    }
+}
+
 void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
 {
     printf("starting ap startuf for CPU %d\n", APIC_ID);
-    //configure_cmos_and_reset_vector(trampoline_addr);
-
-    lapicw(ICR1, APIC_ID << 24);
+    // configure_cmos_and_reset_vector(trampoline_addr);
 
     // send INIT IPI
+    printf("sending INIT IPI\n");
+    lapicw(ICR1, APIC_ID << 24);
     lapicw(ICR2, INIT | LEVEL | ASSERT);
     while (lapic_read(ICRLO) & DELIVS)
     {
@@ -146,7 +163,7 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("INIT DELIVS Bit got deleted.\n");
 
-    pit_wait(1000);
+    delay(1000);
     lapicw(ICR2, INIT | LEVEL);
     while (lapic_read(ICRLO) & DELIVS)
     {
@@ -154,7 +171,7 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("DEASSERT DELIVS Bit got deleted.\n");
 
-    pit_wait(1000);
+    delay(1000);
 
     // send 2 SIPIs
     for (int i = 0; i < 2; i++)
@@ -167,6 +184,6 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
             printf("waiting for SIPI DELIVS to clear\n");
         }
         printf("SIPI #%d DELIVS-Bit got deleted.\n", i + 1);
-        pit_wait(1000);
+        delay(1000);
     }
 }

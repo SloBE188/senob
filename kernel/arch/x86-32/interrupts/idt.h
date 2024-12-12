@@ -99,7 +99,10 @@ extern void isr128();
 void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr, uint8_t dpl);
 void idt_init();
 void isr_handler(struct Interrupt_registers *regs);
+/*
 void irq_add_handler(int irq_number, void (*handler)(struct Interrupt_registers *regs));
 void irq_delete_handler(int irq_number);
+*/
+void setup_vectors();
 
 #endif

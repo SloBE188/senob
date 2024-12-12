@@ -56,7 +56,7 @@ void irq0_handler(struct Interrupt_registers *regs)
 void init_pit(uint64_t hz)
 {
     //adding interrupt
-    irq_add_handler(PIT_IRQ, &irq0_handler);
+    //irq_add_handler(PIT_IRQ, &irq0_handler);
 
     uint64_t divisor = PIT_SCALE / hz;
 

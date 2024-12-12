@@ -190,6 +190,6 @@ void irq1_handler(struct Interrupt_registers *regs) {
 void init_keyboard() {
     capsOn = false;
     capsLock = false;
-    irq_add_handler(KEYBOARD_IRQ, &irq1_handler);
+    //irq_add_handler(KEYBOARD_IRQ, &irq1_handler);
     outb(KEYBOARD_PORT, KEYBOARD_ENABLE_PORT);
 }

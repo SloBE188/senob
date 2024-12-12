@@ -22,6 +22,7 @@
 #include "../../../libk/stdiok.h"
 #include "../mm/paging/paging.h"
 #include "../syscalls/syscalls.h"
+#include "../sys/apic.h"
 
 
 struct idt_entry_t idt_descriptors[256];
@@ -66,7 +67,15 @@ void init_pic()
     
     outb(0x21, 0x0);
     outb(0xA1, 0x0);
+
+    outb(0x20+1, 0xFF);
+    outb(0xA0+1, 0xFF);
 }
+
+void spurious_interrupt_handler(struct Interrupt_registers* regs);
+void apic_timer_handler(struct Interrupt_registers* regs);
+void apic_error_handler(struct Interrupt_registers* regs);
+
 
 void idt_init()
 {
@@ -112,22 +121,10 @@ void idt_init()
     idt_set_descriptor(31, (uint32_t)isr31, 1);
 
     //irqs
-    idt_set_descriptor(32, (uint32_t)irq0, 1);
-    idt_set_descriptor(33, (uint32_t)irq1, 1);
-    idt_set_descriptor(34, (uint32_t)irq2, 1);
-    idt_set_descriptor(35, (uint32_t)irq3, 1);
-    idt_set_descriptor(36, (uint32_t)irq4, 1);
-    idt_set_descriptor(37, (uint32_t)irq5, 1);
-    idt_set_descriptor(38, (uint32_t)irq6, 1);
-    idt_set_descriptor(39, (uint32_t)irq7, 1);
-    idt_set_descriptor(40, (uint32_t)irq8, 1);
-    idt_set_descriptor(41, (uint32_t)irq9, 1);
-    idt_set_descriptor(42, (uint32_t)irq10, 1);
-    idt_set_descriptor(43, (uint32_t)irq11, 1);
-    idt_set_descriptor(44, (uint32_t)irq12, 1);
-    idt_set_descriptor(45, (uint32_t)irq13, 1);
-    idt_set_descriptor(46, (uint32_t)irq14, 1);
-    idt_set_descriptor(47, (uint32_t)irq15, 1);
+    idt_set_descriptor(0xFF, (uint32_t)spurious_interrupt_handler, 1);
+    idt_set_descriptor(0x20, (uint32_t)apic_timer_handler, 1);
+    idt_set_descriptor(0xFE, (uint32_t)apic_error_handler, 1);
+
 
     //Syscalls
     idt_set_descriptor(128, (uint32_t)isr128, 3);
@@ -135,6 +132,23 @@ void idt_init()
     idt_flush((uint32_t)&idtr);
 
 }
+
+void spurious_interrupt_handler(struct Interrupt_registers* regs) 
+{
+    printf("Spurious interrupt received: 0x%x\n", regs->interrupt_number);
+}
+
+void apic_timer_handler(struct Interrupt_registers* regs) 
+{
+    printf("APIC Timer Interrupt Triggered\n");
+}
+
+void apic_error_handler(struct Interrupt_registers* regs) 
+{
+    printf("APIC Error Interrupt Triggered\n");
+}
+
+
 
 static const char* exceptions[] = {
     "[0x00] Divide by Zero Exception",
@@ -223,37 +237,38 @@ void isr_handler(struct Interrupt_registers *regs)
     
 }
 
-void *irq_handlers[16] = {
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0
-};
+void *vector_handlers[256] = { 0 }; // all vectors
 
-void irq_add_handler(int irq_number, void (*handler)(struct Interrupt_registers *regs))
-{
-    irq_handlers[irq_number] = handler;
+
+void vector_add_handler(int vector, void (*handler)(struct Interrupt_registers *regs)) {
+    vector_handlers[vector] = handler;
 }
 
-void irq_delete_handler(int irq_number)
-{   
-    irq_handlers[irq_number] = 0x00;
+
+void vector_remove_handler(int vector) {
+    vector_handlers[vector] = 0;
 }
 
-void irq_handler(struct Interrupt_registers *regs)
+void setup_vectors()
 {
+    vector_add_handler(0x20, apic_timer_handler);
+    vector_add_handler(0xFF, spurious_interrupt_handler);
+    vector_add_handler(0xFE, apic_error_handler);
+}
+
+
+void irq_handler(struct Interrupt_registers *regs) {
+    int vector = regs->interrupt_number; // find vector
+
+    printf("Interrupt vector %d triggered\n", vector);
+
     void (*handler)(struct Interrupt_registers *regs);
-
-    handler = irq_handlers[regs->interrupt_number - 32];
-    if (handler)
-    {
+    handler = vector_handlers[vector];
+    if (handler) {
         handler(regs);
     }
 
-    if (regs->interrupt_number >= 40)
-    {
-        outb(0xA0, 0x20);
-    }
-
-    outb(0x20,0x20);
-    
-    
+    // send EOI to the local apic
+    lapicw(EOI, 0);
 }
+
