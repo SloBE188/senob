@@ -171,6 +171,13 @@ void prepare_trampoline_code()
     memcpy(&data->gdt_ptr, &gdt_ptr, sizeof(struct gdt_ptr_struct));
     memcpy(data->kernel_directory, kernel_directory, sizeof(kernel_directory));
 
+
+    uint8_t *dummy_code = (uint8_t *)0x7000;
+    dummy_code[0] = 0xF4; // Opcode for hlt
+    dummy_code[1] = 0xEB; // Opcode for jmp
+    dummy_code[2] = 0xFE; // jmp $
+    /*
     memset((void*)0x7000, 0x00, 512);
     memcpy((void*)0x7000, _startcpu, 512);
+    */
 }

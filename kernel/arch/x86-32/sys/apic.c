@@ -57,12 +57,12 @@ void lapicw(int offset, int value)
 
 void map_lapic()
 {
-    mem_map_page(0xFEE00000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
+    mem_map_page(0xFEE00000, 0xFEE00000, PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
 }
 
 void lapic_timer_init()
 {
-    lapicw(TDCR, X1);
+    lapicw(TDCR, 0x3);
     lapicw(TICR, 0x1000);
     lapicw(TIMER, 0x20); // IRQ0 is 32 and the Timer IRQ is 0
 }
@@ -107,11 +107,19 @@ void lapic_init(void)
 
     lapic_timer_init();
 
+    uint32_t timer_div = lapic_read(TDCR);
+    uint32_t timer_init = lapic_read(TICR);
+    uint32_t lvt_timer = lapic_read(TIMER);
+
+    printf("APIC Timer Divider: 0x%x\n", timer_div);
+    printf("APIC Timer Initial Count: 0x%x\n", timer_init);
+    printf("APIC LVT Timer: 0x%x\n", lvt_timer);
+
     // disable LINT0, LINT1 & ERROR
     lapicw(LINT0, MASKED);
     lapicw(LINT1, MASKED);
     lapicw(ERROR, MASKED);
-    //lapicw(TIMER, MASKED);
+    // lapicw(TIMER, MASKED);
 
     // clear error status reg, no idea why you have to do it twice
     lapicw(ESR, 0);
@@ -185,5 +193,59 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
         }
         printf("SIPI #%d DELIVS-Bit got deleted.\n", i + 1);
         delay(1000);
+    }
+}
+
+void test_apic_timer()
+{
+    for (volatile int i = 0; i < 100000; i++)
+        ; // Kurze Verzögerung
+
+    uint32_t timer_curr = lapic_read(TCCR); // Aktueller Timer-Wert
+    printf("APIC Timer Current Count: 0x%x\n", timer_curr);
+
+    uint32_t siv = lapic_read(SVR);
+    printf("SIV Register: 0x%x\n", siv);
+    if (!(siv & 0x100))
+    {
+        printf("if APIC isnt active, activate");
+        lapicw(SVR, siv | 0x100); // Aktiviert APIC
+    }
+}
+
+
+
+#define APIC_BASE_MSR 0x1B
+#define APIC_BASE_MASK 0xFFFFF000
+
+//readmsr function
+static inline void read_msr(uint32_t msr, uint32_t *low, uint32_t *high) 
+{
+    asm volatile (
+        "rdmsr"
+        : "=a"(*low), "=d"(*high)
+        : "c"(msr)
+    );
+}
+
+
+void check_apic_base_address() 
+{
+    uint32_t low, high;
+
+    read_msr(APIC_BASE_MSR, &low, &high);
+
+    // extract baseaddress from the msr data
+    uint64_t apic_base = ((uint64_t)high << 32) | low;
+
+    apic_base &= APIC_BASE_MASK;
+
+    int apic_enabled = low & (1 << 11);
+
+    printf("APIC Base Address: 0x%llx\n", apic_base);
+    if (apic_enabled) {
+        printf("APIC is active\n");
+    } else {
+        printf("APIC isnt active\n");
     }
 }

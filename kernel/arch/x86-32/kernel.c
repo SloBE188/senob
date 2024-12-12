@@ -229,10 +229,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info* multibootinfo)
     //disable_pic();
     lapic_init();
     prepare_trampoline_code();
-
-    asm volatile("int $0x20");
-    //ap_startup(1, (uint32_t)0x7000);
-    
+    test_apic_timer();
+    //asm volatile("int $0x20");
+    ap_startup(1, (uint32_t)0x7000);
+    check_apic_base_address();
     /*typedef void (*trampoline_func_t)(void);
     trampoline_func_t trampoline = (trampoline_func_t)0x7000;
     trampoline();*/
