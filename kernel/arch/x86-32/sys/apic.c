@@ -40,7 +40,7 @@
 #define TCCR (0x0390 / 4)   // Timer Current Count
 #define TDCR (0x03E0 / 4)   // Timer Divide Configuration
 
-volatile uint32_t *IA32_APIC_BASE = (volatile uint32_t *)0xC3000000;
+volatile uint32_t *IA32_APIC_BASE = (volatile uint32_t *)0xFEE00000;
 
 uint32_t lapic_read(int offset)
 {
@@ -84,7 +84,6 @@ void sync_arbitration_ids()
 
 void lapic_init(void)
 {
-    init_pit(1000);
     map_lapic();
 
     // Enable the APIC threw the SVR Reg
@@ -105,7 +104,7 @@ void lapic_init(void)
     // Set TPR to 0x00 -> accept all interrupts (without setting this, the APIC could block every interrupt)
     lapicw(TPR, 0x00);
 
-    lapic_timer_init();
+    /*lapic_timer_init();
 
     uint32_t timer_div = lapic_read(TDCR);
     uint32_t timer_init = lapic_read(TICR);
@@ -113,7 +112,7 @@ void lapic_init(void)
 
     printf("APIC Timer Divider: 0x%x\n", timer_div);
     printf("APIC Timer Initial Count: 0x%x\n", timer_init);
-    printf("APIC LVT Timer: 0x%x\n", lvt_timer);
+    printf("APIC LVT Timer: 0x%x\n", lvt_timer);*/
 
     // disable LINT0, LINT1 & ERROR
     lapicw(LINT0, MASKED);

@@ -60,6 +60,33 @@ apic_local_deliver vector 3 delivery mode 7
 apic_local_deliver vector 3 delivery mode 7
 apic_local_deliver vector 3 delivery mode 7
 apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
+apic_local_deliver vector 3 delivery mode 7
 apic_mem_writel 0xf0 = 0x000001ff
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_readl 0xf0 = 0x000001ff
@@ -67,15 +94,6 @@ apic_mem_readl 0xf0 = 0x000001ff
 apic_mem_readl 0xf0 = 0x000001ff
 apic_mem_writel 0x80 = 0x00000000
 apic_mem_readl 0x20 = 0x00000000
-apic_mem_writel 0x3e0 = 0x00000003
-apic_mem_readl 0x20 = 0x00000000
-apic_mem_writel 0x380 = 0x00001000
-apic_mem_readl 0x20 = 0x00000000
-apic_mem_writel 0x320 = 0x00000020
-apic_mem_readl 0x20 = 0x00000000
-apic_mem_readl 0x3e0 = 0x00000003
-apic_mem_readl 0x380 = 0x00001000
-apic_mem_readl 0x320 = 0x00000020
 apic_mem_writel 0x350 = 0x00010000
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_writel 0x360 = 0x00010000
@@ -91,12 +109,8 @@ apic_mem_readl 0x20 = 0x00000000
 apic_mem_writel 0x280 = 0x00000000
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_readl 0x280 = 0x00000000
-apic_local_deliver vector 0 delivery mode 0
-apic_report_irq_delivered coalescing 1
-apic_mem_readl 0x390 = 0x00000000
-apic_mem_readl 0xf0 = 0x000001ff
 apic_mem_writel 0x300 = 0x01000000
-apic_report_irq_delivered coalescing 2
+apic_report_irq_delivered coalescing 1
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_writel 0x310 = 0x0000c500
 apic_mem_readl 0x20 = 0x00000000
@@ -105,13 +119,13 @@ apic_mem_writel 0x310 = 0x00008500
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_readl 0x300 = 0x01000000
 apic_mem_writel 0x300 = 0x01000000
-apic_report_irq_delivered coalescing 2
+apic_report_irq_delivered coalescing 1
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_writel 0x310 = 0x00000607
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_readl 0x300 = 0x01000000
 apic_mem_writel 0x300 = 0x01000000
-apic_report_irq_delivered coalescing 2
+apic_report_irq_delivered coalescing 1
 apic_mem_readl 0x20 = 0x00000000
 apic_mem_writel 0x310 = 0x00000607
 apic_mem_readl 0x20 = 0x00000000
