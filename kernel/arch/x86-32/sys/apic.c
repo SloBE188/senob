@@ -40,7 +40,7 @@
 #define TCCR (0x0390 / 4)   // Timer Current Count
 #define TDCR (0x03E0 / 4)   // Timer Divide Configuration
 
-volatile uint32_t *IA32_APIC_BASE = (volatile uint32_t *)0xFEE00000;
+volatile uint32_t *IA32_APIC_BASE = (volatile uint32_t *)0xC3000000;
 
 uint32_t lapic_read(int offset)
 {
