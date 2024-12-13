@@ -63,8 +63,8 @@ void map_lapic()
 void lapic_timer_init()
 {
     lapicw(TDCR, 0x3);
-    lapicw(TICR, 0x1000);
-    lapicw(TIMER, 0x20); // IRQ0 is 32 and the Timer IRQ is 0
+    lapicw(TIMER, PERIODIC | 0x20);
+    lapicw(TICR, 10000000);
 }
 
 void sync_arbitration_ids()
@@ -77,6 +77,10 @@ void sync_arbitration_ids()
     while (lapic_read(ICRLO) & DELIVS)
         ;
 }
+
+
+
+
 
 #define PIT_SCALE 1193180
 #define PIT_CHANNEL_1_PORT 0x40
@@ -104,8 +108,8 @@ void lapic_init(void)
     // Set TPR to 0x00 -> accept all interrupts (without setting this, the APIC could block every interrupt)
     lapicw(TPR, 0x00);
 
-    /*lapic_timer_init();
-
+    lapic_timer_init();
+    /*
     uint32_t timer_div = lapic_read(TDCR);
     uint32_t timer_init = lapic_read(TICR);
     uint32_t lvt_timer = lapic_read(TIMER);
@@ -130,7 +134,7 @@ void lapic_init(void)
     uint32_t esr = lapic_read(ESR);
     printf("LAPIC ESR: 0x%x\n", esr);
 
-    // sync_arbitration_ids();
+    sync_arbitration_ids();
 }
 
 void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
@@ -146,14 +150,12 @@ void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
            warm_reset_vector[1], warm_reset_vector[0]);
 }
 
-void delay(uint32_t microseconds)
-{
-    volatile uint32_t count = microseconds * 100; // Anpassung je nach CPU-Geschwindigkeit
-    while (count--)
-    {
-        __asm__ volatile("nop");
+void microdelay(uint32_t iterations) {
+    while (iterations--) {
+        asm volatile("nop"); // No-Operation: Verbraucht CPU-Zeit
     }
 }
+
 
 void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
 {
@@ -170,7 +172,7 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("INIT DELIVS Bit got deleted.\n");
 
-    delay(1000);
+    microdelay(10000000);
     lapicw(ICR2, INIT | LEVEL);
     while (lapic_read(ICRLO) & DELIVS)
     {
@@ -178,7 +180,7 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("DEASSERT DELIVS Bit got deleted.\n");
 
-    delay(1000);
+    microdelay(10000000);
 
     // send 2 SIPIs
     for (int i = 0; i < 2; i++)
@@ -191,60 +193,6 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
             printf("waiting for SIPI DELIVS to clear\n");
         }
         printf("SIPI #%d DELIVS-Bit got deleted.\n", i + 1);
-        delay(1000);
-    }
-}
-
-void test_apic_timer()
-{
-    for (volatile int i = 0; i < 100000; i++)
-        ; // Kurze Verzögerung
-
-    uint32_t timer_curr = lapic_read(TCCR); // Aktueller Timer-Wert
-    printf("APIC Timer Current Count: 0x%x\n", timer_curr);
-
-    uint32_t siv = lapic_read(SVR);
-    printf("SIV Register: 0x%x\n", siv);
-    if (!(siv & 0x100))
-    {
-        printf("if APIC isnt active, activate");
-        lapicw(SVR, siv | 0x100); // Aktiviert APIC
-    }
-}
-
-
-
-#define APIC_BASE_MSR 0x1B
-#define APIC_BASE_MASK 0xFFFFF000
-
-//readmsr function
-static inline void read_msr(uint32_t msr, uint32_t *low, uint32_t *high) 
-{
-    asm volatile (
-        "rdmsr"
-        : "=a"(*low), "=d"(*high)
-        : "c"(msr)
-    );
-}
-
-
-void check_apic_base_address() 
-{
-    uint32_t low, high;
-
-    read_msr(APIC_BASE_MSR, &low, &high);
-
-    // extract baseaddress from the msr data
-    uint64_t apic_base = ((uint64_t)high << 32) | low;
-
-    apic_base &= APIC_BASE_MASK;
-
-    int apic_enabled = low & (1 << 11);
-
-    printf("APIC Base Address: 0x%llx\n", apic_base);
-    if (apic_enabled) {
-        printf("APIC is active\n");
-    } else {
-        printf("APIC isnt active\n");
+        microdelay(200000);
     }
 }
