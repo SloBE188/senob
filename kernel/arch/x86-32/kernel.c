@@ -251,8 +251,8 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     // disable_pic();
     lapic_init();
-    //prepare_trampoline_code();
-    //ap_startup(2, 0x7000);
+    prepare_trampoline_code();
+    ap_startup(2, 0x7000);
 
 
     // test_heap_shrink_and_reuse();

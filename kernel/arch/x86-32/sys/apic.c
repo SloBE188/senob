@@ -119,7 +119,7 @@ void lapic_init(void)
     printf("APIC LVT Timer: 0x%x\n", lvt_timer);*/
 
     // disable LINT0, LINT1 & ERROR
-    lapicw(LINT0, 0x700);
+    lapicw(LINT0, 0x700);       //LINT0 has to use the ExtINT Mode for forwarding PIC interrupts to the APIC
     lapicw(LINT1, 0x400);
     lapicw(ERROR, MASKED);
 
@@ -152,41 +152,43 @@ void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
 
 
 
-void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
+void lapic_send_IPI(uint32_t apic_id)
 {
-    printf("starting ap startuf for CPU %d\n", APIC_ID);
-    // configure_cmos_and_reset_vector(trampoline_addr);
+    lapicw(ICR2, apic_id << 24);
 
-    // send INIT IPI
-    printf("sending INIT IPI\n");
-    lapicw(ICR1, APIC_ID << 24);
-    lapicw(ICR2, INIT | LEVEL | ASSERT);
-    while (lapic_read(ICRLO) & DELIVS)
-    {
-        printf("waiting for INIT DELIVS to clear\n");
-    }
-    printf("INIT DELIVS Bit got deleted.\n");
+    lapicw(ICR1, INIT | LEVEL | ASSERT);    //assert
+    while (lapic_read(ICR1) & DELIVS)
+        ;    
+
+    lapicw(ICR2, apic_id << 24);
+    lapicw(ICR1, INIT | LEVEL); // Deassert 
+    while (lapic_read(ICR1) & DELIVS)
+        ;
+}
+
+void lapic_send_SIPI(uint32_t apic_id, uint32_t trampoline_addr)
+{
+    lapicw(ICR2, apic_id << 24);
+    lapicw(ICR1, trampoline_addr >> 12 | STARTUP | ASSERT);
+
+    while (lapic_read(ICR1) & DELIVS)
+        ;
+}
 
 
-    lapicw(ICR2, INIT | LEVEL);
-    while (lapic_read(ICRLO) & DELIVS)
-    {
-        printf("waiting for DEASSERT DELIVS to clear\n");
-    }
-    printf("DEASSERT DELIVS Bit got deleted.\n");
+void ap_startup(uint32_t apic_id, uint32_t trampoline_addr)
+{
+    printf("starting ap startup for CPU %d\n", apic_id);
 
+    lapic_send_IPI(apic_id);
+    PitWait(10);
 
-    // send 2 SIPIs
     for (int i = 0; i < 2; i++)
     {
-        lapicw(ICR1, APIC_ID << 24);
-        lapicw(ICR2, STARTUP | (trampoline_addr >> 12));
-        printf("SIPI #%d sent. trampoline address: 0x%x\n", i + 1, trampoline_addr >> 12);
-        while (lapic_read(ICRLO) & DELIVS)
-        {
-            printf("waiting for SIPI DELIVS to clear\n");
-        }
-        printf("SIPI #%d DELIVS-Bit got deleted.\n", i + 1);
-
+        lapic_send_SIPI(apic_id, trampoline_addr);
+        PitWait(1);
     }
+
+    printf("CPU %d started!\n", apic_id);
+
 }
