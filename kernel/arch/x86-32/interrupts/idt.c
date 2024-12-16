@@ -60,8 +60,8 @@ void init_pic()
     outb(0x21, 0x00);
     outb(0xA1, 0x00);
 
-    //outb(0x20 + 1, 0xFF);
-    //outb(0xA0 + 1, 0xFF);
+    //outb(0x21, 0xFD);
+    //outb(0xA1, 0xFF);
 }
 
 void spurious_interrupt_handler(struct Interrupt_registers *regs);

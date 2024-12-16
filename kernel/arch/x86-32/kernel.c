@@ -61,6 +61,17 @@ void pit_handler(struct Interrupt_registers *regs)
 
 }
 
+void PitWait(uint32_t ms)
+{
+    uint32_t now = pit_ticks;
+    ++ms;
+
+    while (pit_ticks - now < ms)
+    {
+        ;
+    }
+}
+
 
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
@@ -239,13 +250,12 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     
 
     // disable_pic();
-    //lapic_init();
+    lapic_init();
     //prepare_trampoline_code();
     //ap_startup(2, 0x7000);
 
 
     // test_heap_shrink_and_reuse();
-    asm volatile("sti");
     while (1)
     {
         asm volatile("hlt");

@@ -119,10 +119,9 @@ void lapic_init(void)
     printf("APIC LVT Timer: 0x%x\n", lvt_timer);*/
 
     // disable LINT0, LINT1 & ERROR
-    lapicw(LINT0, MASKED);
+    //lapicw(LINT0, MASKED);
     lapicw(LINT1, MASKED);
     lapicw(ERROR, MASKED);
-    // lapicw(TIMER, MASKED);
 
     // clear error status reg, no idea why you have to do it twice
     lapicw(ESR, 0);
@@ -134,7 +133,7 @@ void lapic_init(void)
     uint32_t esr = lapic_read(ESR);
     printf("LAPIC ESR: 0x%x\n", esr);
 
-    sync_arbitration_ids();
+    //sync_arbitration_ids();
 }
 
 void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
@@ -150,11 +149,7 @@ void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
            warm_reset_vector[1], warm_reset_vector[0]);
 }
 
-void microdelay(uint32_t iterations) {
-    while (iterations--) {
-        asm volatile("nop"); // No-Operation: Verbraucht CPU-Zeit
-    }
-}
+
 
 
 void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
@@ -172,7 +167,7 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("INIT DELIVS Bit got deleted.\n");
 
-    microdelay(10000000);
+
     lapicw(ICR2, INIT | LEVEL);
     while (lapic_read(ICRLO) & DELIVS)
     {
@@ -180,7 +175,6 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
     }
     printf("DEASSERT DELIVS Bit got deleted.\n");
 
-    microdelay(10000000);
 
     // send 2 SIPIs
     for (int i = 0; i < 2; i++)
@@ -193,6 +187,6 @@ void ap_startup(uint32_t APIC_ID, uint32_t trampoline_addr)
             printf("waiting for SIPI DELIVS to clear\n");
         }
         printf("SIPI #%d DELIVS-Bit got deleted.\n", i + 1);
-        microdelay(200000);
+
     }
 }
