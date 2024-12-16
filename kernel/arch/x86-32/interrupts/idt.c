@@ -111,11 +111,12 @@ void idt_init()
     idt_set_descriptor(30, (uint32_t)isr30, 1);
     idt_set_descriptor(31, (uint32_t)isr31, 1);
 
-    // irqs
-    idt_set_descriptor(0xFF, (uint32_t)spurious_interrupt_handler, 1);
-    idt_set_descriptor(0x32, (uint32_t)apic_timer_handler, 1);
+    // irqs;
     idt_set_descriptor(0x20, (uint32_t)irq0, 1);
+    idt_set_descriptor(0x21, (uint32_t)irq1, 1);
+    idt_set_descriptor(0x32, (uint32_t)apic_timer_handler, 1);
     idt_set_descriptor(0xFE, (uint32_t)apic_error_handler, 1);
+    idt_set_descriptor(0xFF, (uint32_t)spurious_interrupt_handler, 1);
 
     // Syscalls
     idt_set_descriptor(128, (uint32_t)isr128, 3);
@@ -245,8 +246,8 @@ void setup_vectors()
 {
     vector_add_handler(0x20, &pit_handler);
     vector_add_handler(0x32, &apic_error_handler);
-    vector_add_handler(0xFF, spurious_interrupt_handler);
     vector_add_handler(0xFE, apic_error_handler);
+    vector_add_handler(0xFF, spurious_interrupt_handler);
 }
 
 void irq_handler(struct Interrupt_registers *regs)
@@ -261,7 +262,7 @@ void irq_handler(struct Interrupt_registers *regs)
     {
         handler(regs);
     }
-    if(regs->interrupt_number >=10)
+    if(regs->interrupt_number >=15)
     {
         outb(0x20,0x20);
         outb(0xA0, 0x20);

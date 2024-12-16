@@ -119,8 +119,8 @@ void lapic_init(void)
     printf("APIC LVT Timer: 0x%x\n", lvt_timer);*/
 
     // disable LINT0, LINT1 & ERROR
-    //lapicw(LINT0, MASKED);
-    lapicw(LINT1, MASKED);
+    lapicw(LINT0, 0x700);
+    lapicw(LINT1, 0x400);
     lapicw(ERROR, MASKED);
 
     // clear error status reg, no idea why you have to do it twice
