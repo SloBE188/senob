@@ -3,8 +3,7 @@
 #include <stdint.h>
 
 
-void irq0_pit(struct Interrupt_registers *regs);
-void init_pit(uint64_t hz);
+void init_pit();
 void pit_wait(uint64_t ms);
 
 #endif

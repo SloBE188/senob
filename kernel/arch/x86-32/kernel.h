@@ -4,10 +4,12 @@
 #define NULL 0
 #define MAX_CPUS 24
 
+#include "interrupts/idt.h"
+
 void dummyfunction1();
 void dummyfunction2();
 
-
+void pit_handler(struct Interrupt_registers *regs);
 
 void kernel_panic(const char* message);
 #define assert(condition) \

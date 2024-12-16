@@ -37,6 +37,7 @@
 #include "syscalls/syscalls.h"
 #include "sys/smp.h"
 #include "sys/apic.h"
+#include "interrupts/pit.h"
 
 extern void rust_testfunction();
 
@@ -49,11 +50,24 @@ void kernel_panic(const char *message)
         ;
 }
 
+volatile uint64_t pit_ticks;
+
+
+void pit_handler(struct Interrupt_registers *regs)
+{
+    pit_ticks++;
+    //schedule();
+    asm volatile("sti");
+
+}
+
+
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 {
     init_gdt();
     idt_init();
+    init_pit();
     // init_keyboard();
     if (magic_value != 0x2BADB002)
     {
@@ -222,14 +236,18 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     print_mp_stats(addr->floating_ptr_addr, addr->mp_config_table_addr);
 
     setup_vectors();
+    
+
     // disable_pic();
-    lapic_init();
-    prepare_trampoline_code();
-    ap_startup(2, 0x7000);
+    //lapic_init();
+    //prepare_trampoline_code();
+    //ap_startup(2, 0x7000);
+
 
     // test_heap_shrink_and_reuse();
-
+    asm volatile("sti");
     while (1)
     {
+        asm volatile("hlt");
     }
 }

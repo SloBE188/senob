@@ -23,6 +23,8 @@
 #include "../mm/paging/paging.h"
 #include "../syscalls/syscalls.h"
 #include "../sys/apic.h"
+#include "pit.h"
+#include "../kernel.h"
 
 struct idt_entry_t idt_descriptors[256];
 struct idtr_t idtr;
@@ -55,11 +57,11 @@ void init_pic()
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
 
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
+    outb(0x21, 0x00);
+    outb(0xA1, 0x00);
 
-    outb(0x20 + 1, 0xFF);
-    outb(0xA0 + 1, 0xFF);
+    //outb(0x20 + 1, 0xFF);
+    //outb(0xA0 + 1, 0xFF);
 }
 
 void spurious_interrupt_handler(struct Interrupt_registers *regs);
@@ -111,7 +113,8 @@ void idt_init()
 
     // irqs
     idt_set_descriptor(0xFF, (uint32_t)spurious_interrupt_handler, 1);
-    idt_set_descriptor(0x20, (uint32_t)apic_timer_handler, 1);
+    idt_set_descriptor(0x32, (uint32_t)apic_timer_handler, 1);
+    idt_set_descriptor(0x20, (uint32_t)irq0, 1);
     idt_set_descriptor(0xFE, (uint32_t)apic_error_handler, 1);
 
     // Syscalls
@@ -240,16 +243,17 @@ void vector_remove_handler(int vector)
 
 void setup_vectors()
 {
-    vector_add_handler(0x20, apic_timer_handler);
+    vector_add_handler(0x20, &pit_handler);
+    vector_add_handler(0x32, &apic_error_handler);
     vector_add_handler(0xFF, spurious_interrupt_handler);
     vector_add_handler(0xFE, apic_error_handler);
 }
 
 void irq_handler(struct Interrupt_registers *regs)
 {
-    int vector = regs->interrupt_number; // find vector
+    int vector = regs->interrupt_number - 32; // find vector
 
-    printf("Interrupt vector %d triggered\n", vector);
+    //printf("Interrupt vector %d triggered\n", vector);
 
     void (*handler)(struct Interrupt_registers *regs);
     handler = vector_handlers[vector];
@@ -257,10 +261,19 @@ void irq_handler(struct Interrupt_registers *regs)
     {
         handler(regs);
     }
-
+    if(regs->interrupt_number >=10)
+    {
+        outb(0x20,0x20);
+        outb(0xA0, 0x20);
+    }else
+    {
+        lapicw(EOI, 0);
+    }
+    
     // send EOI to the local apic
-    lapicw(EOI, 0);
+    //lapicw(EOI, 0);
+    /*lapicw(EOI, 0);
     
     uint32_t esr = lapic_read(ESR);
-    printf("ESR: 0x%x\n", esr);
+    printf("ESR: 0x%x\n", esr);*/
 }

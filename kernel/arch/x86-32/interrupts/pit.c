@@ -21,6 +21,7 @@
 #include <stdint-gcc.h>
 #include "../../../libk/stdiok.h"
 #include "../sys/process.h"
+#include "../kernel.h"
 
 #define PIT_IRQ 0
 
@@ -33,36 +34,29 @@
 #define PIT_SCALE 1193180
 
 
-static volatile uint64_t pit_ticks = 0;
 
-void pit_wait(uint64_t ms)
+
+
+/*void pit_handler(struct Interrupt_registers *regs)
 {
-    uint64_t target_ticks = pit_ticks + ms;
-
-    // Warten bis die gewünschte Anzahl von Ticks erreicht ist
-    while (pit_ticks < target_ticks)
-        asm volatile("hlt");
-}
-
-void irq0_handler(struct Interrupt_registers *regs)
-{
-    pit_ticks += 1;
+    pit_ticks++;
     //schedule();
-    //printf("testing irq0");
+    asm volatile("sti");
 
-}
+}*/
 
 
-void init_pit(uint64_t hz)
+void init_pit()
 {
     //adding interrupt
-    //irq_add_handler(PIT_IRQ, &irq0_handler);
+    vector_add_handler(PIT_IRQ, &pit_handler);
+    uint32_t hz = 1000;
 
     uint64_t divisor = PIT_SCALE / hz;
 
     //0x36 os 0011 0110 from the bits perspective
     outb(PIT_CONTROL, 0x36);
-    outb(PIT_CHANNEL_1_PORT, divisor & PIT_MASK);
-    outb(PIT_CHANNEL_1_PORT, (divisor >> 8) & PIT_MASK);
+    outb(PIT_CHANNEL_1_PORT, divisor);
+    outb(PIT_CHANNEL_1_PORT, divisor >> 8);
 
 }

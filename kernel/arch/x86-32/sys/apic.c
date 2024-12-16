@@ -63,7 +63,7 @@ void map_lapic()
 void lapic_timer_init()
 {
     lapicw(TDCR, 0x3);
-    lapicw(TIMER, PERIODIC | 0x20);
+    lapicw(TIMER, PERIODIC | 0x32);
     lapicw(TICR, 10000000);
 }
 
@@ -108,7 +108,7 @@ void lapic_init(void)
     // Set TPR to 0x00 -> accept all interrupts (without setting this, the APIC could block every interrupt)
     lapicw(TPR, 0x00);
 
-    lapic_timer_init();
+    //lapic_timer_init();
     /*
     uint32_t timer_div = lapic_read(TDCR);
     uint32_t timer_init = lapic_read(TICR);
