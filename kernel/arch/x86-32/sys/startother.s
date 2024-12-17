@@ -14,14 +14,13 @@ trampoline:
     mov ss, ax
     mov sp, 0x7C00
 
-    lgdt [gdt_descriptor]
-
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
 
-    
-    jmp 0x08:pmmode
+    lgdt[gdt_descriptor]
+
+    jmp dword 0x08:pmmode
 
 
 ;GDT
