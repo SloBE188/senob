@@ -155,24 +155,24 @@ void disable_pic(void)
 }
 
 struct trampoline_data {
-    struct idtr_t idtr;
     struct gdt_ptr_struct gdt_ptr;
+    struct idtr_t idtr;
     uint32_t kernel_directory[1024];
 };
 
-extern void _startcpu();
+extern uint8_t _trampoline_start[];
+extern uint8_t _trampoline_end[];
 
 //void* trampolinecodeaddr, uint64_t size
 void prepare_trampoline_code()
 {
     struct trampoline_data* data = (struct trampoline_data*)0x5000;
 
-    memcpy(&data->idtr, &idtr, sizeof(struct idtr_t));
+    //memcpy(&data->idtr, &idtr, sizeof(struct idtr_t));
     memcpy(&data->gdt_ptr, &gdt_ptr, sizeof(struct gdt_ptr_struct));
-    memcpy(data->kernel_directory, kernel_directory, sizeof(kernel_directory));
+    //memcpy(data->kernel_directory, kernel_directory, sizeof(kernel_directory));
 
-
-    memset((void*)0x7000, 0x00, 512);
-    memcpy((void*)0x7000, _startcpu, 512);
+    uint32_t size = _trampoline_end - _trampoline_start;
+    memcpy((void*)0x7000, _trampoline_start, size);
 
 }
