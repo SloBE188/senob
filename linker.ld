@@ -35,11 +35,16 @@ SECTIONS
         *(.bss)
     }
 
-    /* Trampoline-Code Sektion */
     .trampoline ALIGN(4): AT(ADDR(.trampoline) - 0xC0000000) {
         _trampoline_start = .;
         KEEP(*(.trampoline))
         _trampoline_end = .;
+    }
+
+    .pmmc ALIGN(4): AT(ADDR(.pmmc) - 0xC0000000) {
+        _pmmc_start = .;
+        KEEP(*(.pmmc))
+        _pmmc_end = .;
     }
 
     _kernel_end = .;
