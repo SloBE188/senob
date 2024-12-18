@@ -18,7 +18,8 @@ trampoline:
     or eax, 0x1
     mov cr0, eax
 
-    lgdt[gdt_descriptor]
+    mov eax, gdt_descriptor
+    lgdt[eax]
 
     jmp dword 0x08:pmmode
 
