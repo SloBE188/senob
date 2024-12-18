@@ -21,7 +21,7 @@ trampoline:
     mov eax, gdt_descriptor
     lgdt[eax]
 
-    jmp dword 0x08:pmmode
+    jmp 0x8:pmmode
 
 
 ;GDT
@@ -53,7 +53,8 @@ gdt_end:
 gdt_descriptor:
     dw gdt_end - gdt_start -1
     dd gdt_start
-
+    
+section .pmmc
 [BITS 32]
 pmmode:
     mov ax, 0x10
