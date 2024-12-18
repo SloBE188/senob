@@ -107,7 +107,7 @@ void mp_init(struct mp_configuration_table *table)
             break;
         }
         default:
-            printf("Unbekannter Eintragstyp: %u\n", type);
+            printf("unknown: %u\n", type);
             entry_ptr += 8;
             break;
         }
@@ -163,6 +163,9 @@ struct trampoline_data {
 extern uint8_t _trampoline_start[];
 extern uint8_t _trampoline_end[];
 
+extern uint8_t _pmmc_start[];
+extern uint8_t _pmmc_end[];
+
 //void* trampolinecodeaddr, uint64_t size
 void prepare_trampoline_code()
 {
@@ -174,5 +177,8 @@ void prepare_trampoline_code()
 
     uint32_t size = _trampoline_end - _trampoline_start;
     memcpy((void*)0x7000, _trampoline_start, size);
+
+    uint32_t sizepmm = _pmmc_end - _pmmc_start;
+    memcpy((void*)0x8000, _pmmc_start, sizepmm);
 
 }

@@ -30,4 +30,4 @@ To build Senob, follow these steps:
   
 3. Running Senob
    ```sh
-   qemu-system-i386 -machine pc-i440fx-5.1 -smp 4 -cdrom senob.iso
+   qemu-system-i386 -machine pc-q35-5.1 -smp 4 -cdrom senob.iso
