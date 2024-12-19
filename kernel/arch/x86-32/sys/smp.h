@@ -9,8 +9,6 @@
 #include "../interrupts/idt.h"
 #include "../gdt/gdt.h"
 
-extern struct idtr_t idtr;
-extern struct gdt_ptr_struct gdt_ptr;
 
 
 struct cpu{
@@ -80,7 +78,7 @@ struct entry_io_apic {
     uint32_t address; // The memory mapped address of the IO APIC is memory
 };
 
-void print_mp_stats();
+void init_smp(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr);
 void* find_mp_floating_pointer(struct multiboot_info *mb_info);
 struct addr* smp_addresses(struct multiboot_info *mb_info);
 void disable_pic(void);

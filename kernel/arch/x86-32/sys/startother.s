@@ -22,6 +22,7 @@ trampoline:
     lgdt[eax]
 
     jmp 0x8:0x8000
+    jmp $
 
 
 ;GDT
@@ -65,7 +66,10 @@ pmmode:
     mov gs, ax
     mov ss, ax
 
-    mov esp, 0x9000
+    mov ebp, 0x00200000
+    mov esp, ebp
+
+
 
     jmp $
 

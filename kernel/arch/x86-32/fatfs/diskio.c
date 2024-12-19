@@ -255,3 +255,18 @@ DRESULT disk_ioctl (
 	return RES_PARERR;
 }
 
+void disk_test()
+{
+	    char buffer[512];
+    char readin[20] = "nilsnilsnilsnilsnils";
+    // disk_read_from_offset(buffer, 0x6200, 512);
+    // disk_read_sector(buffer, 49, 1);
+    disk_read(0, buffer, 64, 1);
+    printf("Wurde gelesen: %s\n", buffer);
+    // disk_write_sector(readin, 75, 1);
+    disk_write(0, readin, 75, 1);
+
+    char result[20];
+    disk_read(0, result, 75, 1);
+    printf("2Wurde gelesen: %s\n", result);
+}

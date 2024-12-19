@@ -114,144 +114,20 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     disk_initialize(0);
     disk_status(0);
 
-    char buffer[512];
-    char readin[20] = "nilsnilsnilsnilsnils";
-    // disk_read_from_offset(buffer, 0x6200, 512);
-    // disk_read_sector(buffer, 49, 1);
-    disk_read(0, buffer, 64, 1);
-    printf("Wurde gelesen: %s\n", buffer);
-    // disk_write_sector(readin, 75, 1);
-    disk_write(0, readin, 75, 1);
 
-    char result[20];
-    disk_read(0, result, 75, 1);
-    printf("2Wurde gelesen: %s\n", result);
-
-    FATFS fs;
-    FRESULT res;
-
-    res = f_mount(&fs, "0:", 1);
-    printf("result of mount: %d\n", res);
-
-    if (res != FR_OK)
-    {
-        printf("Filesystem mount failed.\n");
-    }
-    else
-    {
-        printf("Filesystem mounted successfully!\n");
-    }
-
-    FIL fil; // File object
-    FRESULT res1;
-    char buffer4[64];
-
-    res1 = f_open(&fil, "0:test.txt", FA_READ);
-    if (res1 == FR_OK)
-    {
-        UINT br; // referenzparameter
-        res1 = f_read(&fil, buffer4, sizeof(buffer4) - 1, &br);
-        if (res1 == FR_OK)
-        {
-            buffer4[br] = '\0'; // Null-terminating string
-            printf("File content: %s\n", buffer4);
-        }
-        f_close(&fil);
-    }
-    else
-    {
-        printf("Failed to open file with error code: %d\n", res1);
-    }
-
-    FIL logfile;
-    UINT byteswritten;
-
-    f_open(&logfile, "logs.txt", FA_WRITE | FA_CREATE_ALWAYS);
-    char *logstarttext = "The start of the logs";
-    f_write(&logfile, logstarttext, strlen(logstarttext), &byteswritten);
-    f_close(&logfile);
-
-    DIR dir;
-    FILINFO fno;
-
-    if (f_opendir(&dir, "0:/") == FR_OK)
-    {
-        while (f_readdir(&dir, &fno) == FR_OK && fno.fname[0] != 0)
-        {
-            printf("Gefunden: %s\n", fno.fname);
-        }
-        f_closedir(&dir);
-    }
-
-    // FRESULT f_read
-    // FIL* fp, 	/* Open file to be read */
-    // void* buff,	/* Data buffer to store the read data */
-    // UINT btr,	/* Number of bytes to read */
-    // UINT* br	/* Number of bytes read */
-
-    FIL readlog;
-    FRESULT check;
-
-    char buffrrr[512];
-    UINT bytesreadd;
-
-    check = f_open(&readlog, "0:logs.txt", FA_READ);
-    if (check == FR_OK)
-    {
-        check = f_read(&readlog, &buffrrr, strlen(buffrrr) - 1, &bytesreadd);
-        if (check == FR_OK)
-        {
-            buffrrr[bytesreadd] = '\0';
-            printf("Read: %s\n", buffrrr);
-        }
-        f_close(&readlog);
-    }
-    else
-    {
-        printf("cry\n");
-    }
-
-    FRESULT check2;
-    check2 = f_mkdir("0:/senob");
-
-    FIL fnfile;
-    UINT byteswritten2;
-
-    f_open(&fnfile, "0:/senob/fnfile.txt", FA_WRITE | FA_CREATE_ALWAYS);
-    char *fn = "it is what it is";
-    f_write(&fnfile, logstarttext, strlen(logstarttext), &byteswritten2);
-    f_close(&fnfile);
-
-    DIR dir2;
-    FILINFO fno2;
-
-    if (f_opendir(&dir2, "0:/senob") == FR_OK)
-    {
-        while (f_readdir(&dir2, &fno2) == FR_OK && fno2.fname[0] != 0)
-        {
-            printf("Gefunden: %s\n", fno2.fname);
-        }
-        f_closedir(&dir2);
-    }
-
+    mount_fatfilesystem();
     init_syscalls();
 
     // struct process* new_process = create_process("0:/start.bin");
 
     // switch_to_thread(new_process->thread);
 
-    // find_mp_floating_pointer(multibootinfo);
     struct addr *addr = smp_addresses(multibootinfo);
-
+    init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);
     printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
-    print_mp_stats(addr->floating_ptr_addr, addr->mp_config_table_addr);
 
     setup_vectors();
-    
-
-    // disable_pic();
     lapic_init();
-    prepare_trampoline_code();
     ap_startup(2, 0x7000);
 
 

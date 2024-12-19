@@ -461,6 +461,24 @@ typedef struct {
 /  zero/null at start-up. If not, the linker option or start-up routine is
 /  not compliance with C standard. */
 
+void mount_fatfilesystem()
+{
+	FATFS fs;
+    FRESULT res;
+
+    res = f_mount(&fs, "0:", 1);
+    printf("result of mount: %d\n", res);
+
+    if (res != FR_OK)
+    {
+        printf("Filesystem mount failed.\n");
+    }
+    else
+    {
+        printf("Filesystem mounted successfully!\n");
+    }
+}
+
 void test_filesystem()
 {
 	FIL fil;        // File object

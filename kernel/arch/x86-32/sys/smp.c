@@ -11,10 +11,11 @@ struct cpu cpus[MAX_CPUS];
 uint32_t ncpus;
 uint32_t ioapicid;
 
-
+/*
 extern struct idtr_t idtr;
 extern struct gdt_ptr_struct gdt_ptr;
 extern uint32_t kernel_directory[1024];
+*/
 
 
 // validates mp checksum
@@ -129,7 +130,7 @@ struct addr *smp_addresses(struct multiboot_info *mb_info)
 
 void prepare_trampoline_code();
 
-void print_mp_stats(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr)
+void init_smp(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr)
 {
     struct mp_floating_pointer_structure *mp_pointer = (struct mp_floating_pointer_structure *)floating_pointer_addr;
     printf("length: %d\n features: %x\n", mp_pointer->length, mp_pointer->features);
@@ -154,11 +155,14 @@ void disable_pic(void)
     outb(0xA0+1, 0xFF);     //slave pic
 }
 
+/*
 struct trampoline_data {
     struct gdt_ptr_struct gdt_ptr;
     struct idtr_t idtr;
     uint32_t kernel_directory[1024];
 };
+*/
+
 
 extern uint8_t _trampoline_start[];
 extern uint8_t _trampoline_end[];
@@ -169,11 +173,13 @@ extern uint8_t _pmmc_end[];
 //void* trampolinecodeaddr, uint64_t size
 void prepare_trampoline_code()
 {
+    /*
     struct trampoline_data* data = (struct trampoline_data*)0x5000;
 
-    //memcpy(&data->idtr, &idtr, sizeof(struct idtr_t));
+    memcpy(&data->idtr, &idtr, sizeof(struct idtr_t));
     memcpy(&data->gdt_ptr, &gdt_ptr, sizeof(struct gdt_ptr_struct));
-    //memcpy(data->kernel_directory, kernel_directory, sizeof(kernel_directory));
+    memcpy(data->kernel_directory, kernel_directory, sizeof(kernel_directory));
+    */
 
     uint32_t size = _trampoline_end - _trampoline_start;
     memcpy((void*)0x7000, _trampoline_start, size);
