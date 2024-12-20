@@ -115,12 +115,26 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     disk_status(0);
 
 
-    mount_fatfilesystem();
+    FATFS fs;
+    FRESULT res;
+
+    res = f_mount(&fs, "0:", 1);
+    printf("result of mount: %d\n", res);
+
+    if (res != FR_OK)
+    {
+        printf("Filesystem mount failed.\n");
+    }
+    else
+    {
+        printf("Filesystem mounted successfully!\n");
+    }
+
     init_syscalls();
 
-    // struct process* new_process = create_process("0:/start.bin");
+    //struct process* new_process = create_process("0:/start.bin");
 
-    // switch_to_thread(new_process->thread);
+    //switch_to_thread(new_process->thread);
 
     struct addr *addr = smp_addresses(multibootinfo);
     init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);

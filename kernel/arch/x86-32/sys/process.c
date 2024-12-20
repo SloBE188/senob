@@ -188,7 +188,7 @@ struct process *create_process(const char *filename)
 
     new_process->thread = new_thread;
 
-    update_tss_esp0(new_thread->kstack.esp0);
+    update_tss_esp0(new_thread->kstack.esp0, 6);
 
     return new_process;
 }

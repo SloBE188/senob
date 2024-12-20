@@ -3,7 +3,14 @@
 
 #include <stdint.h>
 
-extern struct tss tss;
+
+#define NUM_CPUS 4
+#define TSS_BSP 5
+#define TSS_AP1 6
+#define TSS_AP2 7
+#define TSS_AP3 8
+#define TSS_AP4 9
+
 extern struct gdt_ptr_struct gdt_ptr;
 
 struct gdt_entry_struct
@@ -47,5 +54,5 @@ struct tss {
 void init_gdt();
 void setGdtEntry(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint32_t flags);
 void setTSS(uint32_t num, uint16_t ss0, uint32_t esp0);
-void update_tss_esp0(uint32_t esp0);
+void update_tss_esp0(uint32_t esp0, uint32_t AP_NR);
 #endif

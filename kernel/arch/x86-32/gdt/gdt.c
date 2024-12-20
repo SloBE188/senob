@@ -14,28 +14,36 @@ struct gdt_ptr_struct gdt_ptr;
 #define USER_DATA_SEG 0xF2
 #define TSS_SEG 0x89
 
-struct tss tss;
+
+
+struct tss tss[NUM_CPUS];
+
+void init_tss(uint32_t AP_NR)
+{
+    tss[AP_NR].esp0 = 0;
+    //setGdtEntry(AP_NR,);
+}
 
 void init_gdt()
 {
     gdt_ptr.limit = (sizeof(struct gdt_entry_struct) * 6) - 1;
     gdt_ptr.base = (uint32_t)&gdt_entries;
 
-    memset((uint8_t)&tss, 0, sizeof(tss));
+    memset((uint8_t)&tss[TSS_BSP], 0, sizeof(struct tss));
 
-    tss.esp0 = 0;   //0x1FFF0;
-    tss.ss0 = 0x10; //0x18;
+    tss[TSS_BSP].esp0 = 0;   //0x1FFF0;
+    tss[TSS_BSP].ss0 = 0x10; //0x18;
 
     // These don't need to be set when we aren't using hardware
     // task switching, which we aren't using.
     //tss.cs   = 0x0B; //from ring 3 - 0x08 | 3 = 0x0B
     //tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13; //from ring 3 = 0x10 | 3 = 0x13
 
-    uint32_t tss_base = (uint32_t) &tss;
+    uint32_t tss_base = (uint32_t) &tss[TSS_BSP];
     // TSS limit is one less than the actual size
-    uint32_t tss_limit = sizeof(tss)-1;
+    uint32_t tss_limit = sizeof(struct tss)-1;
     // Set io_map to higher than limit to disable io bitmap.
-    tss.io_map = sizeof(tss);
+    tss[TSS_BSP].io_map = sizeof(struct tss);
 
     setGdtEntry(0, 0, 0, 0, 0);                  // Null segment
     setGdtEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);   // Kernel code segment
@@ -62,7 +70,7 @@ void setGdtEntry(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, ui
     gdt_entries[num].access = access;
 }
 
-void update_tss_esp0(uint32_t esp0) 
+void update_tss_esp0(uint32_t esp0, uint32_t AP_NR) 
 {
-    tss.esp0 = esp0;
+    tss[AP_NR].esp0 = esp0;
 }
