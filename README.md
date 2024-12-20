@@ -1,6 +1,6 @@
 # Senob
 
-Senob is a operating system designed for the x86 architecture, with plans to support the ARM architecture in the future.
+Senob is a operating system with a monolithic kernel designed for the x86 architecture, with plans to support the ARM architecture in the future.
 
 ## Features
 
@@ -10,7 +10,7 @@ Senob is a operating system designed for the x86 architecture, with plans to sup
 
 ### Prerequisites
 
-- An x86-based computer or emulator
+- An x86-based computer or emulator (as an example QEMU)
 - A GCC Cross-Compiler
 - NASM
 - GNU Make
