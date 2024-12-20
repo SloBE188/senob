@@ -5,6 +5,7 @@ section .trampoline
 global trampoline
 global trampoline_end
 
+extern initialize_ap
 
 trampoline:
     cli
@@ -68,7 +69,8 @@ pmmode:
 
     mov ebp, 0x00200000
     mov esp, ebp
-
+    
+    call initialize_ap
 
 
     jmp $
