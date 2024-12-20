@@ -3,13 +3,12 @@
 
 #include <stdint.h>
 
-
-#define NUM_CPUS 4
 #define TSS_BSP 5
 #define TSS_AP1 6
 #define TSS_AP2 7
 #define TSS_AP3 8
 #define TSS_AP4 9
+
 
 extern struct gdt_ptr_struct gdt_ptr;
 
