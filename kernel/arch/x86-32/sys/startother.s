@@ -24,7 +24,7 @@ trampoline:
     mov cr0, eax
 
 
-    jmp 0x8:0x8000
+    ;jmp 0x8:0x8000
     jmp $
 
 

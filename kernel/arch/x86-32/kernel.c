@@ -132,9 +132,19 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     init_syscalls();
 
-    //struct process* new_process = create_process("0:/start.bin");
+    DIR dir;
+    FILINFO fno;
 
-    //switch_to_thread(new_process->thread);
+    if (f_opendir(&dir, "0:/") == FR_OK) {
+        while (f_readdir(&dir, &fno) == FR_OK && fno.fname[0] != 0) {
+            printf("Gefunden: %s\n", fno.fname);
+        }
+        f_closedir(&dir);
+    }
+    
+    struct process* new_process = create_process("0:/test.bin");
+
+    switch_to_thread(new_process->thread);
 
     struct addr *addr = smp_addresses(multibootinfo);
     init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);
