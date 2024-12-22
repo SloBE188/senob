@@ -45,4 +45,5 @@ void register_syscalls()
     printf("registering syscalls\n");
     add_syscalls(PRINT_SYSCALL, syscall_0_print);
     add_syscalls(LOAD_PROCESS_SYSCALL, syscall_1_load_process);
+    add_syscalls(CLEAR_SCREEM_SYSCALL, syscall_2_clear_screen);
 }

@@ -5,8 +5,8 @@ void main()
 {
 
     //char input[1024];
-    //print("Welcome to senobs shell!\n");
     clear_screen(0);
+    print("Welcome to the test programm 1 from senob!\n");
     while (1)
     {
         //shell implementation with a readline of user input comes here
