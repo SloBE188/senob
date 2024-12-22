@@ -15,12 +15,14 @@ trampoline:
     mov ss, ax
     mov sp, 0x7C00
 
+
+    mov eax, gdt_descriptor
+    lgdt[eax]
+    
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
 
-    mov eax, gdt_descriptor
-    lgdt[eax]
 
     jmp 0x8:0x8000
     jmp $
