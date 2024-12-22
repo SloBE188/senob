@@ -21,6 +21,10 @@
 
 struct vbe_info* globalvbeinfo;
 
+void clear_screen_sys_2(uint32_t color) 
+{
+    draw_rectangle(0, 0, globalvbeinfo->framebuffer_width, globalvbeinfo->framebuffer_height, color, globalvbeinfo);
+}
 
 void clear_screen(uint32_t color, struct vbe_info* vbeinfo) 
 {

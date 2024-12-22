@@ -1,6 +1,7 @@
 #include "syscalls.h"
 #include "../interrupts/idt.h"
 #include "../sys/process.h"
+#include "../../../../drivers/video/vbe/vbe.h"
 
 
 syscalls_fun_ptr syscall_functions[1024] = {NULL};
@@ -30,6 +31,13 @@ void syscall_1_load_process(struct Interrupt_registers* regs)
     char* user_program_name = regs->ebx;
     struct process* new_program = create_process(user_program_name);
     switch_to_thread(new_program->thread);
+}
+
+void syscall_2_clear_screen(struct Interrupt_registers* regs)
+{
+    uint32_t color = regs->ebx;
+    clear_screen_sys_2(color);
+
 }
 
 void register_syscalls()

@@ -28,6 +28,7 @@ void draw_rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uin
 void draw_string(uint32_t x, uint32_t y, const char* str, uint32_t color, struct vbe_info* vbeinfo);
 void draw_char(uint32_t x, uint32_t y, char c, uint32_t color, struct vbe_info* vbeinfo);
 void clear_screen(uint32_t color, struct vbe_info* vbeinfo);
+void clear_screen_sys_2(uint32_t color);
 
 
 #endif
