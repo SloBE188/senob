@@ -17,6 +17,8 @@ struct process
     struct process* left;
     struct process* right;
     uint32_t height;
+    
+    struct thread* thread_list;
 
 } __attribute__((packed));
 
@@ -81,6 +83,8 @@ struct thread
         uint16_t ss0;
         uint32_t stack_start;
     } kstack __attribute__ ((packed));
+
+    struct thread* next;
 
 };
 

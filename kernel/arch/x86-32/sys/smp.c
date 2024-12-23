@@ -60,7 +60,7 @@ void *find_mp_floating_pointer(struct multiboot_info *mb_info)
 void mp_init(struct mp_configuration_table *table)
 {
     uint8_t *entry_ptr = (uint8_t *)table + sizeof(struct mp_configuration_table);
-    ncpus = 0;
+    ncpus  = 0;
     ioapicid = 0;
 
     for (int i = 0; i < table->entry_count; i++)

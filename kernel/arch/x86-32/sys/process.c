@@ -59,6 +59,7 @@ int get_balance(struct process* node)
 
 struct process* rotate_right(struct process* y)
 {
+    //T2 = Teilbaum
     struct process* x = y->left;
     struct process* T2 = x->right;
 
@@ -66,12 +67,14 @@ struct process* rotate_right(struct process* y)
     x->right = y;
     y->left = T2;
 
-    y->height = max(height(y->left), height(y->right));
-    x->height = max(height(x->left), height(x->right));
+    y->height = 1 + max(height(y->left), height(y->right));
+    x->height = 1 + max(height(x->left), height(x->right));
 
 
     return y;
 }
+
+
 
 struct process* rotate_left(struct process* x)
 {
@@ -82,8 +85,8 @@ struct process* rotate_left(struct process* x)
     y->right = x;
     x->right = T2;
 
-    x->height = max(height(x->left), height(x->right));
-    y->height = max(height(y->left), height(y->right));
+    x->height = 1 + max(height(x->left), height(x->right));
+    y->height = 1 + max(height(y->left), height(y->right));
 
 
     return x;
@@ -101,6 +104,41 @@ struct process* get_min_value(struct process* node)
     return curr;
 
 }
+
+
+void add_thread_to_process(struct process* process, struct thread* new_thread)
+{
+    if (process == NULL || new_thread == NULL)
+    {
+        printf("Unable to add thread to process\n");
+        return;
+    }
+
+    new_thread->next = process->thread_list;
+    process->thread_list = new_thread;
+    
+}
+
+/*
+void free_threads(struct thread* thread_list) {
+    struct thread* current = thread_list;
+    while (current != NULL) {
+        struct thread* next = current->next;
+        kfree(current);
+        current = next;
+    }
+}
+
+void delete_process_with_threads(struct process* root, uint32_t pid) {
+    struct process* node = find_process(root, pid);
+    if (node) {
+        free_threads(node->thread_list);
+        root = delete_process(root, pid);
+    }
+}
+*/
+
+
 
 struct process* delete_process(struct process* root, uint32_t pid)
 {
@@ -123,7 +161,7 @@ struct process* delete_process(struct process* root, uint32_t pid)
     
     else
     {
-        if ((root->left == NULL) | (root->right == NULL))
+        if ((root->left == NULL) || (root->right == NULL))
         {
 
             struct process* temp = (struct process*)kmalloc(sizeof(struct process));
@@ -204,7 +242,7 @@ struct process* insert_process(struct process* root, struct process* new_process
 {
     if (root == NULL)
     {
-        return root;
+        return new_process;
     }
 
     if(new_process->pid < root->pid)
@@ -344,6 +382,7 @@ struct process *create_process(const char *filename)
     
     new_thread->thread_id = get_thread_id();
     new_thread->owner = new_process;
+    new_thread->next = new_process->thread_list;
 
     //new_thread->regs->cr3 = new_process->page_directory;
 
@@ -404,6 +443,8 @@ struct process *create_process(const char *filename)
     new_process->thread = new_thread;
 
     update_tss_esp0(new_thread->kstack.esp0, 6);
+
+    root = insert_process(root, new_process);
 
     return new_process;  
 }
