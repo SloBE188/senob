@@ -79,7 +79,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     init_gdt();
     idt_init();
     init_pit();
-    // init_keyboard();
     if (magic_value != 0x2BADB002)
     {
         printf("Invalid magic value: %x\n", magic_value);
@@ -148,6 +147,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
 
     setup_vectors();
+    init_keyboard();
     lapic_init();
     ap_startup(2, 0x7000);
 
