@@ -142,9 +142,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
         f_closedir(&dir);
     }
     
-    struct process* new_process = create_process("0:/test.bin");
-
-    switch_to_thread(new_process->thread);
 
     struct addr *addr = smp_addresses(multibootinfo);
     init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);
@@ -153,6 +150,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     setup_vectors();
     lapic_init();
     ap_startup(2, 0x7000);
+
+    struct process* new_process = create_process("0:/test.bin");
+
+    switch_to_thread(new_process->thread);
 
 
     // test_heap_shrink_and_reuse();
