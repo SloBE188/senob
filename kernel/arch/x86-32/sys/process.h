@@ -14,6 +14,10 @@ struct process
     uint32_t* page_directory;
     struct thread* thread;
 
+    struct process* left;
+    struct process* right;
+    uint32_t height;
+
 } __attribute__((packed));
 
 struct registers_save 
@@ -44,6 +48,7 @@ struct thread
 {
     uint32_t thread_id;
     struct process* owner;
+    //struct thread* next_thread;
 
     struct
     {

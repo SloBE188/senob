@@ -29,6 +29,8 @@
 uint32_t current_processid = 0;
 uint32_t current_threadid = 0;
 
+struct process* root = NULL;
+
 uint32_t get_process_id()
 {
     return current_processid++;
@@ -37,6 +39,110 @@ uint32_t get_process_id()
 uint32_t get_thread_id()
 {
     return current_threadid++;
+}
+
+int max(int a, int b) 
+{
+    return (a > b) ? a : b;
+}
+
+
+int height(struct process* node) 
+{
+    return node ? node->height : 0;
+}
+
+int get_balance(struct process* node) 
+{
+    return node ? height(node->left) - height(node->right) : 0;
+}
+
+struct process* rotate_right(struct process* y)
+{
+    struct process* x = y->left;
+    struct process* T2 = x->right;
+
+
+    x->right = y;
+    y->left = T2;
+
+    y->height = max(height(y->left), height(y->right));
+    x->height = max(height(x->left), height(x->right));
+
+
+    return y;
+}
+
+struct process* rotate_left(struct process* x)
+{
+    struct process* y = x->right;
+    struct process* T2 = x->left;
+
+
+    y->right = x;
+    x->right = T2;
+
+    x->height = max(height(x->left), height(x->right));
+    y->height = max(height(y->left), height(y->right));
+
+
+    return x;
+}
+
+
+struct process* insert_process(struct process* root, struct process* new_process)
+{
+    if (root == NULL)
+    {
+        return root;
+    }
+
+    if(new_process->pid < root->pid)
+    {
+        root->left = insert_process(root->left, new_process->pid);
+    }
+    else if (new_process->pid > root->pid)
+    {
+        root->right = insert_process(root->right, new_process->pid);
+    }else
+    {
+        return root;
+    }
+
+    root->height = 1 + max(height(root->left), height(root->right));
+
+    uint32_t balance = get_balance(root);
+
+    //IF THE NODE IS UNBALANCED, HERE ARE THE 4 CASES
+
+    //LL
+    if (balance > 1 && new_process->pid < root->left->pid)
+    {
+        return rotate_right(root);
+    }
+
+    //RR
+    if (balance < -1 && new_process->pid > root->right->pid)
+    {
+        return rotate_left(root);
+    }
+
+    //LR
+    if (balance > 1 && new_process->pid > root->left->pid)
+    {
+        root->left = rotate_left(root->left);
+        return rotate_right(root);
+    }
+
+    //RL
+    if (balance < -1 && new_process->pid > root->left->pid)
+    {
+        root->right = rotate_right(root->right);
+        return rotate_right(root);
+    }
+
+    return root;
+
 }
 
 // returns needed pages
@@ -176,7 +282,6 @@ struct process *create_process(const char *filename)
     new_thread->regs.es = segment_selector;
     new_thread->regs.fs = segment_selector;
     new_thread->regs.gs = segment_selector;
-
     uint32_t user_stack_pointer = USER_STACK_TOP - 4;
     new_thread->regs.esp = user_stack_pointer;
 
@@ -190,7 +295,7 @@ struct process *create_process(const char *filename)
 
     update_tss_esp0(new_thread->kstack.esp0, 6);
 
-    return new_process;
+    return new_process;  
 }
 
 /*uint32_t kernel_stack = ((uint32_t) kmalloc(4096)) + 4096;
