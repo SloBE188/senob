@@ -17,12 +17,18 @@
 
 #include "vbe.h"
 #include "font.h"
+#include "../../../kernel/libk/stdiok.h"
 
 
 struct vbe_info* globalvbeinfo;
 
+extern uint32_t cursor_x;
+extern uint32_t cursor_y;
+
 void clear_screen_sys_2(uint32_t color) 
 {
+    cursor_x = 0;
+    cursor_y = 0;
     draw_rectangle(0, 0, globalvbeinfo->framebuffer_width, globalvbeinfo->framebuffer_height, color, globalvbeinfo);
 }
 

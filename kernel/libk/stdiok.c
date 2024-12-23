@@ -3,8 +3,8 @@
 
 #define FONT_WIDTH  8
 #define FONT_HEIGHT 8
-static uint32_t cursor_x = 0;
-static uint32_t cursor_y = 0;
+uint32_t cursor_x = 0;
+uint32_t cursor_y = 0;
 static struct vbe_info* global_vbe_info;
 
 void set_vbe_info(struct vbe_info* vbe_info) {
