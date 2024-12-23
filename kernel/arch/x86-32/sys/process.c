@@ -89,6 +89,116 @@ struct process* rotate_left(struct process* x)
     return x;
 }
 
+struct process* get_min_value(struct process* node)
+{
+    struct process* curr = node;
+
+    while (curr->left != NULL)
+    {
+        curr = curr->left;
+    }
+    
+    return curr;
+
+}
+
+struct process* delete_process(struct process* root, uint32_t pid)
+{
+
+    //STANDARD BST DELETE
+    if (root == NULL)
+    {
+        return root;
+    }
+
+    if(pid < root->pid)
+    {
+        root->left = delete_process(root->left, pid);
+    }
+    
+    else if (pid > root->pid)
+    {
+        root->right = delete_process(root->right, pid);
+    }
+    
+    else
+    {
+        if ((root->left == NULL) | (root->right == NULL))
+        {
+
+            struct process* temp = (struct process*)kmalloc(sizeof(struct process));
+
+            temp = root->left ? root->left : root->right;
+
+                if (temp == NULL)
+                {
+                    temp = root;
+                    root = NULL;
+                }
+                else
+                {
+                    *root = *temp;
+                }
+            
+                
+                //should probabaly free here idk
+                kfree(temp);
+
+        } else
+        {
+            struct process* temp = get_min_value(root->right);
+
+            root->pid = temp->pid;
+
+            root->right = delete_process(root->right, temp->pid);
+        }   
+        
+    }
+
+    if (root == NULL)
+    {
+        return root;
+    }
+
+    root->height = 1 + max(height(root->left), height(root->right));
+
+    uint32_t balance = get_balance(root);
+
+
+    //IF THE NODE IS UNBALANCED, HERE ARE THE 4 CASES
+
+
+    //LL
+    if (balance > 1 && get_balance(root->left) >= 0)
+    {
+        return rotate_right(root);
+    }
+
+    //RR
+    if (balance < -1 && get_balance(root->left) < 0)
+    {
+        return rotate_left(root);
+    }
+
+    //LR
+    if (balance > 1 && get_balance(root->right) <= 0)
+    {
+        root->left = rotate_left(root->left);
+        return rotate_right(root);
+    }
+
+    //RL
+    if (balance < -1 && get_balance(root->right) > 0)
+    {
+        root->right = rotate_right(root->right);
+        return rotate_right(root);
+    }
+
+    return root;
+    
+    
+}
+
 
 struct process* insert_process(struct process* root, struct process* new_process)
 {
