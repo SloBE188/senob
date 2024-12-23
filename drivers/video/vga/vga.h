@@ -7,7 +7,7 @@
 #define COLOR8_LIGHT_GREY 7
 
 #define width 80
-#define height 25
+#define height_screen 25
 
 void print(const char* s);
 void scrollUp();

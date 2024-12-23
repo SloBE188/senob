@@ -40,4 +40,5 @@ void initialize_ap()
     idt_flush((uint32_t)&idtr);
     enable_paging();
     mem_change_page_directory(&kernel_directory);
+    while(1){}
 }

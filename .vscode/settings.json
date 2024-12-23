@@ -18,6 +18,8 @@
         "pit.h": "c",
         "memory.h": "c",
         "m_argv.h": "c",
-        "stdiok.h": "c"
+        "stdiok.h": "c",
+        "limits": "c",
+        "*.tcc": "c"
     }
 }

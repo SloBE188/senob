@@ -20,7 +20,7 @@ struct cpu{
     struct thread* current_thread;
     uint32_t isbsp;         //1 = yes, 0 = no
     char cpu_name;          //CPU 0... for the user
-
+    uint32_t* page_directory;
 };
 
 extern struct cpu cpus[MAX_CPUS];

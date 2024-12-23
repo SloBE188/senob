@@ -29,8 +29,8 @@ void reset()
     column = 0;
     currColor = defaultColor;
 
-    //loops threw all the line & columns and clears them with the for loop height & width
-    for (uint16_t y = 0; y < height; y++)
+    //loops threw all the line & columns and clears them with the for loop height_screen & width
+    for (uint16_t y = 0; y < height_screen; y++)
     {
         for (uint16_t x = 0; x < width; x++)
         {
@@ -43,7 +43,7 @@ void reset()
 
 void newLine()
 {
-    if (line < height - 1)
+    if (line < height_screen - 1)
     {
         line++;
         column = 0;
@@ -57,7 +57,7 @@ void newLine()
 
 void scrollUp()
 {
-    for (uint16_t y = 0; y < height; y++)
+    for (uint16_t y = 0; y < height_screen; y++)
     {
         for (uint16_t x = 0; x < width; x++)
         {
@@ -66,7 +66,7 @@ void scrollUp()
     }
     for (uint16_t x = 0; x < width; x++)
     {
-        vga_address[(height-1) * width + x] = ' ' | currColor;
+        vga_address[(height_screen-1) * width + x] = ' ' | currColor;
     }
     
 }
