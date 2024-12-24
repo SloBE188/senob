@@ -4,7 +4,7 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,6 @@
 uint32_t current_processid = 0;
 uint32_t current_threadid = 0;
 
-struct process* root = NULL;
 
 uint32_t get_process_id()
 {
@@ -41,71 +40,18 @@ uint32_t get_thread_id()
     return current_threadid++;
 }
 
-int max(int a, int b) 
+struct avl_node* create_avl_node(struct process* proc)
 {
-    return (a > b) ? a : b;
+    struct avl_node* node = (struct avl_node*)kmalloc(sizeof(struct avl_node));
+    node->proc = proc;
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1;
+
+    return node;
 }
 
-
-int height(struct process* node) 
-{
-    return node ? node->height : 0;
-}
-
-int get_balance(struct process* node) 
-{
-    return node ? height(node->left) - height(node->right) : 0;
-}
-
-struct process* rotate_right(struct process* y)
-{
-    //T2 = Teilbaum
-    struct process* x = y->left;
-    struct process* T2 = x->right;
-
-
-    x->right = y;
-    y->left = T2;
-
-    y->height = 1 + max(height(y->left), height(y->right));
-    x->height = 1 + max(height(x->left), height(x->right));
-
-
-    return y;
-}
-
-
-
-struct process* rotate_left(struct process* x)
-{
-    struct process* y = x->right;
-    struct process* T2 = x->left;
-
-
-    y->right = x;
-    x->right = T2;
-
-    x->height = 1 + max(height(x->left), height(x->right));
-    y->height = 1 + max(height(y->left), height(y->right));
-
-
-    return x;
-}
-
-struct process* get_min_value(struct process* node)
-{
-    struct process* curr = node;
-
-    while (curr->left != NULL)
-    {
-        curr = curr->left;
-    }
-    
-    return curr;
-
-}
-
-
+/*
 void add_thread_to_process(struct process* process, struct thread* new_thread)
 {
     if (process == NULL || new_thread == NULL)
@@ -115,10 +61,9 @@ void add_thread_to_process(struct process* process, struct thread* new_thread)
     }
 
     new_thread->next = process->thread_list;
-    process->thread_list = new_thread;
-    
+    process->thread_list = new_thread;  
 }
-
+*/
 /*
 void free_threads(struct thread* thread_list) {
     struct thread* current = thread_list;
@@ -138,160 +83,6 @@ void delete_process_with_threads(struct process* root, uint32_t pid) {
 }
 */
 
-
-
-struct process* delete_process(struct process* root, uint32_t pid)
-{
-
-    //STANDARD BST DELETE
-    if (root == NULL)
-    {
-        return root;
-    }
-
-    if(pid < root->pid)
-    {
-        root->left = delete_process(root->left, pid);
-    }
-    
-    else if (pid > root->pid)
-    {
-        root->right = delete_process(root->right, pid);
-    }
-    
-    else
-    {
-        if ((root->left == NULL) || (root->right == NULL))
-        {
-
-            struct process* temp = (struct process*)kmalloc(sizeof(struct process));
-
-            temp = root->left ? root->left : root->right;
-
-                if (temp == NULL)
-                {
-                    temp = root;
-                    root = NULL;
-                }
-                else
-                {
-                    *root = *temp;
-                }
-            
-                
-                //should probabaly free here idk
-                kfree(temp);
-
-        } else
-        {
-            struct process* temp = get_min_value(root->right);
-
-            root->pid = temp->pid;
-
-            root->right = delete_process(root->right, temp->pid);
-        }   
-        
-    }
-
-    if (root == NULL)
-    {
-        return root;
-    }
-
-    root->height = 1 + max(height(root->left), height(root->right));
-
-    uint32_t balance = get_balance(root);
-
-
-    //IF THE NODE IS UNBALANCED, HERE ARE THE 4 CASES
-
-
-    //LL
-    if (balance > 1 && get_balance(root->left) >= 0)
-    {
-        return rotate_right(root);
-    }
-
-    //RR
-    if (balance < -1 && get_balance(root->left) < 0)
-    {
-        return rotate_left(root);
-    }
-
-    //LR
-    if (balance > 1 && get_balance(root->right) <= 0)
-    {
-        root->left = rotate_left(root->left);
-        return rotate_right(root);
-    }
-
-    //RL
-    if (balance < -1 && get_balance(root->right) > 0)
-    {
-        root->right = rotate_right(root->right);
-        return rotate_right(root);
-    }
-
-    return root;
-    
-    
-}
-
-
-struct process* insert_process(struct process* root, struct process* new_process)
-{
-    if (root == NULL)
-    {
-        return new_process;
-    }
-
-    if(new_process->pid < root->pid)
-    {
-        root->left = insert_process(root->left, new_process->pid);
-    }
-    else if (new_process->pid > root->pid)
-    {
-        root->right = insert_process(root->right, new_process->pid);
-    }else
-    {
-        return root;
-    }
-
-    root->height = 1 + max(height(root->left), height(root->right));
-
-    uint32_t balance = get_balance(root);
-
-    //IF THE NODE IS UNBALANCED, HERE ARE THE 4 CASES
-
-    //LL
-    if (balance > 1 && new_process->pid < root->left->pid)
-    {
-        return rotate_right(root);
-    }
-
-    //RR
-    if (balance < -1 && new_process->pid > root->right->pid)
-    {
-        return rotate_left(root);
-    }
-
-    //LR
-    if (balance > 1 && new_process->pid > root->left->pid)
-    {
-        root->left = rotate_left(root->left);
-        return rotate_right(root);
-    }
-
-    //RL
-    if (balance < -1 && new_process->pid > root->left->pid)
-    {
-        root->right = rotate_right(root->right);
-        return rotate_right(root);
-    }
-
-    return root;
-
-}
 
 // returns needed pages
 uint32_t map_program_to_address(const char *filename, uint32_t program_address)
@@ -375,14 +166,12 @@ struct process *create_process(const char *filename)
     memset(new_thread, 0x00, sizeof(struct thread));
     printf("Allocated thread structure at: %p\n", new_thread);
     
-    
     //new_thread->regs = (struct regss *)kmalloc(sizeof(struct regss));
     //memset(new_thread->regs, 0x00, sizeof(struct regss));
     
-    
     new_thread->thread_id = get_thread_id();
     new_thread->owner = new_process;
-    new_thread->next = new_process->thread_list;
+    //new_thread->next = new_process->thread_list;
 
     //new_thread->regs->cr3 = new_process->page_directory;
 
@@ -404,14 +193,16 @@ struct process *create_process(const char *filename)
 
     for (uint32_t addr = (USER_STACK_TOP - (PAGE_SIZE * count_stack_pages)); addr < USER_STACK_TOP; addr += PAGE_SIZE) 
     {
-    uint32_t phys = mem_get_phys_from_virt(addr);
-    if (phys == -1) 
-    {
-        printf("address 0x%x is not mapped\n", addr);
-    } else {
-        printf("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
+        uint32_t phys = mem_get_phys_from_virt(addr);
+        if (phys == (uint32_t)-1) 
+        {
+            printf("address 0x%x is not mapped\n", addr);
+        } 
+        else 
+        {
+            printf("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
+        }
     }
-    }   
 
     mem_map_page(0xb0000000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
 
@@ -419,8 +210,6 @@ struct process *create_process(const char *filename)
     {
         printf("address 0xb0000000 is not mapped\n");
     }
-
-
 
     uint32_t segment_selector = 0x23;
     new_thread->regs.ss = segment_selector;
@@ -444,7 +233,7 @@ struct process *create_process(const char *filename)
 
     update_tss_esp0(new_thread->kstack.esp0, 6);
 
-    root = insert_process(root, new_process);
+
 
     return new_process;  
 }
@@ -474,10 +263,8 @@ update_tss_esp0(kernel_stack);*/
 
     uint32_t cr3;     //  60*/
 
-
 struct registers_save* save_thread_state(struct thread* thread)
 {
-
     struct registers_save* registers = (struct registers_save*)kmalloc(sizeof(struct registers_save));
 
     registers->eax = thread->regs.eax;
@@ -506,7 +293,6 @@ struct registers_save* save_thread_state(struct thread* thread)
 
 void switch_to_thread(struct thread *thread)
 {
-
     struct registers_save* registers = save_thread_state(thread);
     switch_task(registers);
 }

@@ -155,7 +155,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     switch_to_thread(new_process->thread);
 
-
     // test_heap_shrink_and_reuse();
     while (1)
     {

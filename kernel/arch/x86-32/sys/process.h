@@ -14,13 +14,20 @@ struct process
     uint32_t* page_directory;
     struct thread* thread;
 
-    struct process* left;
-    struct process* right;
-    uint32_t height;
+    uint32_t priority;
     
     struct thread* thread_list;
 
 } __attribute__((packed));
+
+struct avl_node
+{
+    struct process* proc;
+
+    struct avl_node* left;
+    struct avl_node* right;
+    uint32_t height;
+};
 
 struct registers_save 
 {
@@ -50,7 +57,7 @@ struct thread
 {
     uint32_t thread_id;
     struct process* owner;
-    //struct thread* next_thread;
+    //struct thread* next;
 
     struct
     {
@@ -84,7 +91,6 @@ struct thread
         uint32_t stack_start;
     } kstack __attribute__ ((packed));
 
-    struct thread* next;
 
 };
 
@@ -94,6 +100,6 @@ void switch_to_thread(struct thread* thread);
 void copy_program_to_address(const char* filename, uint32_t pages_needed, uint32_t program_address);
 uint32_t map_program_to_address(const char* filename, uint32_t program_address);
 struct registers_save* save_thread_state(struct thread* thread);
-
+void test_avl_tree();
 
 #endif
