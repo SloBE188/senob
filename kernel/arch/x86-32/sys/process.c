@@ -212,6 +212,179 @@ void insert(uint32_t pid)
     
 }
 
+
+struct rb_node* rb_search(struct rb_node* root, uint32_t pid) 
+{
+    struct rb_node* current = root;
+    while (current != NIL && current->proc->pid != pid) {
+        if (pid < current->proc->pid)
+            current = current->left;
+        else
+            current = current->right;
+    }
+    return current;
+}
+
+struct rb_node* tree_minimum(struct rb_node* x) 
+{
+    while (x->left != NIL) 
+    {
+        x = x->left;
+    }
+    return x;
+}
+
+void rb_transplant(struct rb_node* u, struct rb_node* v) 
+{
+    //u gets replaced by  v as a parent
+    if (u->parent == NULL) 
+    {
+        root = v;
+    } else if (u == u->parent->left) 
+    {
+        u->parent->left = v;
+    } else {
+        u->parent->right = v;
+    }
+    v->parent = u->parent;
+}
+
+void rb_delete_fixup(struct rb_node* x) 
+{
+    while (x != root && x->color == BLACK) 
+    {
+        if (x == x->parent->left) 
+        {
+            struct rb_node* w = x->parent->right; // siblings from x
+            // case 1: w is red
+            if (w->color == RED) 
+            {
+                w->color = BLACK;
+                x->parent->color = RED;
+                left_rotate(x->parent);
+                w = x->parent->right;
+            }
+            // case 2: w is black and both kids are black
+            if (w->left->color == BLACK && w->right->color == BLACK) 
+            {
+                w->color = RED;
+                x = x->parent;
+            } else 
+            {
+                // case 3: w is black, w->left is red, w->right is black
+                if (w->right->color == BLACK) 
+                {
+                    w->left->color = BLACK;
+                    w->color = RED;
+                    right_rotate(w);
+                    w = x->parent->right;
+                }
+                // case 4: w->right is red
+                w->color = x->parent->color;
+                x->parent->color = BLACK;
+                w->right->color = BLACK;
+                left_rotate(x->parent);
+                x = root;
+            }
+        } 
+        else {
+            // switch left and right up
+            struct rb_node* w = x->parent->left;
+            if (w->color == RED) 
+            {
+                w->color = BLACK;
+                x->parent->color = RED;
+                right_rotate(x->parent);
+                w = x->parent->left;
+            }
+            if (w->right->color == BLACK && w->left->color == BLACK) 
+            {
+                w->color = RED;
+                x = x->parent;
+            } else {
+                if (w->left->color == BLACK) 
+                {
+                    w->right->color = BLACK;
+                    w->color = RED;
+                    left_rotate(w);
+                    w = x->parent->left;
+                }
+                w->color = x->parent->color;
+                x->parent->color = BLACK;
+                w->left->color = BLACK;
+                right_rotate(x->parent);
+                x = root;
+            }
+        }
+    }
+    x->color = BLACK;
+}
+
+
+void rb_delete(uint32_t pid) 
+{
+    // find node to delete
+    struct rb_node* z = rb_search(root, pid);
+    if (z == NIL) 
+    {
+        return;
+    }
+
+    struct rb_node* y = z;  //node to del or move
+    struct rb_node* x = NIL;    //x is the child which will bereplacing y
+    int y_original_color = y->color;
+
+    // normal bst delete
+    if (z->left == NIL) 
+    {
+        // no left child
+        x = z->right;
+        rb_transplant(z, z->right);
+    } 
+    else if (z->right == NIL) 
+    {
+        // no right child
+        x = z->left;
+        rb_transplant(z, z->left);
+    } 
+    else {
+        // 2 children ->  successor(most left node in right subtree)
+        y = tree_minimum(z->right);  
+        y_original_color = y->color;
+        x = y->right;  // x will replace y
+
+        if (y->parent == z)
+        {
+            x->parent = y;
+        } else {
+            // attach y->right to y->parent
+            rb_transplant(y, y->right);
+            y->right = z->right;
+            y->right->parent = y;
+        }
+
+        // z gets replaced by y
+        rb_transplant(z, y);
+        y->left = z->left;
+        y->left->parent = y;
+
+        // WICHTIG: Die Farbe von y uebernimmt z's Farbe
+        //y which just replaced z has to take over zs color
+        y->color = z->color;
+    }
+
+
+    // kfree(z->proc);  if allocated
+    // kfree(z);
+
+    // if y was a black node,fixuop
+    if (y_original_color == BLACK) 
+    {
+        rb_delete_fixup(x);
+    }
+}
+
+
 // returns needed pages
 uint32_t map_program_to_address(const char *filename, uint32_t program_address)
 {
@@ -445,6 +618,11 @@ uint32_t init_proc()
   
     printf("In-Order Traversal of the Red-Black Tree:\n");  
     inOrderTraversal(root);  
+
+    rb_delete(15);
+    rb_delete(5);
+    printf("In-Order Traversal of the Red-Black Tree 2:\n");  
+    inOrderTraversal(root);
   
     return 0;  
 }

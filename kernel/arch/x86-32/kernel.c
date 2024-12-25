@@ -153,7 +153,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     //struct process* new_process = create_process("0:/test.bin");
 
-    //switch_to_thread(new_process->thread);
+    //switch_to_thread(new_process->head_thread);
 
     init_proc();
 
