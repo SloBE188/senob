@@ -161,7 +161,7 @@ void fixup_insert(struct rb_node* new_node)
 
 }
 
-void insert(uint32_t pid)
+void rb_insert(uint32_t pid)
 {
     struct rb_node* new_node = (struct rb_node*)kmalloc(sizeof(struct rb_node));
     printf("Node allocated at: %p\t", new_node);
@@ -368,7 +368,6 @@ void rb_delete(uint32_t pid)
         y->left = z->left;
         y->left->parent = y;
 
-        // WICHTIG: Die Farbe von y uebernimmt z's Farbe
         //y which just replaced z has to take over zs color
         y->color = z->color;
     }
@@ -446,6 +445,9 @@ void copy_program_to_address(const char *filename, uint32_t pages_needed, uint32
     }
 }
 
+
+struct thread* create_user_thread(struct process* process);
+
 struct process *create_process(const char *filename)
 {
     struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
@@ -463,21 +465,30 @@ struct process *create_process(const char *filename)
 
     new_process->pid = get_process_id();
 
-    struct thread *new_thread = (struct thread *)kmalloc(sizeof(struct thread));
-    memset(new_thread, 0x00, sizeof(struct thread));
-    printf("Allocated thread structure at: %p\n", new_thread);
     
-    //new_thread->regs = (struct regss *)kmalloc(sizeof(struct regss));
-    //memset(new_thread->regs, 0x00, sizeof(struct regss));
-    
-    new_thread->thread_id = get_thread_id();
-    new_thread->owner = new_process;
-    //new_thread->next = new_process->thread_list;
-
-    //new_thread->regs->cr3 = new_process->page_directory;
 
     uint32_t pages_needed = map_program_to_address(filename, 0x00400000);
     copy_program_to_address(filename, pages_needed, 0x00400000);
+
+    struct thread* main_thread = create_user_thread(new_process);
+
+    new_process->head_thread = main_thread;
+
+    update_tss_esp0(main_thread->kstack.esp0, 6);
+
+
+
+    return new_process;  
+}
+
+struct thread* create_user_thread(struct process* process)
+{
+    struct thread *new_thread = (struct thread *)kmalloc(sizeof(struct thread));
+    memset(new_thread, 0x00, sizeof(struct thread));
+    printf("Allocated thread structure at: %p\n", new_thread);
+
+    new_thread->thread_id = get_thread_id();
+    new_thread->owner = process;
 
     uint32_t count_stack_pages = 40;
 
@@ -530,39 +541,11 @@ struct process *create_process(const char *filename)
     new_thread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
     new_thread->kstack.stack_start = (uint32_t)kernel_stack;
 
-    new_process->head_thread = new_thread;
+    return new_thread;
 
-    update_tss_esp0(new_thread->kstack.esp0, 6);
-
-
-
-    return new_process;  
 }
 
-/*uint32_t kernel_stack = ((uint32_t) kmalloc(4096)) + 4096;
-uint8_t* kesp = (uint8_t*) (kernel_stack);
-update_tss_esp0(kernel_stack);*/
 
-/*    uint32_t eax;     //  0
-    uint32_t ebx;     //  4
-    uint32_t ecx;     //  8
-    uint32_t edx;     //  12
-
-    uint32_t esp;     //  16
-    uint32_t ebp;     //  20
-
-    uint32_t edi;     //  24
-    uint32_t eip;     //  28
-    uint32_t eflags;  //  32
-
-    uint32_t cs;      //  36
-    uint32_t ss;      //  40
-    uint32_t ds;      //  44
-    uint32_t es;      //  48
-    uint32_t fs;      //  52
-    uint32_t gs;      //  56
-
-    uint32_t cr3;     //  60*/
 
 struct registers_save* save_thread_state(struct thread* thread)
 {
@@ -598,22 +581,25 @@ void switch_to_thread(struct thread *thread)
     switch_task(registers);
 }
 
-uint32_t init_proc()
+void node_preparation()
 {
     // Initialize NIL node  
     NIL = (struct rb_node*)kmalloc(sizeof(struct rb_node));  
-    NIL->color = BLACK; // NIL is black 
+    NIL->color = BLACK; // NIL has to be black 
     NIL->left   = NIL;
     NIL->right  = NIL;
     NIL->parent = NIL;
-
     root = NIL;
-  
+}
+
+uint32_t init_proc()
+{
+    node_preparation();
     int values[] = {10, 20, 30, 15, 5};  
     int n = sizeof(values) / sizeof(values[0]);  
   
     for (int i = 0; i < n; i++) {  
-        insert(values[i]);  
+        rb_insert(values[i]);  
     }  
   
     printf("In-Order Traversal of the Red-Black Tree:\n");  
