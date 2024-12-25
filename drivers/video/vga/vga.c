@@ -29,12 +29,12 @@ void reset()
     column = 0;
     currColor = defaultColor;
 
-    //loops threw all the line & columns and clears them with the for loop height_screen & width
+    //loops threw all the line & columns and clears them with the for loop height_screen & width_screen
     for (uint16_t y = 0; y < height_screen; y++)
     {
-        for (uint16_t x = 0; x < width; x++)
+        for (uint16_t x = 0; x < width_screen; x++)
         {
-            vga_address[y * width + x] = ' ' | defaultColor;    //Every character has a character and a color
+            vga_address[y * width_screen + x] = ' ' | defaultColor;    //Every character has a character and a color
         }
         
     }
@@ -59,14 +59,14 @@ void scrollUp()
 {
     for (uint16_t y = 0; y < height_screen; y++)
     {
-        for (uint16_t x = 0; x < width; x++)
+        for (uint16_t x = 0; x < width_screen; x++)
         {
-            vga_address[(y-1) * width + x] = vga_address[y * width + x];
+            vga_address[(y-1) * width_screen + x] = vga_address[y * width_screen + x];
         }
     }
-    for (uint16_t x = 0; x < width; x++)
+    for (uint16_t x = 0; x < width_screen; x++)
     {
-        vga_address[(height_screen-1) * width + x] = ' ' | currColor;
+        vga_address[(height_screen-1) * width_screen + x] = ' ' | currColor;
     }
     
 }
@@ -74,11 +74,11 @@ void scrollUp()
 void handleBackspace() {
     if (column > 0) {
         column--;
-        vga_address[line * width + column] = ' ' | currColor;
+        vga_address[line * width_screen + column] = ' ' | currColor;
     } else if (line > 0) {
         line--;
-        column = width - 1;
-        vga_address[line * width + column] = ' ' | currColor;
+        column = width_screen - 1;
+        vga_address[line * width_screen + column] = ' ' | currColor;
     }
 }
 
@@ -92,12 +92,12 @@ void print(const char* s) {
                 column = 0;
                 break;
             case '\t':
-                if (column == width) {
+                if (column == width_screen) {
                     newLine();
                 }
                 uint16_t tablen = 4 - (column % 4);
                 while (tablen != 0) {
-                    vga_address[line * width + (column++)] = ' ' | currColor;
+                    vga_address[line * width_screen + (column++)] = ' ' | currColor;
                     tablen--;
                 }
                 break;
@@ -105,10 +105,10 @@ void print(const char* s) {
                 handleBackspace();
                 break;
             default:
-                if (column == width) {
+                if (column == width_screen) {
                     newLine();
                 }
-                vga_address[line * width + (column++)] = *s | currColor;
+                vga_address[line * width_screen + (column++)] = *s | currColor;
                 break;
         }
         s++;

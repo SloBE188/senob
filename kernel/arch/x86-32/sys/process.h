@@ -2,6 +2,7 @@
 #define PROCESS_H
 
 #include <stdint.h>
+#include "../../../../drivers/video/vbe/vbe.h"
 
 #define USER_STACK_TOP 0xB0000000
 #define PROGRAMM_VIRTUAL_ADDRESS_START 0x00400000
@@ -22,7 +23,6 @@ struct process
     struct thread* tail_thread;
 
     uint32_t priority;
-    uint32_t koru;
     
 
 

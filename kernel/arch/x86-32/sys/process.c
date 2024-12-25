@@ -703,7 +703,13 @@ void node_preparation()
 
 void test_process()
 {
+
+    clear_screen_sys_2(COLOR_GREEN);
     printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
+    struct process* p1 = create_process("0:/test.bin");
+    inOrderTraversal(root);
+    PitWait(8000);
+    switch_to_thread(p1->head_thread);
     while (1)
     {
         /* code */
@@ -729,9 +735,9 @@ uint32_t init_proc()
     printf("In-Order Traversal of the Red-Black Tree 2:\n");  
     inOrderTraversal(root);*/
 
-    struct process* p1 = create_process("0:/test.bin");
+    //struct process* p1 = create_process("0:/test.bin");
     struct process* pk1 = create_kernel_process(&test_process);
-    //switch_to_thread(pk1->head_thread);
+    switch_to_thread(pk1->head_thread);
     inOrderTraversal(root);
   
     return 0;  
