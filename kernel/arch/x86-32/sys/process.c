@@ -96,8 +96,6 @@ void inOrderTraversal(struct rb_node* x)
 } 
 
 
-#define BLACK 0
-#define RED 1
 
 void fixup_insert(struct rb_node* new_node)
 {
@@ -492,8 +490,36 @@ void rb_insert_process(struct process* p)
     fixup_insert(new_node);
 }
 
-
+struct thread* create_kernel_thread(struct process* process, void(*start_function)());
 struct thread* create_user_thread(struct process* process);
+
+
+struct process *create_kernel_process(void(*start_function)())
+{
+    struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
+    memset(new_process, 0x00, sizeof(struct process));
+    printf("Allocated process structure at: %p\n", new_process);
+
+    new_process->page_directory = kernel_directory;
+
+    new_process->pid = get_process_id();
+
+    new_process->head_thread = NULL;
+    new_process->tail_thread = NULL;
+
+
+    struct thread* main_thread = create_kernel_thread(new_process, start_function);
+
+    new_process->head_thread = main_thread;
+
+    update_tss_esp0(main_thread->kstack.esp0, 6);
+
+    rb_insert_process(new_process);
+
+    return new_process;  
+}
+
+
 
 struct process *create_process(const char *filename)
 {
@@ -520,6 +546,8 @@ struct process *create_process(const char *filename)
     new_process->head_thread = NULL;
     new_process->tail_thread = NULL;
 
+   
+
     struct thread* main_thread = create_user_thread(new_process);
 
     new_process->head_thread = main_thread;
@@ -529,6 +557,37 @@ struct process *create_process(const char *filename)
     rb_insert_process(new_process);
 
     return new_process;  
+}
+
+struct thread* create_kernel_thread(struct process* process, void(*start_function)())
+{
+    struct thread* new_kthread = (struct thread*)kmalloc(sizeof(struct thread));
+    memset(new_kthread, 0x00, sizeof(struct thread));
+
+    new_kthread->thread_id = get_thread_id();
+    new_kthread->owner = process;
+
+
+    // kernel stack
+    new_kthread->kstack.ss0 = 0x10;
+    uint8_t *kernel_stack = (uint8_t *)kmalloc(4096);
+    new_kthread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
+    new_kthread->kstack.stack_start = (uint32_t)kernel_stack;
+
+    uint32_t segment_selector = 0x10;
+    new_kthread->regs.ss = segment_selector;
+    new_kthread->regs.eflags = 0x202;
+    new_kthread->regs.cs = 0x08;
+    new_kthread->regs.eip = (uint32_t) start_function;
+    new_kthread->regs.ds = segment_selector;
+    new_kthread->regs.es = segment_selector;
+    new_kthread->regs.fs = segment_selector;
+    new_kthread->regs.gs = segment_selector;
+    new_kthread->regs.esp = new_kthread->kstack.esp0;
+
+    return new_kthread;
+
+
 }
 
 struct thread* create_user_thread(struct process* process)
@@ -642,6 +701,16 @@ void node_preparation()
     root = NIL;
 }
 
+void test_process()
+{
+    printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
+    while (1)
+    {
+        /* code */
+    }
+    
+}
+
 uint32_t init_proc()
 {
     node_preparation();
@@ -661,7 +730,8 @@ uint32_t init_proc()
     inOrderTraversal(root);*/
 
     struct process* p1 = create_process("0:/test.bin");
-    switch_to_thread(p1->head_thread);
+    struct process* pk1 = create_kernel_process(&test_process);
+    //switch_to_thread(pk1->head_thread);
     inOrderTraversal(root);
   
     return 0;  

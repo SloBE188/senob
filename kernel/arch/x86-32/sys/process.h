@@ -5,6 +5,10 @@
 
 #define USER_STACK_TOP 0xB0000000
 #define PROGRAMM_VIRTUAL_ADDRESS_START 0x00400000
+#define KERNEL_PROCESS 20
+#define USER_PROCESS 30
+#define BLACK 0
+#define RED 1
 
 struct process
 {
@@ -18,6 +22,7 @@ struct process
     struct thread* tail_thread;
 
     uint32_t priority;
+    uint32_t koru;
     
 
 
