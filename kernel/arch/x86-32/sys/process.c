@@ -445,6 +445,53 @@ void copy_program_to_address(const char *filename, uint32_t pages_needed, uint32
     }
 }
 
+void rb_insert_process(struct process* p)
+{
+    // new node for rb tree
+    struct rb_node* new_node = (struct rb_node*)kmalloc(sizeof(struct rb_node));
+    memset(new_node, 0, sizeof(struct rb_node));
+    printf("RB node allocated at: %p\n", new_node);
+
+
+    new_node->proc = p;      
+    // p->pid already set in create_process()
+    //new_node->proc->pid = p->pid;
+
+    //normal bst insertion (as long as x ist null(end of the path), y to x(root))
+    struct rb_node* y = NULL;
+    struct rb_node* x = root;
+
+    while (x != NIL)
+    {
+        y = x;
+        if (p->pid < x->proc->pid)
+            x = x->left;
+        else
+            x = x->right;
+    }
+
+    new_node->parent = y;
+    if (y == NULL) 
+    {
+        root = new_node;
+    }
+    else if (p->pid < y->proc->pid) 
+    {
+        y->left = new_node;
+    } 
+    else 
+    {
+        y->right = new_node;
+    }
+
+    new_node->left  = NIL;
+    new_node->right = NIL;
+    new_node->color = RED;
+
+
+    fixup_insert(new_node);
+}
+
 
 struct thread* create_user_thread(struct process* process);
 
@@ -470,13 +517,16 @@ struct process *create_process(const char *filename)
     uint32_t pages_needed = map_program_to_address(filename, 0x00400000);
     copy_program_to_address(filename, pages_needed, 0x00400000);
 
+    new_process->head_thread = NULL;
+    new_process->tail_thread = NULL;
+
     struct thread* main_thread = create_user_thread(new_process);
 
     new_process->head_thread = main_thread;
 
     update_tss_esp0(main_thread->kstack.esp0, 6);
 
-
+    rb_insert_process(new_process);
 
     return new_process;  
 }
@@ -503,7 +553,7 @@ struct thread* create_user_thread(struct process* process)
         mem_map_page((uint32_t)vaddr, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
     }
 
-    for (uint32_t addr = (USER_STACK_TOP - (PAGE_SIZE * count_stack_pages)); addr < USER_STACK_TOP; addr += PAGE_SIZE) 
+    /*for (uint32_t addr = (USER_STACK_TOP - (PAGE_SIZE * count_stack_pages)); addr < USER_STACK_TOP; addr += PAGE_SIZE) 
     {
         uint32_t phys = mem_get_phys_from_virt(addr);
         if (phys == (uint32_t)-1) 
@@ -514,7 +564,7 @@ struct thread* create_user_thread(struct process* process)
         {
             printf("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
         }
-    }
+    }*/
 
     mem_map_page(0xb0000000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
 
@@ -595,7 +645,7 @@ void node_preparation()
 uint32_t init_proc()
 {
     node_preparation();
-    int values[] = {10, 20, 30, 15, 5};  
+    /*int values[] = {10, 20, 30, 15, 5};  
     int n = sizeof(values) / sizeof(values[0]);  
   
     for (int i = 0; i < n; i++) {  
@@ -608,6 +658,10 @@ uint32_t init_proc()
     rb_delete(15);
     rb_delete(5);
     printf("In-Order Traversal of the Red-Black Tree 2:\n");  
+    inOrderTraversal(root);*/
+
+    struct process* p1 = create_process("0:/test.bin");
+    switch_to_thread(p1->head_thread);
     inOrderTraversal(root);
   
     return 0;  

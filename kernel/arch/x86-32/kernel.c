@@ -151,11 +151,9 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     lapic_init();
     ap_startup(2, 0x7000);
 
-    struct process* new_process = create_process("0:/test.bin");
+    init_proc();
 
-    switch_to_thread(new_process->head_thread);
 
-    //init_proc();
 
     // test_heap_shrink_and_reuse();
     while (1)
