@@ -29,6 +29,10 @@
 uint32_t current_processid = 0;
 uint32_t current_threadid = 0;
 
+struct process* processes[100];
+
+struct rb_node* root = NULL;
+struct rb_node* NIL = NULL;
 
 uint32_t get_process_id()
 {
@@ -40,49 +44,173 @@ uint32_t get_thread_id()
     return current_threadid++;
 }
 
-struct avl_node* create_avl_node(struct process* proc)
-{
-    struct avl_node* node = (struct avl_node*)kmalloc(sizeof(struct avl_node));
-    node->proc = proc;
-    node->left = NULL;
-    node->right = NULL;
-    node->height = 1;
 
-    return node;
-}
 
-/*
-void add_thread_to_process(struct process* process, struct thread* new_thread)
+// left rotation
+void left_rotate(struct rb_node* x) 
+{  
+    struct rb_node* y = x->right;  
+    x->right = y->left;  
+    if (y->left != NIL) {  
+        y->left->parent = x;  
+    }  
+    y->parent = x->parent;  
+    if (x->parent == NULL) {  
+        root = y;  
+    } else if (x == x->parent->left) {  
+        x->parent->left = y;  
+    } else {  
+        x->parent->right = y;  
+    }  
+    y->left = x;  
+    x->parent = y;  
+}  
+  
+// right rotation
+void right_rotate(struct rb_node* y) 
+{  
+    struct rb_node* x = y->left;  
+    y->left = x->right;  
+    if (x->right != NIL) {  
+        x->right->parent = y;  
+    }  
+    x->parent = y->parent;  
+    if (y->parent == NULL) {  
+        root = x;  
+    } else if (y == y->parent->left) {  
+        y->parent->left = x;  
+    } else {  
+        y->parent->right = x;  
+    }  
+    x->right = y;  
+    y->parent = x;  
+}  
+
+void inOrderTraversal(struct rb_node* x) 
+{  
+    if (x != NIL) {  
+        inOrderTraversal(x->left);  
+        printf("%d %s ", x->proc->pid, (x->color == 0) ? "Black" : "Red");  
+        inOrderTraversal(x->right);  
+    }  
+} 
+
+
+#define BLACK 0
+#define RED 1
+
+void fixup_insert(struct rb_node* new_node)
 {
-    if (process == NULL || new_thread == NULL)
+    //parent yes & RED
+    while (new_node->parent != NULL && new_node->parent->color == RED)
     {
-        printf("Unable to add thread to process\n");
-        return;
+        
+        //is the parent node a left or right node (grandnodes)?
+        if (new_node->parent == new_node->parent->parent->left)
+        {
+            struct rb_node* y = new_node->parent->parent->right;    //uncle of node
+            if (y->color == RED)
+            {
+                //nodes uncle is red
+                new_node->parent->color = BLACK;    //set parent black (else it would violate the properties of a rb)
+                y->color = BLACK;   //uncle black
+                new_node->parent->parent->color = RED; //grandparents red
+                new_node = new_node->parent->parent;     //move to grandparent
+            }else       //uncle is black
+            {   //new_node is a right child
+                if (new_node == new_node->parent->right)
+                {
+                    //case 2
+                    new_node = new_node->parent;
+                    left_rotate(new_node);
+                }
+                //case 3, new_node is a left child
+                new_node->parent->color = BLACK;
+                new_node->parent->parent->color = RED;
+                right_rotate(new_node->parent->parent);
+                
+            }
+        //parent node is a right node from its parents
+        }else
+        {
+            struct rb_node* y = new_node->parent->parent->left;
+            if (y->color = RED)
+            {
+                new_node->parent->color = BLACK;
+                y->color = BLACK;
+                new_node->parent->parent->color = RED;
+                new_node = new_node->parent->parent;
+            }else
+            {
+                if (new_node == new_node->parent->left)
+                {
+                    new_node = new_node->parent;
+                    right_rotate(new_node);
+                }
+                new_node->parent->color = BLACK;
+                new_node->parent->parent->color = RED;
+                left_rotate(new_node->parent->parent);
+                
+            }
+                        
+        }
+        
+    }
+    root->color = BLACK;    //has to be black ALWAYS
+    
+
+}
+
+void insert(uint32_t pid)
+{
+    struct rb_node* new_node = (struct rb_node*)kmalloc(sizeof(struct rb_node));
+    printf("Node allocated at: %p\t", new_node);
+
+    //evt. proc alloc
+    struct process* new_process = &processes[pid];
+    printf("Process allocated at: %p\n", new_process);
+    new_node->proc = new_process;
+
+    new_node->proc->pid = pid;
+
+    struct rb_node* y = NULL;   //follows the parent node
+    struct rb_node* x = root;
+
+
+    //normal bst insertion (as long as x ist null(end of the path), y to x(root))
+    while(x != NIL)
+    {
+        y = x;
+        if(new_node->proc->pid < x->proc->pid)
+        {
+            x = x->left;
+        }else
+        {
+            x = x->right;
+        }   
     }
 
-    new_thread->next = process->thread_list;
-    process->thread_list = new_thread;  
-}
-*/
-/*
-void free_threads(struct thread* thread_list) {
-    struct thread* current = thread_list;
-    while (current != NULL) {
-        struct thread* next = current->next;
-        kfree(current);
-        current = next;
+    new_node->parent = y;
+    if (y == NULL)
+    {
+        root = new_node;
     }
-}
-
-void delete_process_with_threads(struct process* root, uint32_t pid) {
-    struct process* node = find_process(root, pid);
-    if (node) {
-        free_threads(node->thread_list);
-        root = delete_process(root, pid);
+    else if (new_node->proc->pid < y->proc->pid)
+    {
+        y->left = new_node;
+    }else
+    {
+        y->right = new_node;
     }
-}
-*/
 
+    new_node->left = NIL;
+    new_node->right = NIL;
+    new_node->color = RED;
+
+    //fix possible violations for rb tree
+    fixup_insert(new_node);
+    
+}
 
 // returns needed pages
 uint32_t map_program_to_address(const char *filename, uint32_t program_address)
@@ -229,7 +357,7 @@ struct process *create_process(const char *filename)
     new_thread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
     new_thread->kstack.stack_start = (uint32_t)kernel_stack;
 
-    new_process->thread = new_thread;
+    new_process->head_thread = new_thread;
 
     update_tss_esp0(new_thread->kstack.esp0, 6);
 
@@ -295,4 +423,28 @@ void switch_to_thread(struct thread *thread)
 {
     struct registers_save* registers = save_thread_state(thread);
     switch_task(registers);
+}
+
+uint32_t init_proc()
+{
+    // Initialize NIL node  
+    NIL = (struct rb_node*)kmalloc(sizeof(struct rb_node));  
+    NIL->color = BLACK; // NIL is black 
+    NIL->left   = NIL;
+    NIL->right  = NIL;
+    NIL->parent = NIL;
+
+    root = NIL;
+  
+    int values[] = {10, 20, 30, 15, 5};  
+    int n = sizeof(values) / sizeof(values[0]);  
+  
+    for (int i = 0; i < n; i++) {  
+        insert(values[i]);  
+    }  
+  
+    printf("In-Order Traversal of the Red-Black Tree:\n");  
+    inOrderTraversal(root);  
+  
+    return 0;  
 }

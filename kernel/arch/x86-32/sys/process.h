@@ -12,22 +12,29 @@ struct process
     char filename[20];
 
     uint32_t* page_directory;
-    struct thread* thread;
+
+
+    struct thread* head_thread;
+    struct thread* tail_thread;
 
     uint32_t priority;
     
-    struct thread* thread_list;
+
 
 } __attribute__((packed));
 
-struct avl_node
+struct rb_node
 {
     struct process* proc;
+    uint32_t color;
 
-    struct avl_node* left;
-    struct avl_node* right;
-    uint32_t height;
+    struct rb_node* parent;
+    struct rb_node* left;
+    struct rb_node* right;
+
 };
+
+
 
 struct registers_save 
 {
@@ -57,7 +64,8 @@ struct thread
 {
     uint32_t thread_id;
     struct process* owner;
-    //struct thread* next;
+    struct thread* next;
+    struct thread* prev;
 
     struct
     {
@@ -101,5 +109,6 @@ void copy_program_to_address(const char* filename, uint32_t pages_needed, uint32
 uint32_t map_program_to_address(const char* filename, uint32_t program_address);
 struct registers_save* save_thread_state(struct thread* thread);
 void test_avl_tree();
+uint32_t init_proc();
 
 #endif
