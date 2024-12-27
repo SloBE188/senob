@@ -585,6 +585,22 @@ struct thread* create_kernel_thread(struct process* process, void(*start_functio
     new_kthread->regs.gs = segment_selector;
     new_kthread->regs.esp = new_kthread->kstack.esp0;
 
+    if(process->head_thread == NULL)
+    {
+        process->head_thread = new_kthread;
+        process->tail_thread = new_kthread;
+
+        new_kthread->prev = NULL;
+        new_kthread->next = NULL;
+    }else
+    {
+        new_kthread->prev = process->tail_thread;
+        new_kthread->next = NULL;
+
+        process->tail_thread->next = new_kthread;
+        process->tail_thread = new_kthread;
+    }
+
     return new_kthread;
 
 
@@ -649,6 +665,24 @@ struct thread* create_user_thread(struct process* process)
     uint8_t *kernel_stack = (uint8_t *)kmalloc(4096);
     new_thread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
     new_thread->kstack.stack_start = (uint32_t)kernel_stack;
+
+    if(process->head_thread == NULL)
+    {
+        process->head_thread = new_thread;
+        process->tail_thread = new_thread;
+
+        new_thread->prev = NULL;
+        new_thread->next = NULL;
+    }else
+    {
+        new_thread->prev = process->tail_thread;
+        new_thread->next = NULL;
+
+        process->tail_thread->next = new_thread;
+        process->tail_thread = new_thread;
+    }
+    
+    
 
     return new_thread;
 
