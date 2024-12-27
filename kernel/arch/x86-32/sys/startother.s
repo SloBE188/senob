@@ -4,6 +4,9 @@
 
 KERNEL_VIRTUAL_START EQU 0xC0000000
 
+extern kernel_directory
+extern initialize_ap
+
 [BITS 16]
 section .trampoline
 
@@ -11,8 +14,8 @@ section .trampoline
 global trampoline
 global trampoline_end
 
-extern initialize_ap
-extern kernel_directory
+
+
 
 trampoline:
     cli
@@ -78,7 +81,6 @@ pmmode:
     mov ebp, 0x00200000
     mov esp, ebp
 
-
     ; Load the address of kernel_directory into ecx
     mov ecx, kernel_directory
     sub ecx, KERNEL_VIRTUAL_START
@@ -94,10 +96,29 @@ pmmode:
     or ecx, 0x80000000
     mov cr0, ecx
     
-    jmp $
+    mov ebp, 0xC2000000
+    mov esp, ebp
+
+    ; Jump to higher half
+    lea ecx, [higher_half_ap_start]
+    jmp ecx
+
+higher_half_ap_start:
+    ; Setup stack
+    mov esp, stack_top
+    xor ebp, ebp
+    push ebx
+    push eax
+    cli
+
     call initialize_ap
 
-
     jmp $
+
+
+section .bss
+stack_bottom:
+    RESB 16384 * 8              ; 16 KiB stack
+stack_top:
 
 trampoline_end:
