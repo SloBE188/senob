@@ -31,12 +31,12 @@ static inline void load_tr(uint16_t tss_selector)
 
 void initialize_ap()
 {
-    while(1){}
+
     uint32_t apic_id = 2;   //will get that from cpuid, just as an example here
-    uint32_t ap_tss_selector = (5 + apic_id) << 3;  //*8 for getting the right entry
+    //uint32_t ap_tss_selector = (5 + apic_id) << 3;  //*8 for getting the right entry
 
     gdt_flush((uint32_t)&gdt_ptr);
-    load_tr(ap_tss_selector);
+    //load_tr(ap_tss_selector);
 
     idt_flush((uint32_t)&idtr);
     enable_paging();

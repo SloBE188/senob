@@ -149,7 +149,11 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     setup_vectors();
     init_keyboard();
     lapic_init();
-    ap_startup(2, 0x7000);
+    for (uint32_t i = 1; i < 4; i++)
+    {
+        ap_startup(i, 0x7000);
+    }
+    
 
     init_proc();
 

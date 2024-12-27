@@ -20,6 +20,7 @@
         "m_argv.h": "c",
         "stdiok.h": "c",
         "limits": "c",
-        "*.tcc": "c"
+        "*.tcc": "c",
+        "*.s": "c"
     }
 }

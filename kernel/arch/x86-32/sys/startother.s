@@ -95,9 +95,6 @@ pmmode:
     mov ecx, cr0
     or ecx, 0x80000000
     mov cr0, ecx
-    
-    mov ebp, 0xC2000000
-    mov esp, ebp
 
     ; Jump to higher half
     lea ecx, [higher_half_ap_start]
