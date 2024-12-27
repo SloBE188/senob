@@ -2,6 +2,8 @@
 %define REBASE16(ADDR) (ADDR - trampoline + 0x7000)
 %define REBASE32(ADDR) (ADDR - pmmode + 0x8000)
 
+KERNEL_VIRTUAL_START EQU 0xC0000000
+
 [BITS 16]
 section .trampoline
 
@@ -10,6 +12,7 @@ global trampoline
 global trampoline_end
 
 extern initialize_ap
+extern kernel_directory
 
 trampoline:
     cli
@@ -72,8 +75,24 @@ pmmode:
     mov gs, ax
     mov ss, ax
 
-    ;mov ebp, 0x00200000
-    ;mov esp, ebp
+    mov ebp, 0x00200000
+    mov esp, ebp
+
+
+    ; Load the address of kernel_directory into ecx
+    mov ecx, kernel_directory
+    sub ecx, KERNEL_VIRTUAL_START
+    mov cr3, ecx
+
+    ; Enable PSE with 4 MiB pages
+    mov ecx, cr4
+    or ecx, 0x00000010
+    mov cr4, ecx
+
+    ; Enable paging
+    mov ecx, cr0
+    or ecx, 0x80000000
+    mov cr0, ecx
     
     jmp $
     call initialize_ap
