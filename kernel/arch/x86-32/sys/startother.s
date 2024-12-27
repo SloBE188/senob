@@ -62,7 +62,7 @@ gdt_descriptor:
     dd gdt_start
     
 
-;section .pmmc
+section .pmmc
 [BITS 32]
 pmmode:
     mov ax, 0x10
@@ -72,10 +72,10 @@ pmmode:
     mov gs, ax
     mov ss, ax
 
-    jmp $
-    mov ebp, 0x00200000
-    mov esp, ebp
+    ;mov ebp, 0x00200000
+    ;mov esp, ebp
     
+    jmp $
     call initialize_ap
 
 
