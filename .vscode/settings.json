@@ -21,6 +21,7 @@
         "stdiok.h": "c",
         "limits": "c",
         "*.tcc": "c",
-        "*.s": "c"
+        "*.s": "c",
+        "heap.h": "c"
     }
 }
