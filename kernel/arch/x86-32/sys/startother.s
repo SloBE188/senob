@@ -1,3 +1,7 @@
+
+%define REBASE16(ADDR) (ADDR - trampoline + 0x7000)
+%define REBASE32(ADDR) (ADDR - pmmode + 0x8000)
+
 [BITS 16]
 section .trampoline
 
@@ -15,16 +19,15 @@ trampoline:
     mov ss, ax
     mov sp, 0x7C00
 
-
-    mov eax, gdt_descriptor
-    lgdt[eax]
-    
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
 
+    lgdt[REBASE16(gdt_descriptor)]
+    
 
-    ;jmp 0x8:0x8000
+
+    jmp 0x08:REBASE32(pmmode)
     jmp $
 
 
@@ -59,7 +62,7 @@ gdt_descriptor:
     dd gdt_start
     
 
-section .pmmc
+;section .pmmc
 [BITS 32]
 pmmode:
     mov ax, 0x10
@@ -69,6 +72,7 @@ pmmode:
     mov gs, ax
     mov ss, ax
 
+    jmp $
     mov ebp, 0x00200000
     mov esp, ebp
     
