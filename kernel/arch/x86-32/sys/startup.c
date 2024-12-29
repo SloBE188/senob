@@ -47,7 +47,7 @@ static inline void load_tr(uint16_t tss_selector)
 }
 
 
-static inline uint32_t get_local_apic_id_cpuid(void) 
+uint32_t get_local_apic_id_cpuid(void) 
 {
     uint32_t eax, ebx, ecx, edx;
     __asm__ volatile (

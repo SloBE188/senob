@@ -17,10 +17,9 @@ struct cpu{
     uint32_t lapic_base;    //for the bsp normally 0xfee00000
     uint32_t lapic_version;
     uint32_t lapic_flags;   // to check if its the bsp or not
-    struct thread* current_thread;
+    struct process* proc;
     uint32_t isbsp;         //1 = yes, 0 = no
     char cpu_name;          //CPU 0... for the user
-    uint32_t* page_directory;
 };
 
 extern struct cpu cpus[MAX_CPUS];

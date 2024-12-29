@@ -25,11 +25,14 @@
 #include "../mm/heap/heap.h"
 #include "../mm/PMM/pmm.h"
 #include "../fatfs/ff.h"
+#include "smp.h"
+#include "startup.h"
 
 uint32_t current_processid = 0;
 uint32_t current_threadid = 0;
 
 struct process* processes[100];
+extern struct cpu cpus[MAX_CPUS];
 
 struct rb_node* root = NULL;
 struct rb_node* NIL = NULL;
@@ -221,6 +224,24 @@ struct rb_node* rb_search(struct rb_node* root, uint32_t pid)
             current = current->right;
     }
     return current;
+}
+
+struct rb_node* rb_search_runnable(struct rb_node* root) 
+{
+    if (root == NIL)
+        return;
+
+    //search left subtree
+    struct rb_node* left_node = rb_search_runnable(root->left);
+    if(left_node != NIL)
+        return left_node;
+
+    if (root->proc->state == RUNNABLE)
+        return root;
+
+    //search right
+    return rb_search_runnable(root->right);
+    
 }
 
 struct rb_node* tree_minimum(struct rb_node* x) 
@@ -499,6 +520,7 @@ struct process *create_kernel_process(void(*start_function)())
     struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
     printf("Allocated process structure at: %p\n", new_process);
+    new_process->state = EMBRYO;
 
     new_process->page_directory = kernel_directory;
 
@@ -514,6 +536,8 @@ struct process *create_kernel_process(void(*start_function)())
 
     update_tss_esp0(main_thread->kstack.esp0, 6);
 
+    new_process->state = RUNNABLE;
+
     rb_insert_process(new_process);
 
     return new_process;  
@@ -526,6 +550,8 @@ struct process *create_process(const char *filename)
     struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
     printf("Allocated process structure at: %p\n", new_process);
+
+    new_process->state = EMBRYO;
 
     new_process->page_directory = mem_alloc_page_dir();
    /* uint32_t *pd = new_process->page_directory;
@@ -553,6 +579,8 @@ struct process *create_process(const char *filename)
     new_process->head_thread = main_thread;
 
     update_tss_esp0(main_thread->kstack.esp0, 6);
+
+    new_process->state = RUNNABLE;
 
     rb_insert_process(new_process);
 
@@ -749,6 +777,35 @@ void test_process()
         /* code */
     }
     
+}
+
+void scheduler(void)
+{
+    uint32_t apic_id = get_local_apic_id_cpuid();
+    struct process* proc;
+    struct cpu* cpu = &cpus[apic_id];
+    cpu->proc = 0;
+
+    for(;;)
+    {
+        asm volatile("sti");
+
+        //TODO Some kind of asking for the lock here (acquire)
+        
+        struct rb_node* node = rb_search_runnable(root);
+        cpu->proc = node->proc;
+        if(cpu->proc->state != RUNNABLE)
+            printf("process isnt runnable, smth must habe gone wrong.\n");
+        cpu->proc->state = RUNNING;
+        mem_change_page_directory(cpu->proc->page_directory);
+        switch_to_thread(cpu->proc->head_thread);
+
+        mem_change_page_directory(kernel_directory);
+
+        cpu->proc = 0x00;
+    }
+
+    //TODO some release here
 }
 
 uint32_t init_proc()

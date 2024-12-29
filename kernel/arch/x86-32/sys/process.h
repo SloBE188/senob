@@ -11,6 +11,8 @@
 #define BLACK 0
 #define RED 1
 
+enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+
 struct process
 {
     uint32_t pid;
@@ -22,7 +24,7 @@ struct process
     struct thread* head_thread;
     struct thread* tail_thread;
 
-    uint32_t priority;
+    enum procstate state;
     
 
 
