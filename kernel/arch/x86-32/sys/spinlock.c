@@ -23,6 +23,8 @@ static inline uint32_t xchg(volatile uint32_t *addr, uint32_t newval)
   return result;
 }
 
+uint32_t holding(struct spinlock* lock);
+
 void acquire(struct spinlock* lock)
 {
     if(holding(lock))
@@ -33,8 +35,9 @@ void acquire(struct spinlock* lock)
     while(xchg(&lock->locked, 1) != 0)
         ;;
 
-    lock->cpu = curr_cpu();
+    __sync_synchronize();
 
+    lock->cpu = curr_cpu();
 
 }
 
@@ -43,6 +46,7 @@ void release(struct spinlock* lock)
     if(!holding(lock))
         printf("cpu isnt even holding the lock, why are you trying to release it?");
 
+    __sync_synchronize();
 
     asm volatile("movl $0, %0" : "+m" (lock->locked) : );
 
