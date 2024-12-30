@@ -22,6 +22,7 @@
         "limits": "c",
         "*.tcc": "c",
         "*.s": "c",
-        "heap.h": "c"
+        "heap.h": "c",
+        "spinlock.h": "c"
     }
 }

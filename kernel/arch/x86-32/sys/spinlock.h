@@ -12,6 +12,8 @@ struct spinlock
 };
 
 void init_lock(struct spinlock* lock, char* name);
+void acquire(struct spinlock* lock);
+void release(struct spinlock* lock);
 
 
 #endif

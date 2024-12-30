@@ -542,7 +542,10 @@ struct process *create_kernel_process(void(*start_function)())
 
     new_process->state = RUNNABLE;
 
+
+    acquire(&rb_tree_lock);
     rb_insert_process(new_process);
+    release(&rb_tree_lock);
 
     return new_process;  
 }
@@ -586,7 +589,9 @@ struct process *create_process(const char *filename)
 
     new_process->state = RUNNABLE;
 
+    acquire(&rb_tree_lock);
     rb_insert_process(new_process);
+    release(&rb_tree_lock);
 
     return new_process;  
 }
@@ -797,6 +802,7 @@ void scheduler(void)
         asm volatile("sti");
 
         //TODO Some kind of asking for the lock here (acquire)
+        acquire(&scheduler_lock);
         
         struct rb_node* node = rb_search_runnable(root);
         cpu->proc = node->proc;
@@ -809,6 +815,8 @@ void scheduler(void)
         mem_change_page_directory(kernel_directory);
 
         cpu->proc = 0x00;
+
+        release(&scheduler_lock);
     }
 
     //TODO some release here
@@ -822,8 +830,8 @@ void init_locks()
 
 uint32_t init_proc()
 {
-    node_preparation();
     init_locks();
+    node_preparation();
     
     /*int values[] = {10, 20, 30, 15, 5};  
     int n = sizeof(values) / sizeof(values[0]);  

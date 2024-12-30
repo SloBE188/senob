@@ -1,12 +1,13 @@
 #include "spinlock.h"
 #include "startup.h"
+#include "smp.h"
 
 
 
 void init_lock(struct spinlock* lock, char* name)
 {
     lock->cpu = 0;
-    lock->locked = lock;
+    lock->locked = 0;
     lock->name = name;
 }
 
@@ -61,7 +62,7 @@ uint32_t holding(struct spinlock* lock)
     asm volatile("cli");
 
     uint32_t res;
-    res = (lock->locked && lock->cpu == curr_cpu());
+    res = lock->locked && lock->cpu == curr_cpu();
     
     return res;
 }
