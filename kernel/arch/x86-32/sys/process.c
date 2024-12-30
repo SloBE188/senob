@@ -27,6 +27,7 @@
 #include "../fatfs/ff.h"
 #include "smp.h"
 #include "startup.h"
+#include "spinlock.h"
 
 uint32_t current_processid = 0;
 uint32_t current_threadid = 0;
@@ -36,6 +37,9 @@ extern struct cpu cpus[MAX_CPUS];
 
 struct rb_node* root = NULL;
 struct rb_node* NIL = NULL;
+
+struct spinlock rb_tree_lock;
+struct spinlock scheduler_lock;
 
 uint32_t get_process_id()
 {
@@ -779,11 +783,13 @@ void test_process()
     
 }
 
+
+
 void scheduler(void)
 {
-    uint32_t apic_id = get_local_apic_id_cpuid();
+
     struct process* proc;
-    struct cpu* cpu = &cpus[apic_id];
+    struct cpu* cpu = curr_cpu();
     cpu->proc = 0;
 
     for(;;)
@@ -808,9 +814,17 @@ void scheduler(void)
     //TODO some release here
 }
 
+void init_locks()
+{
+    init_lock(&rb_tree_lock, "rb_tree_lock");
+    init_lock(&scheduler_lock, "scheduler_lock");
+}
+
 uint32_t init_proc()
 {
     node_preparation();
+    init_locks();
+    
     /*int values[] = {10, 20, 30, 15, 5};  
     int n = sizeof(values) / sizeof(values[0]);  
   

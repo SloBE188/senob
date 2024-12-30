@@ -82,4 +82,8 @@ void* find_mp_floating_pointer(struct multiboot_info *mb_info);
 struct addr* smp_addresses(struct multiboot_info *mb_info);
 void disable_pic(void);
 void prepare_trampoline_code();
+uint32_t get_local_apic_id_cpuid(void);
+struct cpu* curr_cpu();
+
+
 #endif

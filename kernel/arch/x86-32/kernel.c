@@ -142,18 +142,13 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     }
     
 
+    lapic_init();
     struct addr *addr = smp_addresses(multibootinfo);
     init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);
     printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
 
     setup_vectors();
     init_keyboard();
-    lapic_init();
-    for (uint32_t i = 1; i < 4; i++)
-    {
-        ap_startup(i, 0x7000);
-    }
-    
 
     init_proc();
 

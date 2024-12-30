@@ -164,6 +164,13 @@ void init_smp(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr)
     //disable_pic();
     mp_init(table);
     prepare_trampoline_code();
+
+
+    for (uint32_t i = 1; i < ncpus; i++)
+    {
+        ap_startup(i, 0x7000);
+    }
+
 }
 
 void disable_pic(void)
@@ -172,14 +179,6 @@ void disable_pic(void)
     outb(0xA0+1, 0xFF);     //slave pic
 }
 
-/*
-struct trampoline_data {
-    struct gdt_ptr_struct gdt_ptr;
-    struct idtr_t idtr;
-    uint32_t kernel_directory[1024];
-};
-*/
-
 
 extern uint8_t _trampoline_start[];
 extern uint8_t _trampoline_end[];
@@ -187,16 +186,9 @@ extern uint8_t _trampoline_end[];
 extern uint8_t _pmmc_start[];
 extern uint8_t _pmmc_end[];
 
-//void* trampolinecodeaddr, uint64_t size
+
 void prepare_trampoline_code()
 {
-    /*
-    struct trampoline_data* data = (struct trampoline_data*)0x5000;
-
-    memcpy(&data->idtr, &idtr, sizeof(struct idtr_t));
-    memcpy(&data->gdt_ptr, &gdt_ptr, sizeof(struct gdt_ptr_struct));
-    memcpy(data->kernel_directory, kernel_directory, sizeof(kernel_directory));
-    */
 
     uint32_t size = _trampoline_end - _trampoline_start;
     memcpy((void*)0x7000, _trampoline_start, size);
@@ -204,4 +196,24 @@ void prepare_trampoline_code()
     uint32_t sizepmm = _pmmc_end - _pmmc_start;
     memcpy((void*)0x8000, _pmmc_start, sizepmm);
 
+}
+
+uint32_t get_local_apic_id_cpuid(void) 
+{
+    uint32_t eax, ebx, ecx, edx;
+    __asm__ volatile (
+        "cpuid"
+        : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+        : "a"(1)
+    );
+    // APIC-ID is in the bits 31:24 from ebx
+    return (ebx >> 24) & 0xFF;
+}
+
+struct cpu* curr_cpu()
+{
+    uint32_t apic_id = get_local_apic_id_cpuid();
+    struct cpu* cpu = &cpus[apic_id];
+
+    return cpu;
 }

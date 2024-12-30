@@ -19,6 +19,7 @@
 #include "../gdt/gdt.h"
 #include "../interrupts/idt.h"
 #include "../mm/paging/paging.h"
+#include "smp.h"
 
 extern struct idtr_t idtr;
 extern struct gdt_ptr_struct gdt_ptr;
@@ -46,18 +47,6 @@ static inline void load_tr(uint16_t tss_selector)
     asm volatile("ltr %0" : : "r"(tss_selector));
 }
 
-
-uint32_t get_local_apic_id_cpuid(void) 
-{
-    uint32_t eax, ebx, ecx, edx;
-    __asm__ volatile (
-        "cpuid"
-        : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
-        : "a"(1)
-    );
-    // APIC-ID is in the bits 31:24 from ebx
-    return (ebx >> 24) & 0xFF;
-}
 
 void initialize_ap()
 {
