@@ -808,7 +808,7 @@ void test_process()
 
     clear_screen_sys_2(COLOR_GREEN);
     printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
-    struct process *p1 = create_process("0:/test.bin");
+    //struct process *p1 = create_process("0:/test.bin");
     // inOrderTraversal(root);
     // PitWait(8000);
     // switch_to_thread(p1->head_thread);
@@ -817,9 +817,9 @@ void test_process()
     }
 }
 
-struct process *get_process(uint32_t pid)
+struct process* get_process(uint32_t nr)
 {
-    struct process *proc = &processes[pid];
+    struct process *proc = &processes[nr];
     return proc;
 }
 
@@ -836,12 +836,13 @@ void scheduler(void)
 
         acquire(&scheduler_lock);
 
-        // struct rb_node* node = rb_search_runnable(root);
-        for (p = processes; p < 100; p++)
+        // struct rb_node* node = rb_search_runnable(root);        
+        for (uint32_t i = 0; 0 < 100; i++)
         {
-            if (p->state != RUNNABLE)
+            if (processes[i].state != RUNNABLE)
                 continue;
 
+            p = &processes[i];
             cpu->proc = p;
             mem_change_page_directory(p->page_directory);
             p->state = RUNNABLE;
@@ -862,6 +863,8 @@ void init_locks()
     init_lock(&scheduler_lock, "scheduler_lock");
 }
 
+
+
 uint32_t init_proc()
 {
 
@@ -876,9 +879,11 @@ uint32_t init_proc()
 
     // struct process* p1 = create_process("0:/test.bin");
     struct process *pk1 = create_kernel_process(&test_process);
+    //struct process* pk2 = &processes[0];
+    struct process* pk2 = get_process(0);
     // struct process* pk2 = create_kernel_process(&test_process);
     // struct process* pk3 = create_kernel_process(&test_process);
-    // switch_to_thread(p1->head_thread);
+    //switch_to_thread(pk2->head_thread);
     // inOrderTraversal(root);
 
     return 0;
