@@ -170,6 +170,7 @@ void init_smp(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr)
     {
         ap_startup(i, 0x7000);
     }
+    PitWait(200);
 
 }
 

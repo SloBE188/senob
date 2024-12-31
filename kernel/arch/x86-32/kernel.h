@@ -2,7 +2,7 @@
 #define KERNEL_H
 
 #define NULL 0
-#define MAX_CPUS 4
+#define MAX_CPUS 8
 
 #include "interrupts/idt.h"
 

@@ -33,11 +33,10 @@ uint32_t current_processid = 0;
 uint32_t current_threadid = 0;
 
 struct process processes[100];
-struct thread threads[120];
 extern struct cpu cpus[MAX_CPUS];
 
-struct rb_node* root = NULL;
-struct rb_node* NIL = NULL;
+struct rb_node *root = NULL;
+struct rb_node *NIL = NULL;
 
 struct spinlock rb_tree_lock;
 struct spinlock scheduler_lock;
@@ -52,101 +51,112 @@ uint32_t get_thread_id()
     return current_threadid++;
 }
 
-
-
 // left rotation
-void left_rotate(struct rb_node* x) 
-{  
-    struct rb_node* y = x->right;  
-    x->right = y->left;  
-    if (y->left != NIL) {  
-        y->left->parent = x;  
-    }  
-    y->parent = x->parent;  
-    if (x->parent == NULL) {  
-        root = y;  
-    } else if (x == x->parent->left) {  
-        x->parent->left = y;  
-    } else {  
-        x->parent->right = y;  
-    }  
-    y->left = x;  
-    x->parent = y;  
-}  
-  
-// right rotation
-void right_rotate(struct rb_node* y) 
-{  
-    struct rb_node* x = y->left;  
-    y->left = x->right;  
-    if (x->right != NIL) {  
-        x->right->parent = y;  
-    }  
-    x->parent = y->parent;  
-    if (y->parent == NULL) {  
-        root = x;  
-    } else if (y == y->parent->left) {  
-        y->parent->left = x;  
-    } else {  
-        y->parent->right = x;  
-    }  
-    x->right = y;  
-    y->parent = x;  
-}  
-
-void inOrderTraversal(struct rb_node* x) 
-{  
-    if (x != NIL) {  
-        inOrderTraversal(x->left);  
-        printf("%d %s ", x->proc->pid, (x->color == 0) ? "Black" : "Red");  
-        inOrderTraversal(x->right);  
-    }  
-} 
-
-
-
-void fixup_insert(struct rb_node* new_node)
+void left_rotate(struct rb_node *x)
 {
-    //parent yes & RED
+    struct rb_node *y = x->right;
+    x->right = y->left;
+    if (y->left != NIL)
+    {
+        y->left->parent = x;
+    }
+    y->parent = x->parent;
+    if (x->parent == NULL)
+    {
+        root = y;
+    }
+    else if (x == x->parent->left)
+    {
+        x->parent->left = y;
+    }
+    else
+    {
+        x->parent->right = y;
+    }
+    y->left = x;
+    x->parent = y;
+}
+
+// right rotation
+void right_rotate(struct rb_node *y)
+{
+    struct rb_node *x = y->left;
+    y->left = x->right;
+    if (x->right != NIL)
+    {
+        x->right->parent = y;
+    }
+    x->parent = y->parent;
+    if (y->parent == NULL)
+    {
+        root = x;
+    }
+    else if (y == y->parent->left)
+    {
+        y->parent->left = x;
+    }
+    else
+    {
+        y->parent->right = x;
+    }
+    x->right = y;
+    y->parent = x;
+}
+
+void inOrderTraversal(struct rb_node *x)
+{
+    if (x != NIL)
+    {
+        inOrderTraversal(x->left);
+        printf("%d %s ", x->proc->pid, (x->color == 0) ? "Black" : "Red");
+        inOrderTraversal(x->right);
+    }
+}
+
+void fixup_insert(struct rb_node *new_node)
+{
+    // parent yes & RED
     while (new_node->parent != NULL && new_node->parent->color == RED)
     {
-        
-        //is the parent node a left or right node (grandnodes)?
+
+        // is the parent node a left or right node (grandnodes)?
         if (new_node->parent == new_node->parent->parent->left)
         {
-            struct rb_node* y = new_node->parent->parent->right;    //uncle of node
+            struct rb_node *y = new_node->parent->parent->right; // uncle of node
             if (y->color == RED)
             {
-                //nodes uncle is red
-                new_node->parent->color = BLACK;    //set parent black (else it would violate the properties of a rb)
-                y->color = BLACK;   //uncle black
-                new_node->parent->parent->color = RED; //grandparents red
-                new_node = new_node->parent->parent;     //move to grandparent
-            }else       //uncle is black
-            {   //new_node is a right child
+                // nodes uncle is red
+                new_node->parent->color = BLACK;       // set parent black (else it would violate the properties of a rb)
+                y->color = BLACK;                      // uncle black
+                new_node->parent->parent->color = RED; // grandparents red
+                new_node = new_node->parent->parent;   // move to grandparent
+            }
+            else // uncle is black
+            {    // new_node is a right child
                 if (new_node == new_node->parent->right)
                 {
-                    //case 2
+                    // case 2
                     new_node = new_node->parent;
                     left_rotate(new_node);
                 }
-                //case 3, new_node is a left child
+                // case 3, new_node is a left child
                 new_node->parent->color = BLACK;
                 new_node->parent->parent->color = RED;
                 right_rotate(new_node->parent->parent);
-                
             }
-        //parent node is a right node from its parents
-        }else
+            // parent node is a right node from its parents
+        }
+        else
         {
-            struct rb_node* y = new_node->parent->parent->left;
+            struct rb_node *y = new_node->parent->parent->left;
             if (y->color = RED)
             {
                 new_node->parent->color = BLACK;
                 y->color = BLACK;
                 new_node->parent->parent->color = RED;
                 new_node = new_node->parent->parent;
-            }else
+            }
+            else
             {
                 if (new_node == new_node->parent->left)
                 {
@@ -156,44 +166,39 @@ void fixup_insert(struct rb_node* new_node)
                 new_node->parent->color = BLACK;
                 new_node->parent->parent->color = RED;
                 left_rotate(new_node->parent->parent);
-                
             }
-                        
         }
-        
     }
-    root->color = BLACK;    //has to be black ALWAYS
-    
-
+    root->color = BLACK; // has to be black ALWAYS
 }
 
 void rb_insert(uint32_t pid)
 {
-    struct rb_node* new_node = (struct rb_node*)kmalloc(sizeof(struct rb_node));
+    struct rb_node *new_node = (struct rb_node *)kmalloc(sizeof(struct rb_node));
     printf("Node allocated at: %p\t", new_node);
 
-    //evt. proc alloc
-    struct process* new_process = &processes[pid];
+    // evt. proc alloc
+    struct process *new_process = &processes[pid];
     printf("Process allocated at: %p\n", new_process);
     new_node->proc = new_process;
 
     new_node->proc->pid = pid;
 
-    struct rb_node* y = NULL;   //follows the parent node
-    struct rb_node* x = root;
+    struct rb_node *y = NULL; // follows the parent node
+    struct rb_node *x = root;
 
-
-    //normal bst insertion (as long as x ist null(end of the path), y to x(root))
-    while(x != NIL)
+    // normal bst insertion (as long as x ist null(end of the path), y to x(root))
+    while (x != NIL)
     {
         y = x;
-        if(new_node->proc->pid < x->proc->pid)
+        if (new_node->proc->pid < x->proc->pid)
         {
             x = x->left;
-        }else
+        }
+        else
         {
             x = x->right;
-        }   
+        }
     }
 
     new_node->parent = y;
@@ -204,7 +209,8 @@ void rb_insert(uint32_t pid)
     else if (new_node->proc->pid < y->proc->pid)
     {
         y->left = new_node;
-    }else
+    }
+    else
     {
         y->right = new_node;
     }
@@ -213,16 +219,15 @@ void rb_insert(uint32_t pid)
     new_node->right = NIL;
     new_node->color = RED;
 
-    //fix possible violations for rb tree
+    // fix possible violations for rb tree
     fixup_insert(new_node);
-    
 }
 
-
-struct rb_node* rb_search(struct rb_node* root, uint32_t pid) 
+struct rb_node *rb_search(struct rb_node *root, uint32_t pid)
 {
-    struct rb_node* current = root;
-    while (current != NIL && current->proc->pid != pid) {
+    struct rb_node *current = root;
+    while (current != NIL && current->proc->pid != pid)
+    {
         if (pid < current->proc->pid)
             current = current->left;
         else
@@ -231,57 +236,59 @@ struct rb_node* rb_search(struct rb_node* root, uint32_t pid)
     return current;
 }
 
-struct rb_node* rb_search_runnable(struct rb_node* root) 
+struct rb_node *rb_search_runnable(struct rb_node *root)
 {
     if (root == NIL)
         return;
 
-    //search left subtree
-    struct rb_node* left_node = rb_search_runnable(root->left);
-    if(left_node != NIL)
+    // search left subtree
+    struct rb_node *left_node = rb_search_runnable(root->left);
+    if (left_node != NIL)
         return left_node;
 
     if (root->proc->state == RUNNABLE)
         return root;
 
-    //search right
+    // search right
     return rb_search_runnable(root->right);
-    
 }
 
-struct rb_node* tree_minimum(struct rb_node* x) 
+struct rb_node *tree_minimum(struct rb_node *x)
 {
-    while (x->left != NIL) 
+    while (x->left != NIL)
     {
         x = x->left;
     }
     return x;
 }
 
-void rb_transplant(struct rb_node* u, struct rb_node* v) 
+void rb_transplant(struct rb_node *u, struct rb_node *v)
 {
-    //u gets replaced by  v as a parent
-    if (u->parent == NULL) 
+    // u gets replaced by  v as a parent
+    if (u->parent == NULL)
     {
         root = v;
-    } else if (u == u->parent->left) 
+    }
+    else if (u == u->parent->left)
     {
         u->parent->left = v;
-    } else {
+    }
+    else
+    {
         u->parent->right = v;
     }
     v->parent = u->parent;
 }
 
-void rb_delete_fixup(struct rb_node* x) 
+void rb_delete_fixup(struct rb_node *x)
 {
-    while (x != root && x->color == BLACK) 
+    while (x != root && x->color == BLACK)
     {
-        if (x == x->parent->left) 
+        if (x == x->parent->left)
         {
-            struct rb_node* w = x->parent->right; // siblings from x
+            struct rb_node *w = x->parent->right; // siblings from x
             // case 1: w is red
-            if (w->color == RED) 
+            if (w->color == RED)
             {
                 w->color = BLACK;
                 x->parent->color = RED;
@@ -289,14 +296,15 @@ void rb_delete_fixup(struct rb_node* x)
                 w = x->parent->right;
             }
             // case 2: w is black and both kids are black
-            if (w->left->color == BLACK && w->right->color == BLACK) 
+            if (w->left->color == BLACK && w->right->color == BLACK)
             {
                 w->color = RED;
                 x = x->parent;
-            } else 
+            }
+            else
             {
                 // case 3: w is black, w->left is red, w->right is black
-                if (w->right->color == BLACK) 
+                if (w->right->color == BLACK)
                 {
                     w->left->color = BLACK;
                     w->color = RED;
@@ -310,23 +318,26 @@ void rb_delete_fixup(struct rb_node* x)
                 left_rotate(x->parent);
                 x = root;
             }
-        } 
-        else {
+        }
+        else
+        {
             // switch left and right up
-            struct rb_node* w = x->parent->left;
-            if (w->color == RED) 
+            struct rb_node *w = x->parent->left;
+            if (w->color == RED)
             {
                 w->color = BLACK;
                 x->parent->color = RED;
                 right_rotate(x->parent);
                 w = x->parent->left;
             }
-            if (w->right->color == BLACK && w->left->color == BLACK) 
+            if (w->right->color == BLACK && w->left->color == BLACK)
             {
                 w->color = RED;
                 x = x->parent;
-            } else {
-                if (w->left->color == BLACK) 
+            }
+            else
+            {
+                if (w->left->color == BLACK)
                 {
                     w->right->color = BLACK;
                     w->color = RED;
@@ -344,43 +355,45 @@ void rb_delete_fixup(struct rb_node* x)
     x->color = BLACK;
 }
 
-
-void rb_delete(uint32_t pid) 
+void rb_delete(uint32_t pid)
 {
     // find node to delete
-    struct rb_node* z = rb_search(root, pid);
-    if (z == NIL) 
+    struct rb_node *z = rb_search(root, pid);
+    if (z == NIL)
     {
         return;
     }
 
-    struct rb_node* y = z;  //node to del or move
-    struct rb_node* x = NIL;    //x is the child which will bereplacing y
+    struct rb_node *y = z;   // node to del or move
+    struct rb_node *x = NIL; // x is the child which will bereplacing y
     int y_original_color = y->color;
 
     // normal bst delete
-    if (z->left == NIL) 
+    if (z->left == NIL)
     {
         // no left child
         x = z->right;
         rb_transplant(z, z->right);
-    } 
-    else if (z->right == NIL) 
+    }
+    else if (z->right == NIL)
     {
         // no right child
         x = z->left;
         rb_transplant(z, z->left);
-    } 
-    else {
+    }
+    else
+    {
         // 2 children ->  successor(most left node in right subtree)
-        y = tree_minimum(z->right);  
+        y = tree_minimum(z->right);
         y_original_color = y->color;
-        x = y->right;  // x will replace y
+        x = y->right; // x will replace y
 
         if (y->parent == z)
         {
             x->parent = y;
-        } else {
+        }
+        else
+        {
             // attach y->right to y->parent
             rb_transplant(y, y->right);
             y->right = z->right;
@@ -392,21 +405,19 @@ void rb_delete(uint32_t pid)
         y->left = z->left;
         y->left->parent = y;
 
-        //y which just replaced z has to take over zs color
+        // y which just replaced z has to take over zs color
         y->color = z->color;
     }
-
 
     // kfree(z->proc);  if allocated
     // kfree(z);
 
     // if y was a black node,fixuop
-    if (y_original_color == BLACK) 
+    if (y_original_color == BLACK)
     {
         rb_delete_fixup(x);
     }
 }
-
 
 // returns needed pages
 uint32_t map_program_to_address(const char *filename, uint32_t program_address)
@@ -469,21 +480,20 @@ void copy_program_to_address(const char *filename, uint32_t pages_needed, uint32
     }
 }
 
-void rb_insert_process(struct process* p)
+void rb_insert_process(struct process *p)
 {
     // new node for rb tree
-    struct rb_node* new_node = (struct rb_node*)kmalloc(sizeof(struct rb_node));
+    struct rb_node *new_node = (struct rb_node *)kmalloc(sizeof(struct rb_node));
     memset(new_node, 0, sizeof(struct rb_node));
     printf("RB node allocated at: %p\n", new_node);
 
-
-    new_node->proc = p;      
+    new_node->proc = p;
     // p->pid already set in create_process()
-    //new_node->proc->pid = p->pid;
+    // new_node->proc->pid = p->pid;
 
-    //normal bst insertion (as long as x ist null(end of the path), y to x(root))
-    struct rb_node* y = NULL;
-    struct rb_node* x = root;
+    // normal bst insertion (as long as x ist null(end of the path), y to x(root))
+    struct rb_node *y = NULL;
+    struct rb_node *x = root;
 
     while (x != NIL)
     {
@@ -495,32 +505,30 @@ void rb_insert_process(struct process* p)
     }
 
     new_node->parent = y;
-    if (y == NULL) 
+    if (y == NULL)
     {
         root = new_node;
     }
-    else if (p->pid < y->proc->pid) 
+    else if (p->pid < y->proc->pid)
     {
         y->left = new_node;
-    } 
-    else 
+    }
+    else
     {
         y->right = new_node;
     }
 
-    new_node->left  = NIL;
+    new_node->left = NIL;
     new_node->right = NIL;
     new_node->color = RED;
-
 
     fixup_insert(new_node);
 }
 
-struct thread* create_kernel_thread(struct process* process, void(*start_function)());
-struct thread* create_user_thread(struct process* process);
+struct thread *create_kernel_thread(struct process *process, void (*start_function)());
+struct thread *create_user_thread(struct process *process);
 
-
-struct process* get_unused_process()
+struct process *get_unused_process()
 {
     for (uint32_t i = 0; i < 100; i++)
     {
@@ -528,13 +536,12 @@ struct process* get_unused_process()
         {
             return &processes[i];
         }
-        
     }
-    printf("No unused process found\n"); 
-    return  NULL; 
+    printf("No unused process found\n");
+    return NULL;
 }
 
-struct process* get_runnable_process()
+struct process *get_runnable_process()
 {
     for (uint32_t i = 0; i < 100; i++)
     {
@@ -542,30 +549,34 @@ struct process* get_runnable_process()
         {
             return &processes[i];
         }
-        
     }
-    printf("No runnable process found\n"); 
-    return  NULL; 
+    printf("No runnable process found\n");
+    return NULL;
 }
 
-struct process *create_kernel_process(void(*start_function)())
+struct process *create_kernel_process(void (*start_function)())
 {
 
-    struct process* new_process = get_unused_process();
-    //struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
+    struct process *new_process = get_unused_process();
+    if (!new_process)
+    {
+        printf("No more unused process slots\n");
+        return;
+    }
+    
+    // struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
     printf("Allocated process structure at: %p\n", new_process);
     new_process->state = EMBRYO;
 
     new_process->page_directory = kernel_directory;
 
-    new_process->pid = get_process_id();
+    //new_process->pid = get_process_id();
 
     new_process->head_thread = NULL;
     new_process->tail_thread = NULL;
 
-
-    struct thread* main_thread = create_kernel_thread(new_process, start_function);
+    struct thread *main_thread = create_kernel_thread(new_process, start_function);
 
     new_process->head_thread = main_thread;
 
@@ -573,37 +584,32 @@ struct process *create_kernel_process(void(*start_function)())
 
     new_process->state = RUNNABLE;
 
+    // acquire(&rb_tree_lock);
+    // rb_insert_process(new_process);
+    // release(&rb_tree_lock);
 
-    //acquire(&rb_tree_lock);
-    //rb_insert_process(new_process);
-    //release(&rb_tree_lock);
-
-    return new_process;  
+    return new_process;
 }
-
-
 
 struct process *create_process(const char *filename)
 {
-    struct process* new_process = get_unused_process();
-    //struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
+    struct process *new_process = get_unused_process();
+    // struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
     printf("Allocated process structure at: %p\n", new_process);
 
     new_process->state = EMBRYO;
 
     new_process->page_directory = mem_alloc_page_dir();
-   /* uint32_t *pd = new_process->page_directory;
-    for (int i = 0; i < 1024; i++)
-    {
-        printf("PDE[%d]: %x\n", i, pd[i]);
-    }*/
+    /* uint32_t *pd = new_process->page_directory;
+     for (int i = 0; i < 1024; i++)
+     {
+         printf("PDE[%d]: %x\n", i, pd[i]);
+     }*/
 
     mem_change_page_directory(new_process->page_directory);
 
     new_process->pid = get_process_id();
-
-    
 
     uint32_t pages_needed = map_program_to_address(filename, 0x00400000);
     copy_program_to_address(filename, pages_needed, 0x00400000);
@@ -611,9 +617,7 @@ struct process *create_process(const char *filename)
     new_process->head_thread = NULL;
     new_process->tail_thread = NULL;
 
-   
-
-    struct thread* main_thread = create_user_thread(new_process);
+    struct thread *main_thread = create_user_thread(new_process);
 
     new_process->head_thread = main_thread;
 
@@ -621,22 +625,21 @@ struct process *create_process(const char *filename)
 
     new_process->state = RUNNABLE;
 
-    //acquire(&rb_tree_lock);
-    //rb_insert_process(new_process);
-    //release(&rb_tree_lock);
+    // acquire(&rb_tree_lock);
+    // rb_insert_process(new_process);
+    // release(&rb_tree_lock);
 
-    return new_process;  
+    return new_process;
 }
 
-struct thread* create_kernel_thread(struct process* process, void(*start_function)())
+struct thread *create_kernel_thread(struct process *process, void (*start_function)())
 {
-    struct thread* new_kthread = (struct thread*)kmalloc(sizeof(struct thread));
+    struct thread *new_kthread = (struct thread *)kmalloc(sizeof(struct thread));
     printf("kernel thread allocated at: %p\n", new_kthread);
     memset(new_kthread, 0x00, sizeof(struct thread));
 
     new_kthread->thread_id = get_thread_id();
     new_kthread->owner = process;
-
 
     // kernel stack
     new_kthread->kstack.ss0 = 0x10;
@@ -648,21 +651,22 @@ struct thread* create_kernel_thread(struct process* process, void(*start_functio
     new_kthread->regs.ss = segment_selector;
     new_kthread->regs.eflags = 0x202;
     new_kthread->regs.cs = 0x08;
-    new_kthread->regs.eip = (uint32_t) start_function;
+    new_kthread->regs.eip = (uint32_t)start_function;
     new_kthread->regs.ds = segment_selector;
     new_kthread->regs.es = segment_selector;
     new_kthread->regs.fs = segment_selector;
     new_kthread->regs.gs = segment_selector;
     new_kthread->regs.esp = new_kthread->kstack.esp0;
 
-    if(process->head_thread == NULL)
+    if (process->head_thread == NULL)
     {
         process->head_thread = new_kthread;
         process->tail_thread = new_kthread;
 
         new_kthread->prev = NULL;
         new_kthread->next = NULL;
-    }else
+    }
+    else
     {
         new_kthread->prev = process->tail_thread;
         new_kthread->next = NULL;
@@ -672,13 +676,11 @@ struct thread* create_kernel_thread(struct process* process, void(*start_functio
     }
 
     return new_kthread;
-
-
 }
 
-struct thread* create_user_thread(struct process* process)
+struct thread *create_user_thread(struct process *process)
 {
-    struct thread *new_thread = (struct thread*)kmalloc(sizeof(struct thread));
+    struct thread *new_thread = (struct thread *)kmalloc(sizeof(struct thread));
     memset(new_thread, 0x00, sizeof(struct thread));
     printf("Allocated thread structure at: %p\n", new_thread);
 
@@ -698,14 +700,14 @@ struct thread* create_user_thread(struct process* process)
         mem_map_page((uint32_t)vaddr, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
     }
 
-    /*for (uint32_t addr = (USER_STACK_TOP - (PAGE_SIZE * count_stack_pages)); addr < USER_STACK_TOP; addr += PAGE_SIZE) 
+    /*for (uint32_t addr = (USER_STACK_TOP - (PAGE_SIZE * count_stack_pages)); addr < USER_STACK_TOP; addr += PAGE_SIZE)
     {
         uint32_t phys = mem_get_phys_from_virt(addr);
-        if (phys == (uint32_t)-1) 
+        if (phys == (uint32_t)-1)
         {
             printf("address 0x%x is not mapped\n", addr);
-        } 
-        else 
+        }
+        else
         {
             printf("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
         }
@@ -713,7 +715,7 @@ struct thread* create_user_thread(struct process* process)
 
     mem_map_page(0xb0000000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
 
-    if (!mem_is_valid_vaddr(0xb0000000)) 
+    if (!mem_is_valid_vaddr(0xb0000000))
     {
         printf("address 0xb0000000 is not mapped\n");
     }
@@ -736,14 +738,15 @@ struct thread* create_user_thread(struct process* process)
     new_thread->kstack.esp0 = (uint32_t)kernel_stack + 4096 - 4;
     new_thread->kstack.stack_start = (uint32_t)kernel_stack;
 
-    if(process->head_thread == NULL)
+    if (process->head_thread == NULL)
     {
         process->head_thread = new_thread;
         process->tail_thread = new_thread;
 
         new_thread->prev = NULL;
         new_thread->next = NULL;
-    }else
+    }
+    else
     {
         new_thread->prev = process->tail_thread;
         new_thread->next = NULL;
@@ -751,18 +754,13 @@ struct thread* create_user_thread(struct process* process)
         process->tail_thread->next = new_thread;
         process->tail_thread = new_thread;
     }
-    
-    
 
     return new_thread;
-
 }
 
-
-
-struct registers_save* save_thread_state(struct thread* thread)
+struct registers_save *save_thread_state(struct thread *thread)
 {
-    struct registers_save* registers = (struct registers_save*)kmalloc(sizeof(struct registers_save));
+    struct registers_save *registers = (struct registers_save *)kmalloc(sizeof(struct registers_save));
 
     registers->eax = thread->regs.eax;
     registers->ebx = thread->regs.ebx;
@@ -790,17 +788,17 @@ struct registers_save* save_thread_state(struct thread* thread)
 
 void switch_to_thread(struct thread *thread)
 {
-    struct registers_save* registers = save_thread_state(thread);
+    struct registers_save *registers = save_thread_state(thread);
     switch_task(registers);
 }
 
 void node_preparation()
 {
-    // Initialize NIL node  
-    NIL = (struct rb_node*)kmalloc(sizeof(struct rb_node));  
-    NIL->color = BLACK; // NIL has to be black 
-    NIL->left   = NIL;
-    NIL->right  = NIL;
+    // Initialize NIL node
+    NIL = (struct rb_node *)kmalloc(sizeof(struct rb_node));
+    NIL->color = BLACK; // NIL has to be black
+    NIL->left = NIL;
+    NIL->right = NIL;
     NIL->parent = NIL;
     root = NIL;
 }
@@ -810,50 +808,52 @@ void test_process()
 
     clear_screen_sys_2(COLOR_GREEN);
     printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
-    struct process* p1 = create_process("0:/test.bin");
-    //inOrderTraversal(root);
-    //PitWait(8000);
-    //switch_to_thread(p1->head_thread);
+    struct process *p1 = create_process("0:/test.bin");
+    // inOrderTraversal(root);
+    // PitWait(8000);
+    // switch_to_thread(p1->head_thread);
     while (1)
-    {}
-    
+    {
+    }
 }
 
-struct process* get_process(uint32_t pid)
+struct process *get_process(uint32_t pid)
 {
-    struct process* proc = &processes[pid];
+    struct process *proc = &processes[pid];
     return proc;
 }
 
 void scheduler(void)
 {
 
-    struct process* proc;
-    struct cpu* cpu = curr_cpu();
+    struct process *p;
+    struct cpu *cpu = curr_cpu();
     cpu->proc = 0;
 
-    for(;;)
+    for (;;)
     {
-        //asm volatile("sti");
+        // asm volatile("sti");
 
         acquire(&scheduler_lock);
-        
-        //struct rb_node* node = rb_search_runnable(root);
-        proc = get_runnable_process();
-        cpu->proc = proc;
-        if(cpu->proc->state != RUNNABLE)
-            printf("process isnt runnable, smth must habe gone wrong.\n");
-        cpu->proc->state = RUNNING;
-        mem_change_page_directory(cpu->proc->page_directory);
-        switch_to_thread(cpu->proc->head_thread);
 
-        mem_change_page_directory(kernel_directory);
+        // struct rb_node* node = rb_search_runnable(root);
+        for (p = processes; p < 100; p++)
+        {
+            if (p->state != RUNNABLE)
+                continue;
 
-        cpu->proc = 0x00;
+            cpu->proc = p;
+            mem_change_page_directory(p->page_directory);
+            p->state = RUNNABLE;
+            switch_to_thread(p->head_thread);
+
+            mem_change_page_directory(kernel_directory);
+
+            cpu->proc = 0;
+        }
 
         release(&scheduler_lock);
     }
-
 }
 
 void init_locks()
@@ -868,18 +868,18 @@ uint32_t init_proc()
     for (uint32_t i = 0; i < 100; i++)
     {
         processes[i].state = UNUSED;
+        processes[i].pid = i;
     }
-    
-    init_locks();
-    //node_preparation();
-    
 
-    //struct process* p1 = create_process("0:/test.bin");
-    struct process* pk1 = create_kernel_process(&test_process);
-    //struct process* pk2 = create_kernel_process(&test_process);
-    //struct process* pk3 = create_kernel_process(&test_process);
-    //switch_to_thread(p1->head_thread);
-    //inOrderTraversal(root);
-  
-    return 0;  
+    init_locks();
+    // node_preparation();
+
+    // struct process* p1 = create_process("0:/test.bin");
+    struct process *pk1 = create_kernel_process(&test_process);
+    // struct process* pk2 = create_kernel_process(&test_process);
+    // struct process* pk3 = create_kernel_process(&test_process);
+    // switch_to_thread(p1->head_thread);
+    // inOrderTraversal(root);
+
+    return 0;
 }
