@@ -32,7 +32,8 @@
 uint32_t current_processid = 0;
 uint32_t current_threadid = 0;
 
-struct process* processes[100];
+struct process processes[100];
+struct thread threads[120];
 extern struct cpu cpus[MAX_CPUS];
 
 struct rb_node* root = NULL;
@@ -519,9 +520,39 @@ struct thread* create_kernel_thread(struct process* process, void(*start_functio
 struct thread* create_user_thread(struct process* process);
 
 
+struct process* get_unused_process()
+{
+    for (uint32_t i = 0; i < 100; i++)
+    {
+        if (processes[i].state == UNUSED)
+        {
+            return &processes[i];
+        }
+        
+    }
+    printf("No unused process found\n"); 
+    return  NULL; 
+}
+
+struct process* get_runnable_process()
+{
+    for (uint32_t i = 0; i < 100; i++)
+    {
+        if (processes[i].state == RUNNABLE)
+        {
+            return &processes[i];
+        }
+        
+    }
+    printf("No runnable process found\n"); 
+    return  NULL; 
+}
+
 struct process *create_kernel_process(void(*start_function)())
 {
-    struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
+
+    struct process* new_process = get_unused_process();
+    //struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
     printf("Allocated process structure at: %p\n", new_process);
     new_process->state = EMBRYO;
@@ -543,9 +574,9 @@ struct process *create_kernel_process(void(*start_function)())
     new_process->state = RUNNABLE;
 
 
-    acquire(&rb_tree_lock);
-    rb_insert_process(new_process);
-    release(&rb_tree_lock);
+    //acquire(&rb_tree_lock);
+    //rb_insert_process(new_process);
+    //release(&rb_tree_lock);
 
     return new_process;  
 }
@@ -554,7 +585,8 @@ struct process *create_kernel_process(void(*start_function)())
 
 struct process *create_process(const char *filename)
 {
-    struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
+    struct process* new_process = get_unused_process();
+    //struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
     printf("Allocated process structure at: %p\n", new_process);
 
@@ -589,9 +621,9 @@ struct process *create_process(const char *filename)
 
     new_process->state = RUNNABLE;
 
-    acquire(&rb_tree_lock);
-    rb_insert_process(new_process);
-    release(&rb_tree_lock);
+    //acquire(&rb_tree_lock);
+    //rb_insert_process(new_process);
+    //release(&rb_tree_lock);
 
     return new_process;  
 }
@@ -599,6 +631,7 @@ struct process *create_process(const char *filename)
 struct thread* create_kernel_thread(struct process* process, void(*start_function)())
 {
     struct thread* new_kthread = (struct thread*)kmalloc(sizeof(struct thread));
+    printf("kernel thread allocated at: %p\n", new_kthread);
     memset(new_kthread, 0x00, sizeof(struct thread));
 
     new_kthread->thread_id = get_thread_id();
@@ -645,7 +678,7 @@ struct thread* create_kernel_thread(struct process* process, void(*start_functio
 
 struct thread* create_user_thread(struct process* process)
 {
-    struct thread *new_thread = (struct thread *)kmalloc(sizeof(struct thread));
+    struct thread *new_thread = (struct thread*)kmalloc(sizeof(struct thread));
     memset(new_thread, 0x00, sizeof(struct thread));
     printf("Allocated thread structure at: %p\n", new_thread);
 
@@ -778,17 +811,19 @@ void test_process()
     clear_screen_sys_2(COLOR_GREEN);
     printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
     struct process* p1 = create_process("0:/test.bin");
-    inOrderTraversal(root);
-    PitWait(8000);
-    switch_to_thread(p1->head_thread);
+    //inOrderTraversal(root);
+    //PitWait(8000);
+    //switch_to_thread(p1->head_thread);
     while (1)
-    {
-        /* code */
-    }
+    {}
     
 }
 
-
+struct process* get_process(uint32_t pid)
+{
+    struct process* proc = &processes[pid];
+    return proc;
+}
 
 void scheduler(void)
 {
@@ -799,13 +834,13 @@ void scheduler(void)
 
     for(;;)
     {
-        asm volatile("sti");
+        //asm volatile("sti");
 
-        //TODO Some kind of asking for the lock here (acquire)
         acquire(&scheduler_lock);
         
-        struct rb_node* node = rb_search_runnable(root);
-        cpu->proc = node->proc;
+        //struct rb_node* node = rb_search_runnable(root);
+        proc = get_runnable_process();
+        cpu->proc = proc;
         if(cpu->proc->state != RUNNABLE)
             printf("process isnt runnable, smth must habe gone wrong.\n");
         cpu->proc->state = RUNNING;
@@ -819,7 +854,6 @@ void scheduler(void)
         release(&scheduler_lock);
     }
 
-    //TODO some release here
 }
 
 void init_locks()
@@ -830,28 +864,22 @@ void init_locks()
 
 uint32_t init_proc()
 {
-    init_locks();
-    node_preparation();
-    
-    /*int values[] = {10, 20, 30, 15, 5};  
-    int n = sizeof(values) / sizeof(values[0]);  
-  
-    for (int i = 0; i < n; i++) {  
-        rb_insert(values[i]);  
-    }  
-  
-    printf("In-Order Traversal of the Red-Black Tree:\n");  
-    inOrderTraversal(root);  
 
-    rb_delete(15);
-    rb_delete(5);
-    printf("In-Order Traversal of the Red-Black Tree 2:\n");  
-    inOrderTraversal(root);*/
+    for (uint32_t i = 0; i < 100; i++)
+    {
+        processes[i].state = UNUSED;
+    }
+    
+    init_locks();
+    //node_preparation();
+    
 
     //struct process* p1 = create_process("0:/test.bin");
     struct process* pk1 = create_kernel_process(&test_process);
-    switch_to_thread(pk1->head_thread);
-    inOrderTraversal(root);
+    //struct process* pk2 = create_kernel_process(&test_process);
+    //struct process* pk3 = create_kernel_process(&test_process);
+    //switch_to_thread(p1->head_thread);
+    //inOrderTraversal(root);
   
     return 0;  
 }

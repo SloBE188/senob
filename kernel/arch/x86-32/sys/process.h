@@ -117,5 +117,6 @@ uint32_t map_program_to_address(const char* filename, uint32_t program_address);
 struct registers_save* save_thread_state(struct thread* thread);
 void test_avl_tree();
 uint32_t init_proc();
+void scheduler(void);
 
 #endif

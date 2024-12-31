@@ -20,6 +20,8 @@
 #include "../interrupts/idt.h"
 #include "../mm/paging/paging.h"
 #include "smp.h"
+#include "process.h"
+#include "../kernel.h"
 
 extern struct idtr_t idtr;
 extern struct gdt_ptr_struct gdt_ptr;
@@ -59,5 +61,6 @@ void initialize_ap()
 
     idt_flush((uint32_t)&idtr);
     mem_change_page_directory(&kernel_directory);
+    //scheduler();
     while(1){}
 }

@@ -76,6 +76,6 @@ void draw_string(uint32_t x, uint32_t y, const char* str, uint32_t color, struct
 void init_vbe(struct vbe_info* vbeinfo)
 {
     globalvbeinfo = vbeinfo;
-    clear_screen(COLOR_LIGHT_GREY, vbeinfo);
+    clear_screen(COLOR_BLACK, vbeinfo);
 }
 
