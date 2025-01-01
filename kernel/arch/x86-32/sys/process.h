@@ -20,26 +20,19 @@ struct process
 
     uint32_t* page_directory;
 
+    enum procstate state;
+    
+    struct process* parent;
+    struct process* left;
+    struct process* right;
+    uint32_t color;
 
     struct thread* head_thread;
     struct thread* tail_thread;
 
-    enum procstate state;
-    
-
 
 } __attribute__((packed));
 
-struct rb_node
-{
-    struct process* proc;
-    uint32_t color;
-
-    struct rb_node* parent;
-    struct rb_node* left;
-    struct rb_node* right;
-
-};
 
 
 
