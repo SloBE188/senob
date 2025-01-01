@@ -181,7 +181,7 @@ void rb_insert(uint32_t pid)
 {
 
     struct process *new_process = &processes[pid];
-     printf("inserting process with PID: %d\n", pid);
+    printf("inserting process with PID: %d\n", pid);
 
     struct process *y = NULL; // follows the parent node
     struct process *x = root;
@@ -555,6 +555,8 @@ struct process *create_process(const char *filename)
     memset(new_process, 0x00, sizeof(struct process));
     printf("Allocated process structure at: %p\n", new_process);
 
+
+    new_process->pid = get_process_id();
     new_process->state = EMBRYO;
 
     new_process->page_directory = mem_alloc_page_dir();
@@ -773,15 +775,12 @@ void node_preparation()
 void test_process()
 {
 
-    clear_screen_sys_2(COLOR_GREEN);
+    //clear_screen_sys_2(COLOR_GREEN);
     printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
     // struct process *p1 = create_process("0:/test.bin");
     //  inOrderTraversal(root);
     //  PitWait(8000);
     //  switch_to_thread(p1->head_thread);
-    while (1)
-    {
-    }
 }
 
 void scheduler(void)
@@ -838,6 +837,8 @@ void init_locks()
 
 void anotherone()
 {
+    clear_screen_sys_2(COLOR_BLUE);
+    printf("Hey, the scheduler seems to be the problem, the rb tree works.\n");
     while (1)
     {
     }
@@ -853,13 +854,20 @@ uint32_t init_proc()
     struct process *k1 = create_kernel_process(&test_process);
     printf("Creating kernel process 2\n");
     struct process *k2 = create_kernel_process(&anotherone);
-    printf("Creating user process 1\n");
-    struct process *u1 = create_process("0:/test.bin");
+    printf("Creating kernel process 3\n");
+    struct process *k3 = create_kernel_process(&anotherone);
+    printf("Creating kernel process 4\n");
+    struct process *k4 = create_kernel_process(&anotherone);
+    printf("Creating kernel process 5\n");
+    struct process *k5 = create_kernel_process(&anotherone);
+    printf("Creating kernel process 6\n");
+    struct process *k6 = create_kernel_process(&anotherone);
+
 
     printf("In-order traversal of RB Tree:\n");
     inOrderTraversal(root);
-    printf("\n");
 
+    printf("\n");
 
     return 0;
 }

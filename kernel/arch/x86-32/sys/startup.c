@@ -27,6 +27,8 @@ extern struct idtr_t idtr;
 extern struct gdt_ptr_struct gdt_ptr;
 extern uint32_t kernel_directory[1024];
 
+extern struct process *root;
+
 extern void idt_flush(uint32_t);
 extern void gdt_flush(uint32_t);
 
@@ -61,7 +63,9 @@ void initialize_ap()
 
     idt_flush((uint32_t)&idtr);
     mem_change_page_directory(&kernel_directory);
-    //PitWait(2000);
+
+    struct process* kp1 = rb_search(root, 4);
+    switch_to_thread(kp1->head_thread);
     //scheduler();
     while(1){}
 }
