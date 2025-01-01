@@ -797,8 +797,20 @@ void scheduler(void)
 
         acquire(&scheduler_lock);
 
-        // struct * node = rb_search_runnable(root);        
-        for (uint32_t i = 0; 0 < 100; i++)
+        p = rb_search_runnable(root);        
+        if(p->state != RUNNABLE)
+        {
+            printf("The process returned by rb_search_runnable isnt runnable\n");
+            return 0;
+        }
+        cpu->proc = p;
+        mem_change_page_directory(p->page_directory);
+        p->state = RUNNING;
+        switch_to_thread(p->head_thread);
+        mem_change_page_directory(kernel_directory);
+        cpu->proc = 0;
+
+        /*for (uint32_t i = 0; 0 < 100; i++)
         {
             if (processes[i].state != RUNNABLE)
                 continue;
@@ -812,7 +824,7 @@ void scheduler(void)
             mem_change_page_directory(kernel_directory);
 
             cpu->proc = 0;
-        }
+        }*/
 
         release(&scheduler_lock);
     }

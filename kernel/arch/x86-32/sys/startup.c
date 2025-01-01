@@ -61,6 +61,6 @@ void initialize_ap()
 
     idt_flush((uint32_t)&idtr);
     mem_change_page_directory(&kernel_directory);
-    //scheduler();
+    scheduler();
     while(1){}
 }
