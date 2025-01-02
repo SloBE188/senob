@@ -130,7 +130,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     }
 
     init_syscalls();
-
+    init_proc();
     DIR dir;
     FILINFO fno;
 
@@ -142,7 +142,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     }
     
 
-    init_proc();
     lapic_init();
     struct addr *addr = smp_addresses(multibootinfo);
     init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);

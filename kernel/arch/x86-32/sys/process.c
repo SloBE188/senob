@@ -528,7 +528,6 @@ struct process *create_kernel_process(void (*start_function)())
 
     new_process->page_directory = kernel_directory;
 
-    // new_process->pid = get_process_id();
 
     new_process->head_thread = NULL;
     new_process->tail_thread = NULL;
@@ -568,7 +567,6 @@ struct process *create_process(const char *filename)
 
     mem_change_page_directory(new_process->page_directory);
 
-    new_process->pid = get_process_id();
 
     uint32_t pages_needed = map_program_to_address(filename, 0x00400000);
     copy_program_to_address(filename, pages_needed, 0x00400000);
@@ -772,16 +770,6 @@ void node_preparation()
     }
 }
 
-void test_process()
-{
-
-    //clear_screen_sys_2(COLOR_GREEN);
-    printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
-    // struct process *p1 = create_process("0:/test.bin");
-    //  inOrderTraversal(root);
-    //  PitWait(8000);
-    //  switch_to_thread(p1->head_thread);
-}
 
 void scheduler(void)
 {
@@ -842,6 +830,18 @@ void anotherone()
     while (1)
     {
     }
+}
+
+void test_process()
+{
+
+    clear_screen_sys_2(COLOR_GREEN);
+    printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
+    // struct process *p1 = create_process("0:/test.bin");
+    //  inOrderTraversal(root);
+    //  PitWait(8000);
+    //  switch_to_thread(p1->head_thread);
+    while(1){}
 }
 
 uint32_t init_proc()

@@ -64,7 +64,8 @@ void initialize_ap()
     idt_flush((uint32_t)&idtr);
     mem_change_page_directory(&kernel_directory);
 
-    struct process* kp1 = rb_search(root, 4);
+    PitWait(2000);
+    struct process* kp1 = rb_search(root, 0);
     switch_to_thread(kp1->head_thread);
     //scheduler();
     while(1){}
