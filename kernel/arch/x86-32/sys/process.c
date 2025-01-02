@@ -525,6 +525,7 @@ struct process *create_kernel_process(void (*start_function)())
 
     new_process->pid = get_process_id();
     new_process->state = EMBRYO;
+    new_process->assigned_cpu = -1;
 
     new_process->page_directory = kernel_directory;
 
@@ -536,7 +537,7 @@ struct process *create_kernel_process(void (*start_function)())
 
     new_process->head_thread = main_thread;
 
-    update_tss_esp0(main_thread->kstack.esp0, get_local_apic_id_cpuid() + 5);
+    //update_tss_esp0(main_thread->kstack.esp0, get_local_apic_id_cpuid() + 5);
 
     new_process->state = RUNNABLE;
 
@@ -557,6 +558,7 @@ struct process *create_process(const char *filename)
 
     new_process->pid = get_process_id();
     new_process->state = EMBRYO;
+    new_process->assigned_cpu = -1;
 
     new_process->page_directory = mem_alloc_page_dir();
     /* uint32_t *pd = new_process->page_directory;
@@ -578,7 +580,7 @@ struct process *create_process(const char *filename)
 
     new_process->head_thread = main_thread;
 
-    update_tss_esp0(main_thread->kstack.esp0, 6);
+    //update_tss_esp0(main_thread->kstack.esp0, 6);
 
     new_process->state = RUNNABLE;
 
@@ -864,10 +866,20 @@ void scheduler(void)
 
 static void context_switch(struct thread *old_thread, struct thread *new_thread) 
 {
+    struct process* new_process = new_thread->owner;
+    struct cpu* cpu = &cpus[get_local_apic_id_cpuid()];
     if (old_thread == new_thread) 
     {
         return;
     }
+
+    if (new_process->assigned_cpu = -1)
+    {
+        new_process->assigned_cpu = cpu->id;
+    }
+
+    update_tss_esp0(new_thread->kstack.esp0, cpu->id);
+    
 
     printf("switching context from TID %d to TID %d\n", old_thread ? old_thread->thread_id : -1, new_thread->thread_id);
 

@@ -21,6 +21,7 @@ struct process
     uint32_t* page_directory;
 
     enum procstate state;
+    uint32_t assigned_cpu;
     
     struct process* parent;
     struct process* left;
