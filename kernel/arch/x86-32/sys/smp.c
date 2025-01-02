@@ -169,8 +169,8 @@ void init_smp(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr)
     for (uint32_t i = 1; i < ncpus; i++)
     {
         ap_startup(i, 0x7000);
+        PitWait(200);
     }
-    PitWait(200);
 
 }
 

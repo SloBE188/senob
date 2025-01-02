@@ -770,6 +770,7 @@ void node_preparation()
     }
 }
 
+/*
 
 void scheduler(void)
 {
@@ -797,7 +798,7 @@ void scheduler(void)
         mem_change_page_directory(kernel_directory);
         cpu->proc = 0;
 
-        /*for (uint32_t i = 0; 0 < 100; i++)
+        for (uint32_t i = 0; 0 < 100; i++)
         {
             if (processes[i].state != RUNNABLE)
                 continue;
@@ -811,11 +812,73 @@ void scheduler(void)
             mem_change_page_directory(kernel_directory);
 
             cpu->proc = 0;
-        }*/
+        }
 
         release(&scheduler_lock);
     }
+}*/
+
+
+static void context_switch(struct thread *old_thread, struct thread *new_thread);
+
+void scheduler(void) 
+{
+    struct cpu *cpu = &cpus[get_local_apic_id_cpuid()];
+
+    while (1) 
+    {
+        acquire(&scheduler_lock);
+
+        if(cpu->proc != NULL)
+        {
+        struct process *current_process = cpu->proc;
+            if (current_process && current_process->state == RUNNING) 
+            {
+                current_process->state = SLEEPING;
+            }
+        }
+
+        struct process *next_process = rb_search_runnable(root);
+        if (!next_process) 
+        {
+            release(&scheduler_lock);
+            continue;
+        }
+
+        struct thread *next_thread = next_process->head_thread;
+        if (!next_thread) 
+        {
+            printf("No threads in runnable process PID %d.\n", next_process->pid);
+            release(&scheduler_lock);
+            continue;
+        }
+
+        next_process->state = RUNNING;
+        cpu->proc = next_process;
+
+        release(&scheduler_lock);
+
+        context_switch(next_process ? next_process->head_thread : NULL, next_thread);
+    }
 }
+
+static void context_switch(struct thread *old_thread, struct thread *new_thread) 
+{
+    if (old_thread == new_thread) 
+    {
+        return;
+    }
+
+    printf("switching context from TID %d to TID %d\n", old_thread ? old_thread->thread_id : -1, new_thread->thread_id);
+
+    if (old_thread) {
+        save_thread_state(old_thread);
+    }
+
+    switch_to_thread(new_thread);
+}
+
+
 
 void init_locks()
 {

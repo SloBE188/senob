@@ -64,9 +64,10 @@ void initialize_ap()
     idt_flush((uint32_t)&idtr);
     mem_change_page_directory(&kernel_directory);
 
-    PitWait(2000);
-    struct process* kp1 = rb_search(root, 0);
-    switch_to_thread(kp1->head_thread);
+
+    //direct switch works
+    //struct process* next_proc = rb_search_runnable(root);
+    //switch_to_thread(next_proc->head_thread);
     //scheduler();
     while(1){}
 }
