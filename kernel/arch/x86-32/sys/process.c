@@ -526,6 +526,7 @@ struct process *create_kernel_process(void (*start_function)())
     new_process->pid = get_process_id();
     new_process->state = EMBRYO;
     new_process->assigned_cpu = -1;
+    new_process->isuserproc = 0;
 
     new_process->page_directory = kernel_directory;
 
@@ -559,6 +560,7 @@ struct process *create_process(const char *filename)
     new_process->pid = get_process_id();
     new_process->state = EMBRYO;
     new_process->assigned_cpu = -1;
+    new_process->isuserproc = 1;
 
     new_process->page_directory = mem_alloc_page_dir();
     /* uint32_t *pd = new_process->page_directory;
@@ -583,6 +585,8 @@ struct process *create_process(const char *filename)
     //update_tss_esp0(main_thread->kstack.esp0, 6);
 
     new_process->state = RUNNABLE;
+
+    mem_change_page_directory(kernel_directory);
 
     acquire(&rb_tree_lock);
     rb_insert(new_process->pid);
@@ -878,6 +882,11 @@ static void context_switch(struct thread *new_thread)
     }
 
     update_tss_esp0(new_thread->kstack.esp0, cpu->id);
+    if (new_process->isuserproc == 1)
+    {
+        mem_change_page_directory(new_process->page_directory);
+    }
+    
     
 
     printf("switching context from old thread to TID %d\n", new_thread->thread_id);
@@ -938,7 +947,8 @@ uint32_t init_proc()
     struct process *k2 = create_kernel_process(&anotherone);
     printf("Creating kernel process 3\n");
     struct process *k3 = create_kernel_process(&thethirdone);
-
+    printf("Creating a uuser process (1)\n");
+    struct process *u1 = create_process("0:/test.bin");
 
     printf("In-order traversal of RB Tree:\n");
     inOrderTraversal(root);

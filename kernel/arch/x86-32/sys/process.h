@@ -22,6 +22,7 @@ struct process
 
     enum procstate state;
     uint32_t assigned_cpu;
+    uint32_t isuserproc;
     
     struct process* parent;
     struct process* left;
