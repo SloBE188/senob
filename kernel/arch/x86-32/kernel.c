@@ -151,7 +151,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     init_keyboard();
 
 
-    //PitWait(2000);
     scheduler();
 
     // test_heap_shrink_and_reuse();

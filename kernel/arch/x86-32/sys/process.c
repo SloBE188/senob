@@ -869,12 +869,10 @@ static void context_switch(struct thread *new_thread)
 {
     struct process* new_process = new_thread->owner;
     struct cpu* cpu = &cpus[get_local_apic_id_cpuid()];
-    /*if (old_thread == new_thread && cpu->proc != NULL) 
-    {
-        return;
-    }*/
+    struct thread* old_thread = cpu->proc ? cpu->proc->head_thread : NULL;
 
-    if (new_process->assigned_cpu = -1)
+
+    if (new_process->assigned_cpu == -1)
     {
         new_process->assigned_cpu = cpu->id;
     }
@@ -884,9 +882,10 @@ static void context_switch(struct thread *new_thread)
 
     printf("switching context from old thread to TID %d\n", new_thread->thread_id);
 
-    /*if (old_thread) {
+    if(old_thread) 
+    {
         save_thread_state(old_thread);
-    }*/
+    }
 
     switch_to_thread(new_thread);
 }
@@ -899,10 +898,17 @@ void init_locks()
     init_lock(&scheduler_lock, "scheduler_lock");
 }
 
+void thethirdone()
+{
+    clear_screen_sys_2(COLOR_RED);
+    printf("Hey, here is thethirdone :D\n");
+    while(1){}
+}
+
 void anotherone()
 {
     clear_screen_sys_2(COLOR_BLUE);
-    printf("Hey, the scheduler seems to be the problem, the rb tree works.\n");
+    printf("Hey, here is anotherone :D\n");
     while (1)
     {
     }
@@ -931,13 +937,7 @@ uint32_t init_proc()
     printf("Creating kernel process 2\n");
     struct process *k2 = create_kernel_process(&anotherone);
     printf("Creating kernel process 3\n");
-    struct process *k3 = create_kernel_process(&anotherone);
-    printf("Creating kernel process 4\n");
-    struct process *k4 = create_kernel_process(&anotherone);
-    printf("Creating kernel process 5\n");
-    struct process *k5 = create_kernel_process(&anotherone);
-    printf("Creating kernel process 6\n");
-    struct process *k6 = create_kernel_process(&anotherone);
+    struct process *k3 = create_kernel_process(&thethirdone);
 
 
     printf("In-order traversal of RB Tree:\n");
