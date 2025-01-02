@@ -68,6 +68,6 @@ void initialize_ap()
     //direct switch works
     //struct process* next_proc = rb_search_runnable(root);
     //switch_to_thread(next_proc->head_thread);
-    //scheduler();
+    scheduler();
     while(1){}
 }

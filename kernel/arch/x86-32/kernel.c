@@ -152,7 +152,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
 
     //PitWait(2000);
-    //scheduler();
+    scheduler();
 
     // test_heap_shrink_and_reuse();
     while (1)

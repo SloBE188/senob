@@ -821,11 +821,12 @@ void scheduler(void)
 }*/
 
 
-static void context_switch(struct thread *old_thread, struct thread *new_thread);
+static void context_switch(struct thread *new_thread);
 
 void scheduler(void) 
 {
     struct cpu *cpu = &cpus[get_local_apic_id_cpuid()];
+    cpu->proc = NULL;
 
     while (1) 
     {
@@ -860,18 +861,18 @@ void scheduler(void)
 
         release(&scheduler_lock);
 
-        context_switch(next_process ? next_process->head_thread : NULL, next_thread);
+        context_switch(next_thread);
     }
 }
 
-static void context_switch(struct thread *old_thread, struct thread *new_thread) 
+static void context_switch(struct thread *new_thread) 
 {
     struct process* new_process = new_thread->owner;
     struct cpu* cpu = &cpus[get_local_apic_id_cpuid()];
-    if (old_thread == new_thread) 
+    /*if (old_thread == new_thread && cpu->proc != NULL) 
     {
         return;
-    }
+    }*/
 
     if (new_process->assigned_cpu = -1)
     {
@@ -881,11 +882,11 @@ static void context_switch(struct thread *old_thread, struct thread *new_thread)
     update_tss_esp0(new_thread->kstack.esp0, cpu->id);
     
 
-    printf("switching context from TID %d to TID %d\n", old_thread ? old_thread->thread_id : -1, new_thread->thread_id);
+    printf("switching context from old thread to TID %d\n", new_thread->thread_id);
 
-    if (old_thread) {
+    /*if (old_thread) {
         save_thread_state(old_thread);
-    }
+    }*/
 
     switch_to_thread(new_thread);
 }
