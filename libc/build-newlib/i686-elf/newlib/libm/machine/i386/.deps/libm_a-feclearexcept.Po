@@ -1,0 +1,4 @@
+libm/machine/i386/libm_a-feclearexcept.o: \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/feclearexcept.c \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/../../fenv/fenv_stub.c
+../../../newlib-4.5.0/newlib/libm/machine/i386/../../fenv/fenv_stub.c:

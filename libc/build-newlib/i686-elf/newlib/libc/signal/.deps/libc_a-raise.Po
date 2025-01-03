@@ -1,0 +1,2 @@
+libc/signal/libc_a-raise.o: \
+ ../../../newlib-4.5.0/newlib/libc/signal/raise.c

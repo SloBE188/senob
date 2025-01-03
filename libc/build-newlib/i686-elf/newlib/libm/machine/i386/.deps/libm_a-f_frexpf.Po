@@ -1,0 +1,4 @@
+libm/machine/i386/libm_a-f_frexpf.o: \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/f_frexpf.S \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h
+../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h:

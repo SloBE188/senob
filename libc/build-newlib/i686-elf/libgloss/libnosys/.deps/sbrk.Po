@@ -1,0 +1,4 @@
+libnosys/sbrk.o: ../../../newlib-4.5.0/libgloss/libnosys/sbrk.c config.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_syslist.h
+config.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_syslist.h:

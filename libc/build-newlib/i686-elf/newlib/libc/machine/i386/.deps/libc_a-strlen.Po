@@ -1,0 +1,4 @@
+libc/machine/i386/libc_a-strlen.o: \
+ ../../../newlib-4.5.0/newlib/libc/machine/i386/strlen.S \
+ ../../../newlib-4.5.0/newlib/libc/machine/i386/i386mach.h
+../../../newlib-4.5.0/newlib/libc/machine/i386/i386mach.h:

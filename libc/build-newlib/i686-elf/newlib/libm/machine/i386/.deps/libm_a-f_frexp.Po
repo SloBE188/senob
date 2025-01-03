@@ -1,0 +1,4 @@
+libm/machine/i386/libm_a-f_frexp.o: \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/f_frexp.S \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h
+../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h:

@@ -1,0 +1,4 @@
+libm/machine/i386/libm_a-f_atan2f.o: \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/f_atan2f.S \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h
+../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h:

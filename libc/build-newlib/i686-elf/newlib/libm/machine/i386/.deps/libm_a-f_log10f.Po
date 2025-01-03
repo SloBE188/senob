@@ -1,0 +1,4 @@
+libm/machine/i386/libm_a-f_log10f.o: \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/f_log10f.S \
+ ../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h
+../../../newlib-4.5.0/newlib/libm/machine/i386/i386mach.h:

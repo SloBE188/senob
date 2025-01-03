@@ -1,0 +1,4 @@
+libc/machine/i386/libc_a-memchr.o: \
+ ../../../newlib-4.5.0/newlib/libc/machine/i386/memchr.S \
+ ../../../newlib-4.5.0/newlib/libc/machine/i386/i386mach.h
+../../../newlib-4.5.0/newlib/libc/machine/i386/i386mach.h:

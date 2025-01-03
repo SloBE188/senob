@@ -1,0 +1,11 @@
+libc/stdlib/libc_a-ldtoa.o: \
+ ../../../newlib-4.5.0/newlib/libc/stdlib/ldtoa.c newlib.h \
+ _newlib_version.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h
+newlib.h:
+_newlib_version.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:

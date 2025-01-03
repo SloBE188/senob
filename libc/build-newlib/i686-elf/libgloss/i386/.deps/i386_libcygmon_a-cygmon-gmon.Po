@@ -1,0 +1,38 @@
+i386/i386_libcygmon_a-cygmon-gmon.o: \
+ ../../../newlib-4.5.0/libgloss/i386/cygmon-gmon.c \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/stdio.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
+ /home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/newlib.h \
+ /home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/_newlib_version.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
+ /home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h \
+ /home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stdarg.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/stdio.h \
+ ../../../newlib-4.5.0/libgloss/i386/cygmon-gmon.h
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/stdio.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+/home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/newlib.h:
+/home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/_newlib_version.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
+/home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h:
+/home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stdarg.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/stdio.h:
+../../../newlib-4.5.0/libgloss/i386/cygmon-gmon.h:

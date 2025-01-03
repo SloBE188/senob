@@ -1,0 +1,14 @@
+libm/complex/libm_a-catanh.o: \
+ ../../../newlib-4.5.0/newlib/libm/complex/catanh.c \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/complex.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
+ /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
+ _newlib_version.h \
+ /home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/complex.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
+/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
+_newlib_version.h:
+/home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h:
