@@ -1,11 +1,11 @@
 CC = i686-elf-gcc
 ASM = nasm
 AR = ar
-CFLAGS = -g -std=gnu99 -O2 -Wall -Wextra -ffreestanding -fpermissive -nostdlib
+CFLAGS = -g -std=gnu99 -O2 -Wall -Wextra -ffreestanding
 ASMFLAGS = -f elf
 
 LIB_SRC = ./senob.s ./print.c ./proc.c ./build/vbe.c
-LIB_OBJ = ./build/senob.o ./build/print.o ./build/proc.o ./build/vbe.o
+LIB_OBJ = ./build/senob.o ./build/print.o ./build/proc.o ./build/vbe.o ./build/syscall.o
 LIBRARY = ./build/libsenob.a
 
 all: $(LIBRARY)
@@ -23,6 +23,9 @@ $(LIBRARY): $(LIB_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 ./build/vbe.o: ./vbe.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/syscall.o: ./syscall.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 

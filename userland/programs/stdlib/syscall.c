@@ -1,0 +1,1 @@
+//here come the syscall stubs for newlib (for userland, if i want newlib in the kernel aswell, i have to write another syscall stubs)
