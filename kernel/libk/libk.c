@@ -2,8 +2,9 @@
 #include <sys/types.h>
 #include "stdiok.h"
 #include "../../drivers/video/vbe/vbe.h"
+#include <unistd.h>
 
-extern struct vbe_info* globalvbeinfo;
+extern struct vbe_info *globalvbeinfo;
 
 #undef errno
 extern int errno;
@@ -13,10 +14,10 @@ int close(int file)
     return -1;
 }
 
-int execve(char *name, char **argv, char **env)
+int _execve(char *name, char **argv, char **env)
 {
     errno = ENOMEM;
-    return -1;
+    return -1; /* Always fails */
 }
 
 int fork(void)
@@ -25,7 +26,7 @@ int fork(void)
     return -1;
 }
 
-int fstat(int file, struct stat* st)
+int fstat(int file, struct stat *st)
 {
     return 0;
 }
@@ -46,13 +47,16 @@ int kill(int pid, int sig)
     return -1;
 }
 
-int link(char *old, char *new)
+int _link(char *old,
+          char *new)
 {
     errno = EMLINK;
-    return -1;
+    return -1; /* Always fails */
 }
 
-int lseek(int file, int ptr, int dir)
+off_t lseek(int file,
+          off_t offset,
+          int whence)
 {
     return 0;
 }
@@ -62,14 +66,16 @@ int open(int file, char *ptr, int len)
     return 0;
 }
 
-int read(int file, char *ptr, int len)
+int read(int fd,
+         void *buf,
+         size_t len)
 {
-    return 0;
+    return 0; /* EOF */
 }
 
-caddr_t sbrk(int incr)
+void *sbrk(ptrdiff_t incr)
 {
-    return incr;
+    return 0;
 }
 
 int stat(char *file, struct stat *st)
@@ -82,33 +88,29 @@ int times(struct tms *buf)
     return -1;
 }
 
-int unlink(char *name) 
+int _unlink(char *name)
 {
-  errno = ENOENT;
-  return -1; 
-} 
-
-int wait(int *status) {
-  errno = ECHILD;
-  return -1;
+    errno = ENOENT;
+    return -1; /* Always fails */
 }
 
-//void draw_char(uint32_t x, uint32_t y, char c, uint32_t color, struct vbe_info* vbeinfo)
-
-int write(int file, char *ptr, int len) 
+int wait(int *status)
 {
+    errno = ECHILD;
+    return -1;
+}
 
-    for (uint32_t i = 0; i < len; i++)
-    {
-        char c = ptr[i];
-        draw_char(100, 200, c, COLOR_BLUE, globalvbeinfo);
-    }
-    
+// void draw_char(uint32_t x, uint32_t y, char c, uint32_t color, struct vbe_info* vbeinfo)
 
-  return len;
+int write(int fd, const void *buf, size_t len)
+{
+    kernel_write(buf);
+    return len;
 }
 
 void _exit(int status)
 {
-    for(;;){}
+    for (;;)
+    {
+    }
 }

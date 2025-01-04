@@ -151,8 +151,9 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     setup_vectors();
     init_keyboard();
 
+    printf("Heyy, i would love to see you\n");
 
-    scheduler();
+    //scheduler();
 
     // test_heap_shrink_and_reuse();
     while (1)
