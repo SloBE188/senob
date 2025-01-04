@@ -3,10 +3,10 @@
 
 #include <stdbool.h>
 
-void putc(char c);
-void puts(const char* str);
-void printf(const char* fmt, ...);
-int * printf_number(int*, int, bool, int);
+void putc_kernel(char c);
+void puts_kernel(const char* str);
+void kernel_write(const char* fmt, ...);
+int * printf_number_kernel(int*, int, bool, int);
 
 
 #define PRINTF_STATE_START 0

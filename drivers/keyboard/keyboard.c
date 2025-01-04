@@ -111,7 +111,7 @@ void handle_special_key(uint32_t key, bool pressed) {
             break;
         case BACKSPACE:  // Backspace
             if (pressed) {
-                putc('\b');
+                putc_kernel('\b');
             }
             break;
         default:
@@ -181,7 +181,7 @@ void irq1_handler(struct Interrupt_registers *regs) {
     } else {
         if (pressed) {
             uint32_t key = capsOn || capsLock ? uppercase[scancode] : lowercase[scancode];
-            printf("%c", key);
+            kernel_write("%c", key);
             add_key_to_buffer(key);
         }
     }

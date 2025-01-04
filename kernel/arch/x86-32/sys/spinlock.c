@@ -29,7 +29,7 @@ uint32_t holding(struct spinlock* lock);
 void acquire(struct spinlock* lock)
 {
     if(holding(lock))
-        printf("cpu is already holding the lock, smth has gone wrong");
+        kernel_write("cpu is already holding the lock, smth has gone wrong");
 
     asm volatile("cli");        //needed for preventing from deadlocks (sti in release)
 
@@ -45,7 +45,7 @@ void acquire(struct spinlock* lock)
 void release(struct spinlock* lock)
 {
     if(!holding(lock))
-        printf("cpu isnt even holding the lock, why are you trying to release it?");
+        kernel_write("cpu isnt even holding the lock, why are you trying to release it?");
 
     __sync_synchronize();
 

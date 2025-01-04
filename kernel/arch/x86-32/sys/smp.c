@@ -51,7 +51,7 @@ void *find_mp_floating_pointer(struct multiboot_info *mb_info)
 {
     if (!(mb_info->flags & (1 << 6)))
     {
-        printf("Memory map not available.\n");
+        kernel_write("Memory map not available.\n");
         return NULL;
     }
 
@@ -64,13 +64,13 @@ void *find_mp_floating_pointer(struct multiboot_info *mb_info)
         {
             if (validate_mp_checksum((uint8_t *)ptr))
             {
-                // printf("mp floating pointer found at physical address: 0x%x\n", addr);
+                // kernel_write("mp floating pointer found at physical address: 0x%x\n", addr);
                 return (void *)addr;
             }
         }
     }
 
-    printf("no mp floating pointer found\n");
+    kernel_write("no mp floating pointer found\n");
     return NULL;
 }
 
@@ -94,7 +94,7 @@ void mp_init(struct mp_configuration_table *table)
                 cpus[ncpus].id = processor->local_apic_id;
                 cpus[ncpus].isbsp = processor->flags & 0x02;
                 cpus[ncpus].lapic_version = processor->local_apic_version;
-                printf("CPU %d: LAPIC Version=%d, Flags=%d (%s)\n",
+                kernel_write("CPU %d: LAPIC Version=%d, Flags=%d (%s)\n",
                        cpus[ncpus].id,
                        cpus[ncpus].lapic_version,
                        cpus[ncpus].lapic_flags,
@@ -104,13 +104,13 @@ void mp_init(struct mp_configuration_table *table)
             }
 
             if (processor->flags & 0x02)
-                printf("AP is active\n");
+                kernel_write("AP is active\n");
             else
             {
-                printf("processor is disabled\n");
+                kernel_write("processor is disabled\n");
             }
 
-            // printf("Processor %d\n", i);
+            // kernel_write("Processor %d\n", i);
 
             entry_ptr += 20; // processor entries are 20 bytes long
             break;
@@ -119,13 +119,13 @@ void mp_init(struct mp_configuration_table *table)
         { // I/O-APIC entry
             struct entry_io_apic *io_apic = (struct mp_io_apic_entry *)entry_ptr;
             ioapicid = io_apic->id;
-            printf("I/O-APIC: ID=%u, Address=0x%x\n", io_apic->id, io_apic->address);
+            kernel_write("I/O-APIC: ID=%u, Address=0x%x\n", io_apic->id, io_apic->address);
 
             entry_ptr += 8; // I/O-APIC entries are 8 bytes long
             break;
         }
         default:
-            printf("unknown: %u\n", type);
+            kernel_write("unknown: %u\n", type);
             entry_ptr += 8;
             break;
         }
@@ -150,16 +150,16 @@ void prepare_trampoline_code();
 void init_smp(uint32_t *floating_pointer_addr, uint32_t *mp_config_table_addr)
 {
     struct mp_floating_pointer_structure *mp_pointer = (struct mp_floating_pointer_structure *)floating_pointer_addr;
-    printf("length: %d\n features: %x\n", mp_pointer->length, mp_pointer->features);
+    kernel_write("length: %d\n features: %x\n", mp_pointer->length, mp_pointer->features);
     struct mp_configuration_table *table = (struct mp_configuration_table *)mp_config_table_addr;
-    printf("entry count: %d\nlocal APIC: %x\n", table->entry_count, table->lapic_address);
+    kernel_write("entry count: %d\nlocal APIC: %x\n", table->entry_count, table->lapic_address);
     if (mp_pointer->features & (1 << 7))
     {
-        printf("APIC is enabled");
+        kernel_write("APIC is enabled");
     }
     else
     {
-        printf("PIC still active :(\n");
+        kernel_write("PIC still active :(\n");
     }
     //disable_pic();
     mp_init(table);

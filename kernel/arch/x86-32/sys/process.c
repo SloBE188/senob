@@ -110,7 +110,7 @@ void inOrderTraversal(struct process *x)
     if (x != NIL)
     {
         inOrderTraversal(x->left);
-        printf("%d %s ", x->pid, (x->color == 0) ? "Black" : "Red");
+        kernel_write("%d %s ", x->pid, (x->color == 0) ? "Black" : "Red");
         inOrderTraversal(x->right);
     }
 }
@@ -181,7 +181,7 @@ void rb_insert(uint32_t pid)
 {
 
     struct process *new_process = &processes[pid];
-    printf("inserting process with PID: %d\n", pid);
+    kernel_write("inserting process with PID: %d\n", pid);
 
     struct process *y = NULL; // follows the parent node
     struct process *x = root;
@@ -428,7 +428,7 @@ uint32_t map_program_to_address(const char *filename, uint32_t program_address)
     res = f_stat(filename, &filestat);
     if (res != FR_OK)
     {
-        printf("Error looking for the stats from the file: %d\n", res);
+        kernel_write("Error looking for the stats from the file: %d\n", res);
         return 0;
     }
 
@@ -454,7 +454,7 @@ void copy_program_to_address(const char *filename, uint32_t pages_needed, uint32
     res = f_open(&program, filename, FA_READ);
     if (res != FR_OK)
     {
-        printf("Error opening the file: %d\n", res);
+        kernel_write("Error opening the file: %d\n", res);
         return;
     }
 
@@ -464,7 +464,7 @@ void copy_program_to_address(const char *filename, uint32_t pages_needed, uint32
         res = f_read(&program, buffer, PAGE_SIZE, &bytes_read);
         if (res != FR_OK)
         {
-            printf("Error reading the file: %d\n", res);
+            kernel_write("Error reading the file: %d\n", res);
             f_close(&program);
             return;
         }
@@ -476,7 +476,7 @@ void copy_program_to_address(const char *filename, uint32_t pages_needed, uint32
     res = f_close(&program);
     if (res != FR_OK)
     {
-        printf("Error closing the file: %d\n", res);
+        kernel_write("Error closing the file: %d\n", res);
     }
 }
 
@@ -492,7 +492,7 @@ struct process *get_unused_process()
             return &processes[i];
         }
     }
-    printf("No unused process found\n");
+    kernel_write("No unused process found\n");
     return NULL;
 }
 
@@ -505,7 +505,7 @@ struct process *get_runnable_process()
             return &processes[i];
         }
     }
-    printf("No runnable process found\n");
+    kernel_write("No runnable process found\n");
     return NULL;
 }
 
@@ -515,13 +515,13 @@ struct process *create_kernel_process(void (*start_function)())
     struct process *new_process = get_unused_process();
     if (!new_process)
     {
-        printf("No more unused process slots\n");
+        kernel_write("No more unused process slots\n");
         return;
     }
 
     // struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
-    printf("Allocated process structure at: %p\n", new_process);
+    kernel_write("Allocated process structure at: %p\n", new_process);
 
     new_process->pid = get_process_id();
     new_process->state = EMBRYO;
@@ -554,7 +554,7 @@ struct process *create_process(const char *filename)
     struct process *new_process = get_unused_process();
     // struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
     memset(new_process, 0x00, sizeof(struct process));
-    printf("Allocated process structure at: %p\n", new_process);
+    kernel_write("Allocated process structure at: %p\n", new_process);
 
 
     new_process->pid = get_process_id();
@@ -566,7 +566,7 @@ struct process *create_process(const char *filename)
     /* uint32_t *pd = new_process->page_directory;
      for (int i = 0; i < 1024; i++)
      {
-         printf("PDE[%d]: %x\n", i, pd[i]);
+         kernel_write("PDE[%d]: %x\n", i, pd[i]);
      }*/
 
     mem_change_page_directory(new_process->page_directory);
@@ -598,7 +598,7 @@ struct process *create_process(const char *filename)
 struct thread *create_kernel_thread(struct process *process, void (*start_function)())
 {
     struct thread *new_kthread = (struct thread *)kmalloc(sizeof(struct thread));
-    printf("kernel thread allocated at: %p\n", new_kthread);
+    kernel_write("kernel thread allocated at: %p\n", new_kthread);
     memset(new_kthread, 0x00, sizeof(struct thread));
 
     new_kthread->thread_id = get_thread_id();
@@ -645,7 +645,7 @@ struct thread *create_user_thread(struct process *process)
 {
     struct thread *new_thread = (struct thread *)kmalloc(sizeof(struct thread));
     memset(new_thread, 0x00, sizeof(struct thread));
-    printf("Allocated thread structure at: %p\n", new_thread);
+    kernel_write("Allocated thread structure at: %p\n", new_thread);
 
     new_thread->thread_id = get_thread_id();
     new_thread->owner = process;
@@ -668,11 +668,11 @@ struct thread *create_user_thread(struct process *process)
         uint32_t phys = mem_get_phys_from_virt(addr);
         if (phys == (uint32_t)-1)
         {
-            printf("address 0x%x is not mapped\n", addr);
+            kernel_write("address 0x%x is not mapped\n", addr);
         }
         else
         {
-            printf("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
+            kernel_write("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
         }
     }*/
 
@@ -680,7 +680,7 @@ struct thread *create_user_thread(struct process *process)
 
     if (!mem_is_valid_vaddr(0xb0000000))
     {
-        printf("address 0xb0000000 is not mapped\n");
+        kernel_write("address 0xb0000000 is not mapped\n");
     }
 
     uint32_t segment_selector = 0x23;
@@ -794,7 +794,7 @@ void scheduler(void)
         p = rb_search_runnable(root);
         if (p->state != RUNNABLE)
         {
-            printf("The process returned by rb_search_runnable isnt runnable\n");
+            kernel_write("The process returned by rb_search_runnable isnt runnable\n");
             return 0;
         }
         cpu->proc = p;
@@ -855,7 +855,7 @@ void scheduler(void)
         struct thread *next_thread = next_process->head_thread;
         if (!next_thread) 
         {
-            printf("No threads in runnable process PID %d.\n", next_process->pid);
+            kernel_write("No threads in runnable process PID %d.\n", next_process->pid);
             release(&scheduler_lock);
             continue;
         }
@@ -889,7 +889,7 @@ static void context_switch(struct thread *new_thread)
     
     
 
-    printf("switching context from old thread to TID %d\n", new_thread->thread_id);
+    kernel_write("switching context from old thread to TID %d\n", new_thread->thread_id);
 
     if(old_thread) 
     {
@@ -910,14 +910,14 @@ void init_locks()
 void thethirdone()
 {
     clear_screen_sys_2(COLOR_RED);
-    printf("Hey, here is thethirdone :D\n");
+    kernel_write("Hey, here is thethirdone :D\n");
     while(1){}
 }
 
 void anotherone()
 {
     clear_screen_sys_2(COLOR_BLUE);
-    printf("Hey, here is anotherone :D\n");
+    kernel_write("Hey, here is anotherone :D\n");
     while (1)
     {
     }
@@ -927,7 +927,7 @@ void test_process()
 {
 
     clear_screen_sys_2(COLOR_GREEN);
-    printf("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
+    kernel_write("HEYY, ICH BIN EIN KERNEL PROZESS!!!\n");
     // struct process *p1 = create_process("0:/test.bin");
     //  inOrderTraversal(root);
     //  PitWait(8000);
@@ -941,19 +941,19 @@ uint32_t init_proc()
     init_locks();
     node_preparation();
 
-    printf("Creating kernel process 1\n");
+    kernel_write("Creating kernel process 1\n");
     struct process *k1 = create_kernel_process(&test_process);
-    printf("Creating kernel process 2\n");
+    kernel_write("Creating kernel process 2\n");
     struct process *k2 = create_kernel_process(&anotherone);
-    printf("Creating kernel process 3\n");
+    kernel_write("Creating kernel process 3\n");
     struct process *k3 = create_kernel_process(&thethirdone);
-    printf("Creating a uuser process (1)\n");
+    kernel_write("Creating a uuser process (1)\n");
     struct process *u1 = create_process("0:/test.bin");
 
-    printf("In-order traversal of RB Tree:\n");
+    kernel_write("In-order traversal of RB Tree:\n");
     inOrderTraversal(root);
 
-    printf("\n");
+    kernel_write("\n");
 
     return 0;
 }

@@ -5,21 +5,19 @@
 #define FONT_HEIGHT 8
 uint32_t cursor_x = 0;
 uint32_t cursor_y = 0;
-static struct vbe_info* global_vbe_info;
+//static struct vbe_info* global_vbe_info;
+extern struct vbe_info* globalvbeinfo;
 
-void set_vbe_info(struct vbe_info* vbe_info) {
-    global_vbe_info = vbe_info;
-}
 
-void putc(char c) {
-    if (global_vbe_info == 0X00) {
+void putc_kernel(char c) {
+    if (globalvbeinfo == 0X00) {
         return;
     }
 
     if (c == '\n') {
         cursor_x = 0;
         cursor_y += FONT_HEIGHT;
-        if (cursor_y >= global_vbe_info->framebuffer_height) {
+        if (cursor_y >= globalvbeinfo->framebuffer_height) {
             cursor_y = 0; // line break (kind of scrolling lol)
         }
     } else if (c == '\r') {
@@ -27,10 +25,10 @@ void putc(char c) {
 
     } else if (c == '\t') {
         cursor_x += 4 * FONT_WIDTH;
-        if (cursor_x >= global_vbe_info->framebuffer_width) {
+        if (cursor_x >= globalvbeinfo->framebuffer_width) {
             cursor_x = 0;
             cursor_y += FONT_HEIGHT;
-            if (cursor_y >= global_vbe_info->framebuffer_height) {
+            if (cursor_y >= globalvbeinfo->framebuffer_height) {
                 cursor_y = 0;
             }
         }
@@ -40,18 +38,18 @@ void putc(char c) {
             cursor_x -= FONT_WIDTH; // move cursor back
         } else if (cursor_y >= FONT_HEIGHT) {
             cursor_y -= FONT_HEIGHT;
-            cursor_x = global_vbe_info->framebuffer_width - FONT_WIDTH;
+            cursor_x = globalvbeinfo->framebuffer_width - FONT_WIDTH;
         }
         // delete the font at the cursor position
-        draw_rectangle(cursor_x, cursor_y, FONT_WIDTH, FONT_HEIGHT, COLOR_LIGHT_GREY, global_vbe_info);
+        draw_rectangle(cursor_x, cursor_y, FONT_WIDTH, FONT_HEIGHT, COLOR_LIGHT_GREY, globalvbeinfo);
     } else {
         // draw font
-        draw_char(cursor_x, cursor_y, c, COLOR_WHITE, global_vbe_info);
+        draw_char(cursor_x, cursor_y, c, COLOR_WHITE, globalvbeinfo);
         cursor_x += FONT_WIDTH;
-        if (cursor_x >= global_vbe_info->framebuffer_width) {
+        if (cursor_x >= globalvbeinfo->framebuffer_width) {
             cursor_x = 0;
             cursor_y += FONT_HEIGHT;
-            if (cursor_y >= global_vbe_info->framebuffer_height) {
+            if (cursor_y >= globalvbeinfo->framebuffer_height) {
                 cursor_y = 0;
             }
         }
@@ -59,14 +57,14 @@ void putc(char c) {
 }
 
 
-void puts(const char* s) {
+void puts_kernel(const char* s) {
     while (*s) {
-        putc(*s);
+        putc_kernel(*s);
         s++;
     }
 }
 
-void printf(const char* fmt, ...) {
+void kernel_write(const char* fmt, ...) {
     int* argp = (int*)&fmt;
     int state = PRINTF_STATE_START;
     int length = PRINTF_LENGTH_START;
@@ -80,7 +78,7 @@ void printf(const char* fmt, ...) {
                 if (*fmt == '%') {
                     state = PRINTF_STATE_LENGTH;
                 } else {
-                    putc(*fmt);
+                    putc_kernel(*fmt);
                 }
                 break;
             case PRINTF_STATE_LENGTH:
@@ -114,43 +112,43 @@ void printf(const char* fmt, ...) {
             PRINTF_STATE_SPEC_:
                 switch (*fmt) {
                     case 'c':
-                        putc((char)*argp);
+                        putc_kernel((char)*argp);
                         argp++;
                         break;
                     case 's':
                         if (length == PRINTF_LENGTH_LONG || length == PRINTF_LENGTH_LONG_LONG) {
-                            puts(*(const char**)argp);
+                            puts_kernel(*(const char**)argp);
                             argp += 2;
                         } else {
-                            puts(*(const char**)argp);
+                            puts_kernel(*(const char**)argp);
                             argp++;
                         }
                         break;
                     case '%':
-                        putc('%');
+                        putc_kernel('%');
                         break;
                     case 'd':
                     case 'i':
                         radix = 10;
                         sign = true;
-                        argp = printf_number(argp, length, sign, radix);
+                        argp = printf_number_kernel(argp, length, sign, radix);
                         break;
                     case 'u':
                         radix = 10;
                         sign = false;
-                        argp = printf_number(argp, length, sign, radix);
+                        argp = printf_number_kernel(argp, length, sign, radix);
                         break;
                     case 'X':
                     case 'x':
                     case 'p':
                         radix = 16;
                         sign = false;
-                        argp = printf_number(argp, length, sign, radix);
+                        argp = printf_number_kernel(argp, length, sign, radix);
                         break;
                     case 'o':
                         radix = 8;
                         sign = false;
-                        argp = printf_number(argp, length, sign, radix);
+                        argp = printf_number_kernel(argp, length, sign, radix);
                         break;
                     default:
                         break;
@@ -167,7 +165,7 @@ void printf(const char* fmt, ...) {
 
 const char possibleChars[] = "0123456789abcdef";
 
-int* printf_number(int* argp, int length, bool sign, int radix) {
+int* printf_number_kernel(int* argp, int length, bool sign, int radix) {
     char buffer[32] = "";
     uint32_t number;
     int number_sign = 1;
@@ -229,7 +227,7 @@ int* printf_number(int* argp, int length, bool sign, int radix) {
     }
 
     while (--pos >= 0) {
-        putc(buffer[pos]);
+        putc_kernel(buffer[pos]);
     }
 
     return argp;

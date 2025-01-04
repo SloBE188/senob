@@ -38,6 +38,7 @@
 #include "sys/smp.h"
 #include "sys/apic.h"
 #include "interrupts/pit.h"
+#include <stdio.h>
 
 extern void rust_testfunction();
 
@@ -45,7 +46,7 @@ extern void rust_testfunction();
 
 void kernel_panic(const char *message)
 {
-    printf("Kernel Panic: %s\n", message);
+    kernel_write("Kernel Panic: %s\n", message);
     while (1)
         ;
 }
@@ -81,7 +82,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     init_pit();
     if (magic_value != 0x2BADB002)
     {
-        printf("Invalid magic value: %x\n", magic_value);
+        kernel_write("Invalid magic value: %x\n", magic_value);
         kernel_panic("Invalid magic value");
     }
 
@@ -107,7 +108,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     init_memory(multibootinfo->mem_upper * 1024, physicalAllocStart); // mem_upper comes in KiB (hex 0x1fb80), so it gets multiplied by 1024 so i got it in bytes
     heap_init();
-    printf("Module: %d\n", multibootinfo->mods_count);
+    kernel_write("Module: %d\n", multibootinfo->mods_count);
     create_ramdisk();
 
     disk_initialize(0);
@@ -118,15 +119,15 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     FRESULT res;
 
     res = f_mount(&fs, "0:", 1);
-    printf("result of mount: %d\n", res);
+    kernel_write("result of mount: %d\n", res);
 
     if (res != FR_OK)
     {
-        printf("Filesystem mount failed.\n");
+        kernel_write("Filesystem mount failed.\n");
     }
     else
     {
-        printf("Filesystem mounted successfully!\n");
+        kernel_write("Filesystem mounted successfully!\n");
     }
 
     init_syscalls();
@@ -136,7 +137,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     if (f_opendir(&dir, "0:/") == FR_OK) {
         while (f_readdir(&dir, &fno) == FR_OK && fno.fname[0] != 0) {
-            printf("Gefunden: %s\n", fno.fname);
+            kernel_write("Gefunden: %s\n", fno.fname);
         }
         f_closedir(&dir);
     }
@@ -145,7 +146,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     lapic_init();
     struct addr *addr = smp_addresses(multibootinfo);
     init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);
-    printf("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
+    kernel_write("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
 
     setup_vectors();
     init_keyboard();

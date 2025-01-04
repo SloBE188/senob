@@ -126,18 +126,18 @@ void idt_init()
 
 void spurious_interrupt_handler(struct Interrupt_registers *regs)
 {
-    printf("Spurious interrupt received: 0x%x\n", regs->interrupt_number);
+    kernel_write("Spurious interrupt received: 0x%x\n", regs->interrupt_number);
 }
 
 void apic_timer_handler(struct Interrupt_registers *regs)
 {
-    printf("APIC TIMER Interrupt occured\n");
+    kernel_write("APIC TIMER Interrupt occured\n");
 
 }
 
 void apic_error_handler(struct Interrupt_registers *regs)
 {
-    printf("APIC Error Interrupt Triggered\n");
+    kernel_write("APIC Error Interrupt Triggered\n");
 }
 
 static const char *exceptions[] = {
@@ -179,15 +179,15 @@ void page_fault_handler(struct Interrupt_registers *r)
     uint32_t faulting_address;
     asm volatile("mov %%cr2, %0" : "=r"(faulting_address));
 
-    printf("Page fault at address: 0x%x, error code: 0x%x\n", faulting_address, r->err_code);
+    kernel_write("Page fault at address: 0x%x, error code: 0x%x\n", faulting_address, r->err_code);
 
     if (!(r->err_code & 0x1))
     {
-        printf("Page not present.\n");
+        kernel_write("Page not present.\n");
     }
     else
     {
-        printf("Page protection violation.\n");
+        kernel_write("Page protection violation.\n");
     }
 
     while (1)
@@ -201,7 +201,7 @@ void syscall_handler(struct Interrupt_registers *regs)
 
     if (syscall_number >= 1024)
     {
-        printf("not a valid syscall nr: %u\n", syscall_number);
+        kernel_write("not a valid syscall nr: %u\n", syscall_number);
         return;
     }
 
@@ -217,9 +217,9 @@ void isr_handler(struct Interrupt_registers *regs)
             page_fault_handler(regs);
         }
 
-        printf(exceptions[regs->interrupt_number]);
-        printf("\n");
-        printf("Exception occured!\n");
+        kernel_write(exceptions[regs->interrupt_number]);
+        kernel_write("\n");
+        kernel_write("Exception occured!\n");
         for (;;)
             ;
     }
@@ -254,7 +254,7 @@ void irq_handler(struct Interrupt_registers *regs)
 {
     int vector = regs->interrupt_number - 32; // find vector
 
-    //printf("Interrupt vector %d triggered\n", vector);
+    //kernel_write("Interrupt vector %d triggered\n", vector);
 
     void (*handler)(struct Interrupt_registers *regs);
     handler = vector_handlers[vector];
@@ -276,5 +276,5 @@ void irq_handler(struct Interrupt_registers *regs)
     /*lapicw(EOI, 0);
     
     uint32_t esr = lapic_read(ESR);
-    printf("ESR: 0x%x\n", esr);*/
+    kernel_write("ESR: 0x%x\n", esr);*/
 }

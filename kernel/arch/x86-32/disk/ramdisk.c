@@ -48,14 +48,14 @@ void init_ramdisk_disk(struct multiboot_info* mbinfo)
     if (mbinfo->mods_count > 0)
     {
         mod = (struct multiboot_module*)mbinfo->mods_addr;
-        printf("Ram Disk module loaded at physical addr: %x\n", mod->mod_start);
+        kernel_write("Ram Disk module loaded at physical addr: %x\n", mod->mod_start);
     }
     using_ramdisk = true;
     
     memset(&ramdisk, 0x00, sizeof(struct ramdisk));
     ramdisk.phys_addr = mod->mod_start;
     ramdisk.size = mod->mod_end - mod->mod_start;
-    printf("Ram Disk size: %x\n", ramdisk.size);
+    kernel_write("Ram Disk size: %x\n", ramdisk.size);
 
 }
 
@@ -63,7 +63,7 @@ int disk_read_sector(void* buffer, uint32_t sector, uint32_t count)
 {
     if(sector + SECTOR_SIZE >= ramdisk.size)
     {
-        printf("Not able to read sector, its out of space from the ramdisk.\n");
+        kernel_write("Not able to read sector, its out of space from the ramdisk.\n");
         return;
     }
     memcpy(buffer, RAMDISKVIRTUALADRESS + sector * SECTOR_SIZE, count * SECTOR_SIZE);
@@ -75,13 +75,13 @@ void disk_read_from_offset(void* buffer, uint32_t offset, uint32_t size)
 {
     if (offset>= ramdisk.size)
     {
-        printf("Not able to read sector, its out of space from the ramdisk.\n");
+        kernel_write("Not able to read sector, its out of space from the ramdisk.\n");
         return;
     }
     
         
     uint32_t address = RAMDISKVIRTUALADRESS + offset;
-    printf("Reading from address %x with size %u\n", address, size);
+    kernel_write("Reading from address %x with size %u\n", address, size);
     memcpy(buffer, (void*)address, size);
 }
 
@@ -97,7 +97,7 @@ int disk_write_sector(void* buffer, uint32_t sector, uint32_t count)
 {
     if (sector + count * SECTOR_SIZE >= ramdisk.size)
     {
-        printf("You wanna write out of the ramdisk, isnt possible.\n");
+        kernel_write("You wanna write out of the ramdisk, isnt possible.\n");
         return;
     }
     

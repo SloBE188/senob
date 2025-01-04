@@ -93,7 +93,7 @@ void pmm_free_pageframe(uint32_t addr)
 
     if (!is_page_frame_used(pf_index))
     {
-        printf("Page is already free");
+        kernel_write("Page is already free");
         return;
     }
 	

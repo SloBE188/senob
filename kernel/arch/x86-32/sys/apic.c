@@ -110,16 +110,16 @@ void lapic_init(void)
     // Enable the APIC threw the SVR Reg
     lapicw(SVR, ENABLE | 0xFF);
     uint32_t svr = lapic_read(SVR);
-    printf("SVR: 0x%x\n", svr);
+    kernel_write("SVR: 0x%x\n", svr);
 
     uint32_t sivr = IA32_APIC_BASE[SVR];
     if (lapic_read(SVR) & ENABLE)
     {
-        printf("APIC ist aktiviert!\n");
+        kernel_write("APIC ist aktiviert!\n");
     }
     else
     {
-        printf("APIC not activated :(\n");
+        kernel_write("APIC not activated :(\n");
     }
 
     // Set TPR to 0x00 -> accept all interrupts (without setting this, the APIC could block every interrupt)
@@ -131,9 +131,9 @@ void lapic_init(void)
     uint32_t timer_init = lapic_read(TICR);
     uint32_t lvt_timer = lapic_read(TIMER);
 
-    printf("APIC Timer Divider: 0x%x\n", timer_div);
-    printf("APIC Timer Initial Count: 0x%x\n", timer_init);
-    printf("APIC LVT Timer: 0x%x\n", lvt_timer);*/
+    kernel_write("APIC Timer Divider: 0x%x\n", timer_div);
+    kernel_write("APIC Timer Initial Count: 0x%x\n", timer_init);
+    kernel_write("APIC LVT Timer: 0x%x\n", lvt_timer);*/
 
     // disable LINT0, LINT1 & ERROR
     lapicw(LINT0, 0x700);       //LINT0 has to use the ExtINT Mode for forwarding PIC interrupts to the APIC
@@ -148,7 +148,7 @@ void lapic_init(void)
 
     lapicw(ESR, 0); // Clear ESR
     uint32_t esr = lapic_read(ESR);
-    printf("LAPIC ESR: 0x%x\n", esr);
+    kernel_write("LAPIC ESR: 0x%x\n", esr);
 
     //sync_arbitration_ids();
 }
@@ -162,7 +162,7 @@ void configure_cmos_and_reset_vector(uint32_t trampoline_addr)
     uint16_t *warm_reset_vector = (uint16_t *)(0x40 << 4 | 0x67);
     warm_reset_vector[0] = trampoline_addr & 0xF;           // offset (low 16 bits)
     warm_reset_vector[1] = (trampoline_addr >> 4) & 0xFFFF; // segment (high 16 bits)
-    printf("warm reset vector set: segment=0x%x, offset=0x%x\n",
+    kernel_write("warm reset vector set: segment=0x%x, offset=0x%x\n",
            warm_reset_vector[1], warm_reset_vector[0]);
 }
 
@@ -195,7 +195,7 @@ void lapic_send_SIPI(uint32_t apic_id, uint32_t trampoline_addr)
 
 void ap_startup(uint32_t apic_id, uint32_t trampoline_addr)
 {
-    printf("starting ap startup for CPU %d\n", apic_id);
+    kernel_write("starting ap startup for CPU %d\n", apic_id);
 
     lapic_send_IPI(apic_id);
     PitWait(10);
@@ -206,6 +206,6 @@ void ap_startup(uint32_t apic_id, uint32_t trampoline_addr)
         PitWait(1);
     }
 
-    printf("CPU %d started!\n", apic_id);
+    kernel_write("CPU %d started!\n", apic_id);
 
 }
