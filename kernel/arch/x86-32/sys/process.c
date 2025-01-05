@@ -767,6 +767,7 @@ void process_exit(uint32_t pid)
     struct process* proc = rb_search(root, pid);
     kfree(proc->head_thread);
     rb_delete(pid);
+    scheduler();
 }
 
 void node_preparation()
@@ -878,7 +879,8 @@ void thethirdone()
 {
     clear_screen_sys_2(COLOR_RED);
     kernel_write("Hey, here is thethirdone :D\n");
-    while(1){}
+    PitWait(5000);
+    process_exit(get_curr_pid());
 }
 
 void anotherone()
