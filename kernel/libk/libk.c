@@ -14,6 +14,9 @@ extern int errno;
 
 #define MAX_FILES 32
 #define _MAX_LFN 255
+#define STDIN_FILENO  0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
 
 extern struct process *root;
 
@@ -263,10 +266,41 @@ int stat(const char *path, struct stat *st)
 }
 
 
-int write(int fd, const void *buf, size_t len)
+_READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
 {
-    kernel_write(buf);
-    return len;
+
+    if (buf == NULL) 
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    //STDOUT & STDERR -> kernel write output
+    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) 
+    {
+        char temp_buf[len + 1];
+        memcpy(temp_buf, buf, len);
+        temp_buf[len] = '\0';
+        kernel_write(temp_buf);
+        return len;
+    }
+
+    // FATfs write operations
+    if (fd < 0 || fd >= MAX_FILES || file_table[fd] == NULL) 
+    {
+        errno = EBADF;
+        return -1;
+    }
+
+    UINT bw;
+    FRESULT res = f_write(file_table[fd], buf, len, &bw);
+    if (res != FR_OK) 
+    {
+        errno = map_fresult_to_errno(res);
+        return -1;
+    }
+
+    return (ssize_t)bw;
 }
 
 void exit(int status)
