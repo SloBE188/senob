@@ -117,5 +117,6 @@ struct process *rb_search_runnable(struct process *root);
 void inOrderTraversal(struct process *x);
 void process_exit(uint32_t pid);
 uint32_t get_curr_pid();
+struct process *create_kernel_process(void (*start_function)());
 
 #endif
