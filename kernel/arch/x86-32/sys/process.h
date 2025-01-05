@@ -115,5 +115,7 @@ void scheduler(void);
 struct process *rb_search(struct process *root, uint32_t pid);
 struct process *rb_search_runnable(struct process *root);
 void inOrderTraversal(struct process *x);
+void process_exit(uint32_t pid);
+uint32_t get_curr_pid();
 
 #endif

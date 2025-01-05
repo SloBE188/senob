@@ -755,6 +755,20 @@ void switch_to_thread(struct thread *thread)
     switch_task(registers);
 }
 
+uint32_t get_curr_pid()
+{
+    uint32_t cpu_nr = get_local_apic_id_cpuid();
+    struct cpu* curr_cpu = &cpus[cpu_nr];
+    return curr_cpu->proc->pid;
+}
+
+void process_exit(uint32_t pid)
+{
+    struct process* proc = rb_search(root, pid);
+    kfree(proc->head_thread);
+    rb_delete(pid);
+}
+
 void node_preparation()
 {
     // Initialize NIL node
@@ -776,53 +790,6 @@ void node_preparation()
     }
 }
 
-/*
-
-void scheduler(void)
-{
-
-    struct process *p;
-    struct cpu *cpu = curr_cpu();
-    cpu->proc = 0;
-
-    for (;;)
-    {
-        // asm volatile("sti");
-
-        acquire(&scheduler_lock);
-
-        p = rb_search_runnable(root);
-        if (p->state != RUNNABLE)
-        {
-            kernel_write("The process returned by rb_search_runnable isnt runnable\n");
-            return 0;
-        }
-        cpu->proc = p;
-        mem_change_page_directory(p->page_directory);
-        p->state = RUNNING;
-        switch_to_thread(p->head_thread);
-        mem_change_page_directory(kernel_directory);
-        cpu->proc = 0;
-
-        for (uint32_t i = 0; 0 < 100; i++)
-        {
-            if (processes[i].state != RUNNABLE)
-                continue;
-
-            p = &processes[i];
-            cpu->proc = p;
-            mem_change_page_directory(p->page_directory);
-            p->state = RUNNABLE;
-            switch_to_thread(p->head_thread);
-
-            mem_change_page_directory(kernel_directory);
-
-            cpu->proc = 0;
-        }
-
-        release(&scheduler_lock);
-    }
-}*/
 
 
 static void context_switch(struct thread *new_thread);
