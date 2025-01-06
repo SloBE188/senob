@@ -351,6 +351,107 @@ int unlink(const char *name)
     return 0;
 }
 
+int mkdir(const char *path, mode_t mode)
+{
+    if (path == NULL) 
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    FRESULT res = f_mkdir(path);
+    if (res != FR_OK) 
+    {
+        errno = map_fresult_to_errno(res);
+        return -1;
+    }
+
+    return 0;
+}
+
+int chdir(const char *path)
+{
+    if (path == NULL) 
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    FRESULT res = f_chdir(path);
+    if (res != FR_OK) 
+    {
+        errno = map_fresult_to_errno(res);
+        return -1;
+    }
+
+    return 0;
+}
+
+char *getcwd(char *buf, size_t size)
+{
+    if (buf == NULL || size == 0) 
+    {
+        errno = EINVAL;
+        return NULL;
+    }
+
+    FRESULT res = f_getcwd(buf, size);
+    if (res != FR_OK) 
+    {
+        errno = map_fresult_to_errno(res);
+        return NULL;
+    }
+
+    return buf;
+}
+
+int dup(int fd)
+{
+    //search free fd
+    int new_fd = get_free_fd();
+    if (new_fd < 0) 
+    {
+        errno = EMFILE;
+        return -1;
+    }
+
+    //copy reference file
+    file_table[new_fd] = file_table[fd];
+    file_entries[new_fd].path[0] = '\0';
+
+    return new_fd;
+}
+
+int dup2(int oldfd, int newfd)
+{
+    if (oldfd < 0 || oldfd >= MAX_FILES || file_table[oldfd] == NULL) 
+    {
+        errno = EBADF;
+        return -1;
+    }
+
+    if (newfd < 0 || newfd >= MAX_FILES) 
+    {
+        errno = EBADF;
+        return -1;
+    }
+
+    if (file_table[newfd] != NULL) 
+    {
+        close(newfd);
+    }
+
+    file_table[newfd] = file_table[oldfd];
+    strncpy(file_entries[newfd].path, file_entries[oldfd].path, _MAX_LFN);
+    file_entries[newfd].path[_MAX_LFN] = '\0';
+
+    return newfd;
+}
+
+
+
+
+
 void exit(int status)
 {
     process_exit(get_curr_pid());
