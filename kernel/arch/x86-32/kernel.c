@@ -53,13 +53,11 @@ void kernel_panic(const char *message)
 
 volatile uint64_t pit_ticks;
 
-
 void pit_handler(struct Interrupt_registers *regs)
 {
     pit_ticks++;
-    //schedule();
+    // schedule();
     asm volatile("sti");
-
 }
 
 void PitWait(uint32_t ms)
@@ -72,7 +70,6 @@ void PitWait(uint32_t ms)
         ;
     }
 }
-
 
 struct vbe_info vbeinfo;
 void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
@@ -114,7 +111,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     disk_initialize(0);
     disk_status(0);
 
-
     FATFS fs;
     FRESULT res;
 
@@ -135,13 +131,14 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     DIR dir;
     FILINFO fno;
 
-    if (f_opendir(&dir, "0:/") == FR_OK) {
-        while (f_readdir(&dir, &fno) == FR_OK && fno.fname[0] != 0) {
+    if (f_opendir(&dir, "0:/") == FR_OK)
+    {
+        while (f_readdir(&dir, &fno) == FR_OK && fno.fname[0] != 0)
+        {
             kernel_write("Gefunden: %s\n", fno.fname);
         }
         f_closedir(&dir);
     }
-    
 
     lapic_init();
     struct addr *addr = smp_addresses(multibootinfo);
@@ -153,7 +150,8 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     printf("Heyy, i would love to see you\n");
 
-    //scheduler();
+
+    // scheduler();
 
     // test_heap_shrink_and_reuse();
     while (1)

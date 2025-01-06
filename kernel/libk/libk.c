@@ -14,79 +14,110 @@ extern int errno;
 
 #define MAX_FILES 32
 #define _MAX_LFN 255
-#define STDIN_FILENO  0
+#define STDIN_FILENO 0
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
 extern struct process *root;
 
-//struct for additionally saving the paths
-typedef struct {
+// struct for additionally saving the paths
+typedef struct
+{
     FIL *fil;
     TCHAR path[_MAX_LFN + 1];
 } FileEntry;
 
-static FIL* file_table[MAX_FILES] = {0};
+static FIL *file_table[MAX_FILES] = {0};
 static FileEntry file_entries[MAX_FILES] = {0};
 
-
-static int map_fresult_to_errno(FRESULT res) 
+static int map_fresult_to_errno(FRESULT res)
 {
-    switch (res) {
-        case FR_OK: return 0;
-        case FR_DISK_ERR: return EIO;
-        case FR_INT_ERR: return EIO;
-        case FR_NOT_READY: return ENODEV;
-        case FR_NO_FILE: return ENOENT;
-        case FR_NO_PATH: return ENOENT;
-        case FR_INVALID_NAME: return EINVAL;
-        case FR_DENIED: return EACCES;
-        case FR_EXIST: return EEXIST;
-        case FR_INVALID_OBJECT: return EBADF;
-        case FR_WRITE_PROTECTED: return EROFS;
-        case FR_INVALID_DRIVE: return EINVAL;
-        case FR_NOT_ENABLED: return ENODEV;
-        case FR_NO_FILESYSTEM: return ENODEV;
-        case FR_MKFS_ABORTED: return EIO;
-        case FR_TIMEOUT: return ETIMEDOUT;
-        case FR_LOCKED: return EBUSY;
-        case FR_NOT_ENOUGH_CORE: return ENOMEM;
-        case FR_TOO_MANY_OPEN_FILES: return EMFILE;
-        case FR_INVALID_PARAMETER: return EINVAL;
-        default: return EIO;
+    switch (res)
+    {
+    case FR_OK:
+        return 0;
+    case FR_DISK_ERR:
+        return EIO;
+    case FR_INT_ERR:
+        return EIO;
+    case FR_NOT_READY:
+        return ENODEV;
+    case FR_NO_FILE:
+        return ENOENT;
+    case FR_NO_PATH:
+        return ENOENT;
+    case FR_INVALID_NAME:
+        return EINVAL;
+    case FR_DENIED:
+        return EACCES;
+    case FR_EXIST:
+        return EEXIST;
+    case FR_INVALID_OBJECT:
+        return EBADF;
+    case FR_WRITE_PROTECTED:
+        return EROFS;
+    case FR_INVALID_DRIVE:
+        return EINVAL;
+    case FR_NOT_ENABLED:
+        return ENODEV;
+    case FR_NO_FILESYSTEM:
+        return ENODEV;
+    case FR_MKFS_ABORTED:
+        return EIO;
+    case FR_TIMEOUT:
+        return ETIMEDOUT;
+    case FR_LOCKED:
+        return EBUSY;
+    case FR_NOT_ENOUGH_CORE:
+        return ENOMEM;
+    case FR_TOO_MANY_OPEN_FILES:
+        return EMFILE;
+    case FR_INVALID_PARAMETER:
+        return EINVAL;
+    default:
+        return EIO;
     }
 }
 
-//searches free file descriptor
-static int get_free_fd() {
-    for (int fd = 0; fd < MAX_FILES; fd++) {
-        if (file_table[fd] == NULL) {
+// searches free file descriptor
+static int get_free_fd()
+{
+    for (int fd = 0; fd < MAX_FILES; fd++)
+    {
+        if (file_table[fd] == NULL)
+        {
             return fd;
         }
     }
     return -1;
 }
 
+// translation from open flags from newlib to fatfs flags
+static BYTE translate_flags(int flags)
+{
+    BYTE mode = FA_READ;
 
-//translation from open flags from newlib to fatfs flags
-static BYTE translate_flags(int flags) {
-    BYTE mode = FA_READ; 
-
-    if ((flags & O_RDWR) == O_RDWR) {
+    if ((flags & O_RDWR) == O_RDWR)
+    {
         mode = FA_READ | FA_WRITE;
-    } else if (flags & O_WRONLY) {
+    }
+    else if (flags & O_WRONLY)
+    {
         mode = FA_WRITE;
     }
 
-    if (flags & O_CREAT) {
+    if (flags & O_CREAT)
+    {
         mode |= FA_CREATE_ALWAYS;
     }
 
-    if (flags & O_APPEND) {
+    if (flags & O_APPEND)
+    {
         mode |= FA_OPEN_APPEND;
     }
 
-    if (flags & O_TRUNC) {
+    if (flags & O_TRUNC)
+    {
         mode |= FA_CREATE_ALWAYS;
     }
 
@@ -95,14 +126,14 @@ static BYTE translate_flags(int flags) {
 
 int open(const char *name, int flags, ...)
 {
-    if (name == NULL) 
+    if (name == NULL)
     {
         errno = EINVAL;
         return -1;
     }
 
     int fd = get_free_fd();
-    if (fd < 0) 
+    if (fd < 0)
     {
         errno = EMFILE; // too many open files
         return -1;
@@ -113,7 +144,7 @@ int open(const char *name, int flags, ...)
     file_entries[fd].path[_MAX_LFN] = '\0';
 
     FRESULT res = f_open(fil, file_entries[fd].path, translate_flags(flags));
-    if (res != FR_OK) 
+    if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
         return -1;
@@ -126,14 +157,14 @@ int open(const char *name, int flags, ...)
 int close(int file)
 {
 
-    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL) 
+    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL)
     {
         errno = EBADF;
         return -1;
     }
 
     FRESULT res = f_close(file_table[file]);
-    if (res != FR_OK) 
+    if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
         return -1;
@@ -142,12 +173,11 @@ int close(int file)
     file_table[file] = NULL;
     file_entries[file].path[0] = '\0';
     return 0;
-
 }
 
 int fstat(int file, struct stat *st)
 {
-    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL || st == NULL) 
+    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL || st == NULL)
     {
         errno = EBADF;
         return -1;
@@ -155,7 +185,7 @@ int fstat(int file, struct stat *st)
 
     FILINFO fno;
     FRESULT res = f_stat(file_entries[file].path, &fno);
-    if (res != FR_OK) 
+    if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
         return -1;
@@ -169,7 +199,7 @@ int fstat(int file, struct stat *st)
 
 off_t lseek(int file, off_t offset, int whence)
 {
-    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL) 
+    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL)
     {
         errno = EBADF;
         return (off_t)-1;
@@ -179,46 +209,47 @@ off_t lseek(int file, off_t offset, int whence)
     FSIZE_t new_pos = 0;
     FILINFO fno;
 
-    switch (whence) {
-        case SEEK_SET:
-            res = f_lseek(file_table[file], (FSIZE_t)offset);
-            if (res != FR_OK) 
-            {
-                errno = map_fresult_to_errno(res);
-                return (off_t)-1;
-            }
-            new_pos = f_tell(file_table[file]);
-            break;
-
-        case SEEK_CUR:
-            res = f_lseek(file_table[file], file_table[file]->fptr + offset);
-            if (res != FR_OK) 
-            {
-                errno = map_fresult_to_errno(res);
-                return (off_t)-1;
-            }
-            new_pos = f_tell(file_table[file]);
-            break;
-
-        case SEEK_END:
-            res = f_stat(file_entries[file].path, &fno);
-            if (res != FR_OK) 
-            {
-                errno = map_fresult_to_errno(res);
-                return (off_t)-1;
-            }
-            res = f_lseek(file_table[file], fno.fsize + offset);
-            if (res != FR_OK) 
-            {
-                errno = map_fresult_to_errno(res);
-                return (off_t)-1;
-            }
-            new_pos = f_tell(file_table[file]);
-            break;
-
-        default:
-            errno = EINVAL;
+    switch (whence)
+    {
+    case SEEK_SET:
+        res = f_lseek(file_table[file], (FSIZE_t)offset);
+        if (res != FR_OK)
+        {
+            errno = map_fresult_to_errno(res);
             return (off_t)-1;
+        }
+        new_pos = f_tell(file_table[file]);
+        break;
+
+    case SEEK_CUR:
+        res = f_lseek(file_table[file], file_table[file]->fptr + offset);
+        if (res != FR_OK)
+        {
+            errno = map_fresult_to_errno(res);
+            return (off_t)-1;
+        }
+        new_pos = f_tell(file_table[file]);
+        break;
+
+    case SEEK_END:
+        res = f_stat(file_entries[file].path, &fno);
+        if (res != FR_OK)
+        {
+            errno = map_fresult_to_errno(res);
+            return (off_t)-1;
+        }
+        res = f_lseek(file_table[file], fno.fsize + offset);
+        if (res != FR_OK)
+        {
+            errno = map_fresult_to_errno(res);
+            return (off_t)-1;
+        }
+        new_pos = f_tell(file_table[file]);
+        break;
+
+    default:
+        errno = EINVAL;
+        return (off_t)-1;
     }
 
     return (off_t)new_pos;
@@ -226,7 +257,7 @@ off_t lseek(int file, off_t offset, int whence)
 
 int read(int file, void *buf, size_t len)
 {
-    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL || buf == NULL) 
+    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL || buf == NULL)
     {
         errno = EBADF;
         return -1;
@@ -234,7 +265,7 @@ int read(int file, void *buf, size_t len)
 
     UINT br;
     FRESULT res = f_read(file_table[file], buf, len, &br);
-    if (res != FR_OK) 
+    if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
         return -1;
@@ -245,7 +276,7 @@ int read(int file, void *buf, size_t len)
 
 int stat(const char *path, struct stat *st)
 {
-    if (path == NULL || st == NULL) 
+    if (path == NULL || st == NULL)
     {
         errno = EINVAL;
         return -1;
@@ -253,7 +284,7 @@ int stat(const char *path, struct stat *st)
 
     FILINFO fno;
     FRESULT res = f_stat(path, &fno);
-    if (res != FR_OK) 
+    if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
         return -1;
@@ -265,18 +296,17 @@ int stat(const char *path, struct stat *st)
     return 0;
 }
 
-
 _READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
 {
 
-    if (buf == NULL) 
+    if (buf == NULL)
     {
         errno = EINVAL;
         return -1;
     }
 
-    //STDOUT & STDERR -> kernel write output
-    if (fd == STDOUT_FILENO || fd == STDERR_FILENO) 
+    // STDOUT & STDERR -> kernel write output
+    if (fd == STDOUT_FILENO || fd == STDERR_FILENO)
     {
         char temp_buf[len + 1];
         memcpy(temp_buf, buf, len);
@@ -286,7 +316,7 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
     }
 
     // FATfs write operations
-    if (fd < 0 || fd >= MAX_FILES || file_table[fd] == NULL) 
+    if (fd < 0 || fd >= MAX_FILES || file_table[fd] == NULL)
     {
         errno = EBADF;
         return -1;
@@ -294,13 +324,31 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
 
     UINT bw;
     FRESULT res = f_write(file_table[fd], buf, len, &bw);
-    if (res != FR_OK) 
+    if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
         return -1;
     }
 
     return (ssize_t)bw;
+}
+
+int unlink(const char *name)
+{
+    if (name == NULL)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    FRESULT res = f_unlink(name);
+    if (res != FR_OK)
+    {
+        errno = map_fresult_to_errno(res);
+        return -1;
+    }
+
+    return 0;
 }
 
 void exit(int status)
@@ -313,15 +361,13 @@ void _exit(int status)
     process_exit(get_curr_pid());
 }
 
-
-int execve (const char *__path, char * const __argv[], char * const __envp[])
+int execve(const char *__path, char *const __argv[], char *const __envp[])
 {
     errno = ENOMEM;
     return -1; /* Always fails */
 }
 
-
-//TODO should be improved with copying the regs and the user & kernel stack from the parent process
+// TODO should be improved with copying the regs and the user & kernel stack from the parent process
 int fork()
 {
     struct process *calling_proc = rb_search(root, get_curr_pid());
@@ -348,7 +394,6 @@ int fork()
     return proc->pid;
 }
 
-
 int getpid()
 {
     return get_curr_pid();
@@ -371,12 +416,9 @@ int link(const char *old, const char *new)
     return -1; /* Always fails */
 }
 
-
-void* sbrk(ptrdiff_t nbytes)
+void *sbrk(ptrdiff_t nbytes)
 {
-
 }
-
 
 int times(struct tms *buf)
 {
@@ -384,11 +426,6 @@ int times(struct tms *buf)
     return -1;
 }
 
-int unlink(const char *name)
-{
-    errno = ENOENT;
-    return -1; /* Always fails */
-}
 
 int wait(int *status)
 {
