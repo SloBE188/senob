@@ -1,0 +1,72 @@
+//Installing Dependencies:
+sudo apt-get install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo libisl-dev autoconf automake
+
+//Creating directories for the cross compiler
+mkdir -p $HOME/src
+mkdir -p $HOME/opt/cross
+
+//Set environment variables (we also need them in the build script, currently in build.sh)
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+
+
+//Build binutils
+cd $HOME/src
+tar -xvf binutils-2.41.tar.gz
+
+mkdir build-binutils && cd build-binutils
+../binutils-2.41/configure \
+    --target="$TARGET" \
+    --prefix="$PREFIX" \
+    --with-sysroot \
+    --disable-nls \
+    --disable-werror
+	
+make -j4
+make install -j4
+
+//Build gcc
+cd $HOME/src
+tar -xvf gcc-13.2.0.tar.gz
+mkdir build-gcc && cd build-gcc
+
+../gcc-13.2.0/configure \
+    --target="$TARGET" \
+    --prefix="$PREFIX" \
+    --disable-nls \
+    --enable-languages=c,c++ \
+    --without-headers \
+    --disable-hosted-libstdcxx \
+    --disable-shared \
+    --disable-multilib
+
+make all-gcc -j4
+make install-gcc -j4
+make all-target-libgcc -j4
+make install-target-libgcc -j4
+
+//Newlib build (ported C standard libary for senob)
+cd $HOME/src
+tar -xvf newlib-4.5.0.tar.gz
+mkdir build-newlib && cd build-newlib
+
+../newlib-4.5.0/configure \
+    --target="$TARGET" \
+    --prefix="$PREFIX" \
+    --disable-nls \
+    --enable-newlib-io-c99-formats \
+    --enable-newlib-io-long-long \
+    --enable-newlib-register-fini
+
+make -j4
+make install -j4
+
+
+//Test
+i686-elf-gcc --version
+i686-elf-gcc -print-libgcc-file-name
+i686-elf-gcc -print-file-name=libc.a
+i686-elf-gcc -print-file-name=libm.a
+
+
