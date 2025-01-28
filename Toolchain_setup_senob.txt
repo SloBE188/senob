@@ -2,7 +2,8 @@
 sudo apt-get install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo libisl-dev autoconf automake
 
 //Creating directories for the cross compiler
-mkdir -p $HOME/src
+mkdir -p $HOME/src && cd $HOME/src
+//Now download binutils & gcc into the src directory. Binutils: https://ftp.gnu.org/gnu/binutils/ GCC: https://ftp.lip6.fr/pub/gcc/releases/
 mkdir -p $HOME/opt/cross
 
 //Set environment variables (we also need them in the build script, currently in build.sh)
@@ -46,8 +47,10 @@ make install-gcc -j4
 make all-target-libgcc -j4
 make install-target-libgcc -j4
 
+git clone https://github.com/SloBE188/senob.git
+
 //Newlib build (ported C standard libary for senob)
-cd $HOME/src
+cd $HOME/senob/libc
 tar -xvf newlib-4.5.0.tar.gz
 mkdir build-newlib && cd build-newlib
 
