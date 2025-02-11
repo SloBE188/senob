@@ -892,6 +892,10 @@ void anotherone()
     }
 }
 
+#include <stdio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 void test_process()
 {
 
@@ -901,6 +905,73 @@ void test_process()
     //  inOrderTraversal(root);
     //  PitWait(8000);
     //  switch_to_thread(p1->head_thread);
+
+   FILE *fp;
+   const char *str = "Hello, World!";
+
+   fp = fopen("test.txt", "w");
+   if (fp == NULL) {
+      perror("cant open fire for writing");
+      return 1;
+   }
+
+   size_t written = fwrite(str, sizeof(char), strlen(str), fp);
+   printf("nr written elems: %zu\n", written);
+
+   fclose(fp);
+
+
+    fp = fopen("test.txt", "r");
+    if (fp == NULL) {
+        perror("cant open file for reading");
+        return 1;
+    }
+
+    char buffer[256];
+    size_t read = fread(buffer, sizeof(char), sizeof(buffer) - 1, fp);
+    buffer[read] = '\0';
+
+    printf("content of test.txt: %s\n", buffer);
+
+    fclose(fp);
+
+
+    FRESULT fr;
+    FILINFO fno;
+    const char *fname = "0:/test.txt";
+
+
+    printf("Test for \"%s\"...\n", fname);
+
+    fr = f_stat(fname, &fno);
+    switch (fr) {
+
+    case FR_OK:
+        printf("Size: %lu\n", fno.fsize);
+        printf("Timestamp: %u-%02u-%02u, %02u:%02u\n",
+               (fno.fdate >> 9) + 1980, fno.fdate >> 5 & 15, fno.fdate & 31,
+               fno.ftime >> 11, fno.ftime >> 5 & 63);
+        printf("Attributes: %c%c%c%c%c\n",
+               (fno.fattrib & AM_DIR) ? 'D' : '-',
+               (fno.fattrib & AM_RDO) ? 'R' : '-',
+               (fno.fattrib & AM_HID) ? 'H' : '-',
+               (fno.fattrib & AM_SYS) ? 'S' : '-',
+               (fno.fattrib & AM_ARC) ? 'A' : '-');
+        break;
+
+    case FR_NO_FILE:
+    case FR_NO_PATH:
+        printf("\"%s\" is not exist.\n", fname);
+        break;
+
+    default:
+        printf("An error occured. (%d)\n", fr);
+    }   
+
+
+    
+    
+    
     while(1){}
 }
 
@@ -923,6 +994,8 @@ uint32_t init_proc()
     inOrderTraversal(root);
 
     kernel_write("\n");
+
+    switch_to_thread(k1->head_thread);
 
     return 0;
 }

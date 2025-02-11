@@ -183,8 +183,11 @@ int fstat(int file, struct stat *st)
         return -1;
     }
 
+    printf("Trying to stat file: %s\n", file_entries[file].path);
+
     FILINFO fno;
     FRESULT res = f_stat(file_entries[file].path, &fno);
+    
     if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
@@ -369,6 +372,7 @@ int mkdir(const char *path, mode_t mode)
     return 0;
 }
 
+/*
 int chdir(const char *path)
 {
     if (path == NULL) 
@@ -404,7 +408,7 @@ char *getcwd(char *buf, size_t size)
 
     return buf;
 }
-
+*/
 int dup(int fd)
 {
     //search free fd
