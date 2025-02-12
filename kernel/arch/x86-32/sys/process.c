@@ -28,6 +28,12 @@
 #include "smp.h"
 #include "startup.h"
 #include "spinlock.h"
+#include <stdio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include "../../../libk/libk.h"
+
 
 #define NPROC 100
 
@@ -892,10 +898,6 @@ void anotherone()
     }
 }
 
-#include <stdio.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 void test_process()
 {
 
@@ -905,7 +907,7 @@ void test_process()
     //  inOrderTraversal(root);
     //  PitWait(8000);
     //  switch_to_thread(p1->head_thread);
-
+    /*
    FILE *fp;
    const char *str = "Hello, World!";
 
@@ -936,37 +938,17 @@ void test_process()
     fclose(fp);
 
 
-    FRESULT fr;
-    FILINFO fno;
-    const char *fname = "0:/test.txt";
+    struct stat stats;*/
 
+    int fd = open("0:/test.txt", O_RDWR);
+    printf("fd: %d\n", fd);
 
-    printf("Test for \"%s\"...\n", fname);
+    //fstat(fd, &stats);
+    
+    //printf("file size: 0x%x\n", stats.st_size);
 
-    fr = f_stat(fname, &fno);
-    switch (fr) {
-
-    case FR_OK:
-        printf("Size: %lu\n", fno.fsize);
-        printf("Timestamp: %u-%02u-%02u, %02u:%02u\n",
-               (fno.fdate >> 9) + 1980, fno.fdate >> 5 & 15, fno.fdate & 31,
-               fno.ftime >> 11, fno.ftime >> 5 & 63);
-        printf("Attributes: %c%c%c%c%c\n",
-               (fno.fattrib & AM_DIR) ? 'D' : '-',
-               (fno.fattrib & AM_RDO) ? 'R' : '-',
-               (fno.fattrib & AM_HID) ? 'H' : '-',
-               (fno.fattrib & AM_SYS) ? 'S' : '-',
-               (fno.fattrib & AM_ARC) ? 'A' : '-');
-        break;
-
-    case FR_NO_FILE:
-    case FR_NO_PATH:
-        printf("\"%s\" is not exist.\n", fname);
-        break;
-
-    default:
-        printf("An error occured. (%d)\n", fr);
-    }   
+    close(fd);
+   
 
 
     

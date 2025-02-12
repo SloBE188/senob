@@ -8,6 +8,10 @@
 #include <sys/stat.h>
 #include "../arch/x86-32/fatfs/ff.h"
 #include <fcntl.h>
+#include <sys/types.h>
+#include <stddef.h>
+#include "memory.h"
+#include "../arch/x86-32/mm/heap/heap.h"
 
 #undef errno
 extern int errno;
@@ -27,8 +31,8 @@ typedef struct
     TCHAR path[_MAX_LFN + 1];
 } FileEntry;
 
-static FIL *file_table[MAX_FILES] = {0};
-static FileEntry file_entries[MAX_FILES] = {0};
+FIL *file_table[MAX_FILES] = {0};
+FileEntry file_entries[MAX_FILES] = {0};
 
 static int map_fresult_to_errno(FRESULT res)
 {
@@ -125,7 +129,8 @@ static BYTE translate_flags(int flags)
 }
 
 int open(const char *name, int flags, ...)
-{
+{  
+    
     if (name == NULL)
     {
         errno = EINVAL;
@@ -139,18 +144,25 @@ int open(const char *name, int flags, ...)
         return -1;
     }
 
-    FIL *fil = &file_entries[fd].fil;
+    file_entries[fd].fil = kmalloc(sizeof(FIL));
     strncpy(file_entries[fd].path, name, _MAX_LFN);
     file_entries[fd].path[_MAX_LFN] = '\0';
+    printf("added file entry: %s\n", file_entries[fd].path);
 
-    FRESULT res = f_open(fil, file_entries[fd].path, translate_flags(flags));
+    FRESULT res = f_open(file_entries[fd].fil, file_entries[fd].path, translate_flags(flags));
     if (res != FR_OK)
     {
         errno = map_fresult_to_errno(res);
         return -1;
     }
 
-    file_table[fd] = fil;
+    file_table[fd] = file_entries[fd].fil;
+
+    for (size_t i = 0; i < MAX_FILES; i++)
+    {
+        printf("file entry %d: %s\n", i, file_entries[i].path);
+    }
+
     return fd;
 }
 
@@ -175,30 +187,7 @@ int close(int file)
     return 0;
 }
 
-int fstat(int file, struct stat *st)
-{
-    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL || st == NULL)
-    {
-        errno = EBADF;
-        return -1;
-    }
 
-    printf("Trying to stat file: %s\n", file_entries[file].path);
-
-    FILINFO fno;
-    FRESULT res = f_stat(file_entries[file].path, &fno);
-    
-    if (res != FR_OK)
-    {
-        errno = map_fresult_to_errno(res);
-        return -1;
-    }
-
-    st->st_size = fno.fsize;
-    st->st_mode = (fno.fattrib & AM_DIR) ? S_IFDIR : S_IFREG;
-
-    return 0;
-}
 
 off_t lseek(int file, off_t offset, int whence)
 {
@@ -297,6 +286,20 @@ int stat(const char *path, struct stat *st)
     st->st_mode = (fno.fattrib & AM_DIR) ? S_IFDIR : S_IFREG;
 
     return 0;
+}
+
+int fstat(int file, struct stat *st) 
+{
+
+    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL) 
+    {
+        errno = EBADF;
+        return -1;
+    }
+    
+
+    return stat(file_entries[file].path, st);
+
 }
 
 _READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
