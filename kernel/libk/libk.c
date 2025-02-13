@@ -523,8 +523,8 @@ int link(const char *old, const char *new)
     return -1; /* Always fails */
 }
 
-static void* heap_end = 0xC2000000;
-static void* heap_limit = 0xC3000000;
+static void* heap_end = 0xC3000000;
+static void* heap_limit = 0xC7000000;
 
 void *sbrk(ptrdiff_t increment)
 {

@@ -68,6 +68,14 @@ void init_memory(uint32_t memHigh, uint32_t physicalAllocstart)
 
     memset(pageDirs, 0, PAGE_SIZE * NUM_PAGE_DIRS);
     memset(pageDirsUsed, 0, NUM_PAGE_DIRS);
+
+    //prepare heap memory for newlib
+    for (size_t i = 0; i < 1024; i++)
+    {
+        void* virtaddr = 0xC3000000 + (i * PAGE_SIZE);
+        mem_map_page(virtaddr, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE);
+    }
+    
 }
 
 

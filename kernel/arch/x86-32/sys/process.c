@@ -685,6 +685,14 @@ struct thread *create_user_thread(struct process *process)
 
     mem_map_page(0xb0000000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
 
+
+    for (size_t i = 0; i < 1024; i++)
+    {
+        void* viraddrheap = 0x00800000 + (i * PAGE_SIZE);
+        mem_map_page(viraddrheap, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
+    }
+    
+
     if (!mem_is_valid_vaddr(0xb0000000))
     {
         kernel_write("address 0xb0000000 is not mapped\n");
