@@ -33,6 +33,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "../../../libk/libk.h"
+#include <stdlib.h>
 
 
 #define NPROC 100
@@ -949,7 +950,19 @@ void test_process()
 
     close(fd);
    
+    
 
+    int* p = (int*)malloc(4000);
+    kernel_write("Address: %p\n", p);
+    if (p != NULL)
+    {
+        kernel_write("malloc seems to work\n");
+    }
+
+    
+    int* p1 = (int*)malloc(300);
+    kernel_write("Address: %p\n", p1);
+    
 
     
     
@@ -978,8 +991,10 @@ uint32_t init_proc()
 
     kernel_write("\n");
 
-    mem_change_page_directory(u1->page_directory);
-    switch_to_thread(u1->head_thread);
+    //mem_change_page_directory(u1->page_directory);
+    //switch_to_thread(u1->head_thread);
+
+    switch_to_thread(k1->head_thread);
 
 
     return 0;

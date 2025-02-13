@@ -523,8 +523,22 @@ int link(const char *old, const char *new)
     return -1; /* Always fails */
 }
 
-void *sbrk(ptrdiff_t nbytes)
+static void* heap_end = 0xC2000000;
+static void* heap_limit = 0xC3000000;
+
+void *sbrk(ptrdiff_t increment)
 {
+    void* old_heap_end = heap_end;
+    void* new_heap_end = old_heap_end + increment;
+
+    if (new_heap_end > heap_limit)
+    {
+        return (void*) -1;      //no more memory;
+    }
+    
+    heap_end = new_heap_end;
+    return old_heap_end;
+
 }
 
 int times(struct tms *buf)
