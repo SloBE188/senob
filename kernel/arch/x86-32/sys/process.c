@@ -937,15 +937,15 @@ void test_process()
 
     fclose(fp);
 
+    */
+    struct stat stats;
 
-    struct stat stats;*/
-
-    int fd = open("0:/test.txt", O_RDWR);
+    int fd = open("0:/qemu_log.txt", O_RDWR);
     printf("fd: %d\n", fd);
 
-    //fstat(fd, &stats);
+    fstat(fd, &stats);
     
-    //printf("file size: 0x%x\n", stats.st_size);
+    printf("file size: 0x%x\n", stats.st_size);
 
     close(fd);
    

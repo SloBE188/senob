@@ -15,6 +15,7 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 	# here i c1an copy files to /mnt (ramdisk)
 	sudo cp ./test.txt /mnt
 	sudo cp ./userland/programs/test/test.bin /mnt
+	sudo cp ./qemu_log.txt /mnt
 	sudo umount /mnt
 
 ./build/kernel.o:

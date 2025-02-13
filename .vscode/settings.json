@@ -25,5 +25,6 @@
         "heap.h": "c",
         "spinlock.h": "c",
         "stdio.h": "c"
-    }
+    },
+    "makefile.configureOnOpen": false
 }

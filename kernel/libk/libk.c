@@ -158,10 +158,6 @@ int open(const char *name, int flags, ...)
 
     file_table[fd] = file_entries[fd].fil;
 
-    for (size_t i = 0; i < MAX_FILES; i++)
-    {
-        printf("file entry %d: %s\n", i, file_entries[i].path);
-    }
 
     return fd;
 }
@@ -297,7 +293,10 @@ int fstat(int file, struct stat *st)
         return -1;
     }
     
-
+    /*for (size_t i = 0; i < MAX_FILES; i++)
+    {
+        printf("file entry %d: %s\n", i, file_entries[i].path);
+    }*/
     return stat(file_entries[file].path, st);
 
 }
