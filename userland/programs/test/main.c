@@ -8,7 +8,7 @@ void main()
     //char input[1024];
     clear_screen(0);
     print("Welcome to the test programm 1 from senob!\n");
-    //printf("Is this newlib or what");
+    printf("Is this newlib or what");
     
     while (1)
     {

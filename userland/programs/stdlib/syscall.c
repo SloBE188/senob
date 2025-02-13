@@ -1,34 +1,66 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#undef errno
-extern int errno;
+extern syscall_write(int fd, const void* buf, size_t len);
+
+_READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
+{
+    syscall_write(fd, buf, len);
+}
+
+int open(const char *name, int flags, ...)
+{
+    return -1;
+}
 
 int close(int file)
 {
     return -1;
 }
 
-int execve(char *name, char **argv, char **env)
-{
-    errno = ENOMEM;
-    return -1;
-}
-
-int fork(void)
-{
-    errno = EAGAIN;
-    return -1;
-}
-
-int fstat(int file, struct stat* st)
+off_t lseek(int file, off_t offset, int whence)
 {
     return 0;
 }
 
-int getpid(void)
+int read(int file, void *buf, size_t len)
 {
-    return 1;
+    return -1;
+}
+
+int stat(const char *path, struct stat *st)
+{
+    return -1;
+}
+
+int fstat(int file, struct stat *st) 
+{
+    return -1;
+}
+
+int unlink(const char *name)
+{
+    return -1;
+}
+
+int mkdir(const char *path, mode_t mode)
+{
+    return -1;
+}
+
+int dup(int fd)
+{
+    return -1;
+}
+
+int dup2(int oldfd, int newfd)
+{
+    return -1;
+}
+
+int getpid()
+{
+    return -1;
 }
 
 int isatty(int file)
@@ -39,64 +71,15 @@ int isatty(int file)
 int kill(int pid, int sig)
 {
     errno = EINVAL;
-    return -1;
+    return -1; /* Always fails */
 }
 
-int link(char *old, char *new)
+void _exit(int status)
 {
-    errno = EMLINK;
-    return -1;
-}
-
-int lseek(int file, int ptr, int dir)
-{
-    return 0;
-}
-
-int open(int file, char *ptr, int len)
-{
-    return 0;
-}
-
-int read(int file, char *ptr, int len)
-{
-    return 0;
+    for(;;){}
 }
 
 caddr_t sbrk(int incr)
 {
     return incr;
-}
-
-int stat(char *file, struct stat *st)
-{
-    return 0;
-}
-
-int times(struct tms *buf)
-{
-    return -1;
-}
-
-int unlink(char *name) 
-{
-  errno = ENOENT;
-  return -1; 
-} 
-
-int wait(int *status) {
-  errno = ECHILD;
-  return -1;
-}
-
-/*int write(int file, char *ptr, int len) 
-{
-  int todo;
-
-  return len;
-}*/
-
-void _exit(int status)
-{
-    for(;;){}
 }

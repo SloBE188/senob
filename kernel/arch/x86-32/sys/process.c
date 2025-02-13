@@ -588,7 +588,7 @@ struct process *create_process(const char *filename)
 
     new_process->head_thread = main_thread;
 
-    //update_tss_esp0(main_thread->kstack.esp0, 6);
+    update_tss_esp0(main_thread->kstack.esp0, get_local_apic_id_cpuid());       //if i switch to a process directly (test or debugging reasons) i have to uncomment the tss update
 
     new_process->state = RUNNABLE;
 
@@ -962,7 +962,7 @@ uint32_t init_proc()
 
     init_locks();
     node_preparation();
-
+    
     kernel_write("Creating kernel process 1\n");
     struct process *k1 = create_kernel_process(&test_process);
     kernel_write("Creating kernel process 2\n");
@@ -972,12 +972,15 @@ uint32_t init_proc()
     kernel_write("Creating a uuser process (1)\n");
     struct process *u1 = create_process("0:/test.bin");
 
+    
     kernel_write("In-order traversal of RB Tree:\n");
     inOrderTraversal(root);
 
     kernel_write("\n");
 
-    switch_to_thread(k1->head_thread);
+    mem_change_page_directory(u1->page_directory);
+    switch_to_thread(u1->head_thread);
+
 
     return 0;
 }

@@ -127,7 +127,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     }
 
     init_syscalls();
-    //init_proc();
+    init_proc();
     DIR dir;
     FILINFO fno;
 
@@ -150,9 +150,9 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     printf("Heyy, i would love to see you\n");
 
-    PitWait(2000);
-    init_proc();
-    // scheduler();
+    //PitWait(2000);
+
+    //scheduler();
 
     // test_heap_shrink_and_reuse();
     while (1)

@@ -2,6 +2,7 @@
 #include "../interrupts/idt.h"
 #include "../sys/process.h"
 #include "../../../../drivers/video/vbe/vbe.h"
+#include "../../../libk/libk.h"
 
 
 syscalls_fun_ptr syscall_functions[1024] = {NULL};
@@ -40,9 +41,12 @@ void syscall_2_clear_screen(struct Interrupt_registers* regs)
 
 }
 
-void syscall_write(struct Interrupt_registers* regs)
+void syscall_3_write(struct Interrupt_registers* regs)
 {
-
+    int fd = (int)regs->ebx;
+    const void* buf = (const void*)regs->ecx;
+    size_t len = (size_t)regs->edx;
+    regs->eax = write(fd, buf, len);
 }
 
 
@@ -52,5 +56,5 @@ void register_syscalls()
     add_syscalls(PRINT_SYSCALL, syscall_0_print);
     add_syscalls(LOAD_PROCESS_SYSCALL, syscall_1_load_process);
     add_syscalls(CLEAR_SCREEN_SYSCALL, syscall_2_clear_screen);
-    add_syscalls(WRITE_SYSCALL, syscall_write);
+    add_syscalls(WRITE_SYSCALL, syscall_3_write);
 }
