@@ -38,6 +38,7 @@ void syscall_2_clear_screen(struct Interrupt_registers* regs)
 {
     uint32_t color = regs->ebx;
     clear_screen_sys_2(color);
+    regs->eax = (uint32_t) 999;
 
 }
 

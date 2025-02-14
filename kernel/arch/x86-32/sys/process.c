@@ -442,7 +442,7 @@ uint32_t map_program_to_address(const char *filename, uint32_t program_address)
     uint32_t file_size = filestat.fsize;
     uint32_t pages_needed = CEIL_DIV(file_size, PAGE_SIZE);
 
-    for (uint32_t i = 0; i < pages_needed; i++)
+    for (uint32_t i = 0; i < pages_needed + 256; i++)
     {
         void *vaddr = (void *)(program_address + (i * PAGE_SIZE));
         mem_map_page((uint32_t)vaddr, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
@@ -580,6 +580,7 @@ struct process *create_process(const char *filename)
 
 
     uint32_t pages_needed = map_program_to_address(filename, 0x00400000);
+    printf("pages needed: %d\n", pages_needed);
     copy_program_to_address(filename, pages_needed, 0x00400000);
 
     new_process->head_thread = NULL;

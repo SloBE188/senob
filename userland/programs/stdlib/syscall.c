@@ -71,7 +71,7 @@ int isatty(int file)
 
 int kill(int pid, int sig)
 {
-    errno = EINVAL;
+    //errno = EINVAL;
     return -1; /* Always fails */
 }
 

@@ -10,7 +10,7 @@ void main()
     clear_screen(0);
     print("Welcome to the test programm 1 from senob!\n");
     //printf("Is this newlib or what");
-    int a = 200;
+    /*int a = 200;
     char buffer[12];
     char buf[30];
     
@@ -21,7 +21,14 @@ void main()
     print(buf);
 
     itoa(a, buffer, 10);
-    print(buffer);
+    print(buffer);*/
+
+
+    //char alloc[20];
+    int* p = (int*)malloc(50);
+    print("funktioniert?");
+    //itoa(p, buf, 16);
+    //print(alloc);
 
     printf("hayyy");
 
