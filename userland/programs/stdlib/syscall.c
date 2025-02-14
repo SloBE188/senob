@@ -1,11 +1,12 @@
 #include <errno.h>
 #include <sys/types.h>
 
-extern syscall_write(int fd, const void* buf, size_t len);
+extern int syscall_3_write(int fd, const void* buf, size_t len);
+extern void syscall_4_sbrk(int increment);
 
 _READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
 {
-    syscall_write(fd, buf, len);
+    syscall_3_write(fd, buf, len);
 }
 
 int open(const char *name, int flags, ...)
@@ -79,7 +80,8 @@ void _exit(int status)
     for(;;){}
 }
 
-caddr_t sbrk(int incr)
+
+void *sbrk(ptrdiff_t increment)
 {
-    return incr;
+    syscall_4_sbrk(increment);
 }

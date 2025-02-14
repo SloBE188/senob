@@ -999,10 +999,10 @@ uint32_t init_proc()
 
     kernel_write("\n");
 
-    //mem_change_page_directory(u1->page_directory);
-    //switch_to_thread(u1->head_thread);
+    mem_change_page_directory(u1->page_directory);
+    switch_to_thread(u1->head_thread);
 
-    switch_to_thread(k1->head_thread);
+    //switch_to_thread(k1->head_thread);
 
 
     return 0;

@@ -1,1 +1,1 @@
-libnosys/environ.o: ../../../newlib-4.5.0/libgloss/libnosys/environ.c
+# dummy

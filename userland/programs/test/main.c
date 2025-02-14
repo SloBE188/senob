@@ -23,6 +23,8 @@ void main()
     itoa(a, buffer, 10);
     print(buffer);
 
+    printf("hayyy");
+
     
     while (1)
     {

@@ -50,6 +50,26 @@ void syscall_3_write(struct Interrupt_registers* regs)
 }
 
 
+static void* heap_end = 0x00800000;
+static void* heap_limit = 0x00C00000;
+
+void syscall_4_sbrk(struct Interrupt_registers* regs)
+{
+    
+    int increment = regs->ebx;
+
+    void* old_heap_end = heap_end;
+    void* new_heap_end = old_heap_end + increment;
+
+    if(new_heap_end > heap_limit)
+        regs->eax = (uint32_t)-1;
+
+    heap_end = new_heap_end;
+    regs->eax = (uint32_t) old_heap_end;
+
+}
+
+
 void register_syscalls()
 {
     kernel_write("registering syscalls\n");
@@ -57,4 +77,5 @@ void register_syscalls()
     add_syscalls(LOAD_PROCESS_SYSCALL, syscall_1_load_process);
     add_syscalls(CLEAR_SCREEN_SYSCALL, syscall_2_clear_screen);
     add_syscalls(WRITE_SYSCALL, syscall_3_write);
+    add_syscalls(SBRK_SYSCALL, syscall_4_sbrk);
 }

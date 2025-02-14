@@ -427,7 +427,7 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/home/slobe/kernel_dev/senob/libc/build-newlib'
+ac_pwd='/home/slobe/senob/libc/build-newlib'
 srcdir='../newlib-4.5.0'
 INSTALL='/usr/bin/install -c'
 AWK='gawk'

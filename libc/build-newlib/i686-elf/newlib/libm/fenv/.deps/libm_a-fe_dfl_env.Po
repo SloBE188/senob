@@ -1,16 +1,16 @@
 libm/fenv/libm_a-fe_dfl_env.o: \
  ../../../newlib-4.5.0/newlib/libm/fenv/fe_dfl_env.c \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/fenv.h \
- /home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/sys/fenv.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/fenv.h \
+ /home/slobe/senob/libc/build-newlib/i686-elf/newlib/targ-include/sys/fenv.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
  _newlib_version.h \
- /home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/fenv.h:
-/home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/sys/fenv.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
+ /home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/fenv.h:
+/home/slobe/senob/libc/build-newlib/i686-elf/newlib/targ-include/sys/fenv.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
 _newlib_version.h:
-/home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h:
+/home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h:

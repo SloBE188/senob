@@ -16,7 +16,8 @@ enum syscall_numbers
     PRINT_SYSCALL,
     LOAD_PROCESS_SYSCALL,
     CLEAR_SCREEN_SYSCALL,
-    WRITE_SYSCALL
+    WRITE_SYSCALL,
+    SBRK_SYSCALL
 };
 
 void add_syscalls(uint32_t syscall_number, syscalls_fun_ptr sys_function);

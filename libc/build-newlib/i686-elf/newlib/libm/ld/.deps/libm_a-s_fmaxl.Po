@@ -1,41 +1,40 @@
 libm/ld/libm_a-s_fmaxl.o: ../../../newlib-4.5.0/newlib/libm/ld/s_fmaxl.c \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
  _newlib_version.h \
- /home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/math.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
- newlib.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
+ /home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/math.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h newlib.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
  ../../../newlib-4.5.0/newlib/libm/ld/fpmath.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/endian.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h \
- /home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h \
- /home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/machine/_fpmath.h
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/endian.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h \
+ /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h \
+ /home/slobe/senob/libc/build-newlib/i686-elf/newlib/targ-include/machine/_fpmath.h
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
 _newlib_version.h:
-/home/slobe/opt/cross/lib/gcc/i686-elf/13.2.0/include/stddef.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/math.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+/home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/math.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
 newlib.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
 ../../../newlib-4.5.0/newlib/libm/ld/fpmath.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/sys/endian.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h:
-/home/slobe/kernel_dev/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h:
-/home/slobe/kernel_dev/senob/libc/build-newlib/i686-elf/newlib/targ-include/machine/_fpmath.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/endian.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h:
+/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h:
+/home/slobe/senob/libc/build-newlib/i686-elf/newlib/targ-include/machine/_fpmath.h:

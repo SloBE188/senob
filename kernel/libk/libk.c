@@ -523,7 +523,7 @@ int link(const char *old, const char *new)
     return -1; /* Always fails */
 }
 
-static void* heap_end = 0xC3000000;
+static void* heap_end = 0xC3000000;     //curr end of the heap, gets incremented with the sbrk func.
 static void* heap_limit = 0xC7000000;
 
 void *sbrk(ptrdiff_t increment)
@@ -537,7 +537,7 @@ void *sbrk(ptrdiff_t increment)
     }
     
     heap_end = new_heap_end;
-    return old_heap_end;
+    return old_heap_end;    //address which malloc uses, the next time heap_end is updated to the next addr
 
 }
 

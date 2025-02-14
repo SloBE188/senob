@@ -2,7 +2,8 @@
 global syscall_0_print
 global syscall_1_load_proc
 global syscall_2_clear_screen
-global syscall_write
+global syscall_3_write
+global syscall_4_sbrk
 
 syscall_0_print:
     mov eax, 0
@@ -22,11 +23,17 @@ syscall_2_clear_screen:
     int 0x80
     ret
 
-syscall_write:
+syscall_3_write:
     mov eax, 3
     mov ebx, [esp + 4]      ;fd
     mov ecx, [esp + 8]      ;pointer to buff
     mov edx, [esp + 12]     ;count bytes
+    int 0x80
+    ret
+
+syscall_4_sbrk:
+    mov eax, 4
+    mov ebx, [esp + 4]      ;increment
     int 0x80
     ret
 
