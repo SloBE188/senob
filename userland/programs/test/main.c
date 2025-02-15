@@ -2,6 +2,7 @@
 #include "../stdlib/vbe.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../stdlib/syscall.h"
 
 void main()
 {
@@ -51,6 +52,10 @@ void main()
 
     void *p9 = malloc(8192);
     printf("big memory allocation: %p\n", p9);
+
+    readdir("0:/");
+
+
 
 
 

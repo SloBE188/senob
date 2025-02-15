@@ -11,7 +11,39 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *buf, size_t len)
 
 int open(const char *name, int flags, ...)
 {
-    return -1;
+
+    int fd;
+    __asm__ volatile(
+        "mov $5, %%eax          \n"
+        "mov %1, %%ebx          \n"     //name
+        "mov %2, %%ecx          \n"     //flags
+        "int $0x80              \n"             
+        "mov %%eax, %0          \n"     //retourned fd
+        : "=r" (fd)
+        : "r" (name), "r" (flags)
+        : "eax", "ebx", "ecx"
+    );
+    
+    if(fd == -1)
+        return -1;
+
+    return fd;
+}
+
+int readdir(const char* path)
+{
+    int fresult;
+    __asm__ volatile(
+        "mov $6, %%eax          \n"
+        "mov %1, %%ebx          \n"
+        "int $0x80              \n"
+        "mov %%eax, %0          \n"
+        : "=r" (fresult)
+        : "r" (path)
+        : "eax", "ebx"
+    );
+
+    return fresult;
 }
 
 int close(int file)

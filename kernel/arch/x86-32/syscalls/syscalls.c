@@ -3,6 +3,7 @@
 #include "../sys/process.h"
 #include "../../../../drivers/video/vbe/vbe.h"
 #include "../../../libk/libk.h"
+#include "../fatfs/ff.h"
 
 
 syscalls_fun_ptr syscall_functions[1024] = {NULL};
@@ -55,7 +56,7 @@ static void* heap_end = 0x00800000;
 static void* heap_limit = 0x00C00000;
 #define ALIGN_UP(x, align) (((x) + (align - 1)) & ~(align - 1))
 
-void* syscall_4_sbrk(struct Interrupt_registers* regs)
+void syscall_4_sbrk(struct Interrupt_registers* regs)
 {
     
     int increment = regs->ebx;
@@ -74,6 +75,37 @@ void* syscall_4_sbrk(struct Interrupt_registers* regs)
 
 }
 
+void syscall_5_open(struct Interrupt_registers* regs)
+{
+    const char* name = (const char*) regs->ebx;
+    int flags = (int) regs->ecx;
+
+    int fd = open(name, flags);
+
+    regs->eax = (uint32_t) fd;
+}
+
+void syscall_6_readdir(struct Interrupt_registers* regs)
+{
+    const char* path = (const char*) regs->ebx;
+
+    DIR dir;
+    FILINFO fno;
+    uint32_t fresult;
+
+
+    if (f_opendir(&dir, path) == FR_OK)
+    {
+        while (fresult = f_readdir(&dir, &fno) == FR_OK && fno.fname[0] != 0)
+        {
+            kernel_write("Gefunden: %s\n", fno.fname);
+        }
+        f_closedir(&dir);
+    }
+    regs->eax =  fresult;
+
+}
+
 
 void register_syscalls()
 {
@@ -83,4 +115,6 @@ void register_syscalls()
     add_syscalls(CLEAR_SCREEN_SYSCALL, syscall_2_clear_screen);
     add_syscalls(WRITE_SYSCALL, syscall_3_write);
     add_syscalls(SBRK_SYSCALL, syscall_4_sbrk);
+    add_syscalls(OPEN_SYSCALL, syscall_5_open);
+    add_syscalls(READDIR_SYSCALL, syscall_6_readdir);
 }

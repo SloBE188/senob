@@ -31,10 +31,4 @@ syscall_3_write:
     int 0x80
     ret
 
-syscall_4_sbrk:
-    mov eax, 4
-    mov ebx, [esp + 4]      ;increment
-    int 0x80
-    ret
-
 
