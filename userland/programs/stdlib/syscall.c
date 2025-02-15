@@ -48,7 +48,17 @@ int readdir(const char* path)
 
 int close(int file)
 {
-    return -1;
+    int res;
+    __asm__ volatile(
+        "mov $7, %%eax          \n"
+        "mov %1, %%ebx          \n"
+        "int $0x80              \n"
+        "mov %%eax, %0          \n"
+        : "=r" (res)
+        : "r" (file)
+    );
+
+    return res;    
 }
 
 off_t lseek(int file, off_t offset, int whence)
@@ -58,7 +68,19 @@ off_t lseek(int file, off_t offset, int whence)
 
 int read(int file, void *buf, size_t len)
 {
-    return -1;
+    int br;
+    __asm__ volatile(
+        "mov $8, %%eax          \n"
+        "mov %1, %%ebx          \n" //file
+        "mov %2, %%ecx          \n" //buf
+        "mov %3, %%edx          \n" //len
+        "int $0x80              \n"
+        "mov %%eax, %0          \n"
+        : "=r" (br)
+        : "r" (file), "r" (buf), "r" (len)
+    );
+
+    return br;
 }
 
 int stat(const char *path, struct stat *st)

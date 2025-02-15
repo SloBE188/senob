@@ -57,6 +57,26 @@ void main()
 
 
 
+    FILE* fp;
+    fp = fopen("test.txt", "r");
+    if (fp == NULL) {
+        perror("cant open file for reading");
+        return 1;
+    }
+
+    char buffer[256];
+
+    printf("are we ok till here?\n");
+    
+    size_t read = fread(buffer, sizeof(char), sizeof(buffer) - 1, fp);
+    buffer[read] = '\0';
+
+    printf("content of test.txt: %s\n", buffer);
+
+    fclose(fp);
+
+
+
 
 
 

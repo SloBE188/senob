@@ -106,6 +106,26 @@ void syscall_6_readdir(struct Interrupt_registers* regs)
 
 }
 
+void syscall_7_close(struct Interrupt_registers* regs)
+{
+    int file = regs->ebx;
+
+    int res = close(file);
+
+    regs->eax = res;
+}
+
+void syscall_8_read(struct Interrupt_registers* regs)
+{
+    int file = regs->ebx;
+    void* buf = (void*) regs->ecx;
+    size_t len = (size_t) regs->edx;
+
+    int br = read(file, buf, len);
+
+    regs->eax = br;
+}
+
 
 void register_syscalls()
 {
@@ -117,4 +137,6 @@ void register_syscalls()
     add_syscalls(SBRK_SYSCALL, syscall_4_sbrk);
     add_syscalls(OPEN_SYSCALL, syscall_5_open);
     add_syscalls(READDIR_SYSCALL, syscall_6_readdir);
+    add_syscalls(CLOSE_SYSCALL, syscall_7_close);
+    add_syscalls(READ_SYSCALL, syscall_8_read);
 }
