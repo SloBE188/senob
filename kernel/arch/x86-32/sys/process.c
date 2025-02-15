@@ -969,7 +969,7 @@ void test_process()
     }
 
     
-    int* p1 = (int*)malloc(300);
+    int* p1 = (int*)malloc(7000);
     kernel_write("Address: %p\n", p1);
     
 

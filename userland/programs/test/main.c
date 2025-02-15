@@ -25,12 +25,35 @@ void main()
 
 
     //char alloc[20];
-    int* p = (int*)malloc(50);
-    print("funktioniert?");
+    int* p = (int*)malloc(5000);
+    print("funktioniert?\n");
     //itoa(p, buf, 16);
     //print(alloc);
 
-    printf("hayyy");
+    printf("hayyy, hier der pointer: %x\n", p);
+
+
+    int a = 19000;
+    printf("a ist : %d\n", a);
+
+    void *p1 = malloc(32);
+    printf("malloc(32) -> %p\n", p1);
+    void *p2 = malloc(64);
+    printf("malloc(64) -> %p\n", p2);
+    void *p3 = malloc(128);
+    printf("malloc(128) -> %p\n", p3);
+    void *p4 = sbrk(0);
+    printf("sbrk(0) after malloc -> %p\n", p4);
+    void *ptr = sbrk(128);
+    printf("sbrk(128) -> %p\n", ptr);
+    void *heap1 = sbrk(0);
+    printf("Heap before malloc: %p\n", heap1);
+
+    void *p9 = malloc(8192);
+    printf("big memory allocation: %p\n", p9);
+
+
+
 
     
     while (1)

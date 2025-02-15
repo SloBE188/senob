@@ -126,6 +126,8 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
         kernel_write("Filesystem mounted successfully!\n");
     }
 
+    setup_vectors();
+    init_keyboard();
     init_syscalls();
     init_proc();
     DIR dir;
@@ -145,8 +147,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);
     kernel_write("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
 
-    setup_vectors();
-    init_keyboard();
 
     printf("Heyy, i would love to see you\n");
 

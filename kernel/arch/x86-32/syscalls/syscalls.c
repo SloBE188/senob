@@ -53,17 +53,21 @@ void syscall_3_write(struct Interrupt_registers* regs)
 
 static void* heap_end = 0x00800000;
 static void* heap_limit = 0x00C00000;
+#define ALIGN_UP(x, align) (((x) + (align - 1)) & ~(align - 1))
 
-void syscall_4_sbrk(struct Interrupt_registers* regs)
+void* syscall_4_sbrk(struct Interrupt_registers* regs)
 {
     
     int increment = regs->ebx;
 
     void* old_heap_end = heap_end;
-    void* new_heap_end = old_heap_end + increment;
+    void* new_heap_end = (void*)ALIGN_UP((uint32_t)old_heap_end + increment, 0x1000);
 
     if(new_heap_end > heap_limit)
+    {
         regs->eax = (uint32_t)-1;
+        return;
+    }
 
     heap_end = new_heap_end;
     regs->eax = (uint32_t) old_heap_end;
