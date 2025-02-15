@@ -66,6 +66,10 @@ off_t lseek(int file, off_t offset, int whence)
     return 0;
 }
 
+
+/*
+ This version does not work because it isnt guaranteed that the compiler will
+ put the params in the right registers, so i have to speciofically do that, pretty stupid
 int read(int file, void *buf, size_t len)
 {
     int br;
@@ -82,6 +86,23 @@ int read(int file, void *buf, size_t len)
 
     return br;
 }
+*/
+
+int read(int file, void *buf, size_t len)
+{
+    int br;
+    asm volatile (
+        "int $0x80"
+        : "=a"(br)
+        : "a"(8),
+          "b"(file),
+          "c"(buf),
+          "d"(len)
+        : "memory", "cc"
+    );
+    return br;
+}
+
 
 int stat(const char *path, struct stat *st)
 {

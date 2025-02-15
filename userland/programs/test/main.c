@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../stdlib/syscall.h"
+#include <fcntl.h>
 
 void main()
 {
@@ -56,7 +57,6 @@ void main()
     readdir("0:/");
 
 
-
     FILE* fp;
     fp = fopen("test.txt", "r");
     if (fp == NULL) {
@@ -65,15 +65,13 @@ void main()
     }
 
     char buffer[256];
-
-    printf("are we ok till here?\n");
-    
     size_t read = fread(buffer, sizeof(char), sizeof(buffer) - 1, fp);
     buffer[read] = '\0';
 
     printf("content of test.txt: %s\n", buffer);
 
-    fclose(fp);
+    //fclose(fp);
+    
 
 
 
