@@ -1,17 +1,6 @@
 #include <errno.h>
 #include <sys/types.h>
 
-//extern int syscall_3_write(int fd, const void* buf, size_t len);
-
-
-/*
-int write(int fd, const void *buf, size_t len)
-{
-    syscall_3_write(fd, buf, len);
-}
-    */
-
-
 
 int write(int fd, const void* buf, size_t len)
 {
@@ -27,60 +16,58 @@ int write(int fd, const void* buf, size_t len)
 }
 
 
-
-
-int open(const char *name, int flags, ...)
+void *sbrk(ptrdiff_t increment)
 {
+    long ret;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(ret)
+        : "a"(4), "b"(increment)
+        : "memory", "cc"
+    );
 
+    if(ret == -1)
+        return (void*) -1;
+
+    return (void*) ret;
+
+}
+
+
+
+
+
+int open(const char* name, int flags, ...)
+{
     int fd;
     __asm__ volatile(
-        "mov $5, %%eax          \n"
-        "mov %1, %%ebx          \n"     //name
-        "mov %2, %%ecx          \n"     //flags
-        "int $0x80              \n"             
-        "mov %%eax, %0          \n"     //retourned fd
-        : "=r" (fd)
-        : "r" (name), "r" (flags)
-        : "eax", "ebx", "ecx"
+        "int $0x80"
+        : "=a"(fd)
+        : "a"(5), "b"(name), "c"(flags)
+        : "memory", "cc"
     );
-    
+
     if(fd == -1)
         return -1;
 
     return fd;
+
 }
+
 
 int readdir(const char* path)
 {
     int fresult;
     __asm__ volatile(
-        "mov $6, %%eax          \n"
-        "mov %1, %%ebx          \n"
-        "int $0x80              \n"
-        "mov %%eax, %0          \n"
-        : "=r" (fresult)
-        : "r" (path)
-        : "eax", "ebx"
+        "int $0x80"
+        : "=a"(fresult)
+        : "a"(6), "b"(path)
+        : "memory", "cc"
     );
 
     return fresult;
 }
 
-/*int close(int file)
-{
-    int res;
-    __asm__ volatile(
-        "mov $7, %%eax          \n"
-        "mov %1, %%ebx          \n"
-        "int $0x80              \n"
-        "mov %%eax, %0          \n"
-        : "=r" (res)
-        : "r" (file)
-        : "memory", "cc"
-    ); 
-
-    return res;    
-}*/
 
 int close(int file)
 {
@@ -92,21 +79,6 @@ int close(int file)
         : "memory", "cc"
     );
 }
-
-off_t lseek(int file, off_t offset, int whence)
-{
-    off_t new_pos;
-    __asm volatile(
-        "int $0x80"
-        : "=a"(new_pos)
-        : "a"(9), "b"(file), "c"(offset), "d"(whence)
-
-    );
-
-    return new_pos;
-
-}
-
 
 /*
  This version does not work because it isnt guaranteed that the compiler will
@@ -144,6 +116,22 @@ int read(int file, void *buf, size_t len)
     return br;
 }
 
+off_t lseek(int file, off_t offset, int whence)
+{
+    off_t new_pos;
+    __asm volatile(
+        "int $0x80"
+        : "=a"(new_pos)
+        : "a"(9), "b"(file), "c"(offset), "d"(whence)
+        : "memory", "cc"
+
+    );
+
+    return new_pos;
+
+}
+
+
 
 int stat(const char *path, struct stat *st)
 {
@@ -152,6 +140,7 @@ int stat(const char *path, struct stat *st)
         "int $0x80"
         : "=a"(res)
         : "a"(10), "b"(path), "c"(st)
+        : "memory", "cc"
     );
 
     return res;
@@ -164,13 +153,9 @@ int fstat(int file, struct stat *st)
         "int $0x80"
         : "=a"(res)
         : "a"(11), "b"(file), "c"(st)
+        : "memory", "cc"
     );
     return res;
-}
-
-int unlink(const char *name)
-{
-    return -1;
 }
 
 int mkdir(const char *path, mode_t mode)
@@ -180,10 +165,17 @@ int mkdir(const char *path, mode_t mode)
         "int $0x80"
         : "=a"(res)
         : "a"(12), "b"(path), "c"(mode)
+        : "memory", "cc"
     );
 
     return res;
 }
+
+int unlink(const char *name)
+{
+    return -1;
+}
+
 
 int dup(int fd)
 {
@@ -214,24 +206,4 @@ int kill(int pid, int sig)
 void _exit(int status)
 {
     for(;;){}
-}
-
-
-void *sbrk(ptrdiff_t increment)
-{
-    long ret;
-    __asm__ volatile(
-        "mov $4, %%eax      \n"
-        "mov %1, %%ebx      \n"
-        "int $0x80          \n"
-        "mov %%eax, %0      \n"
-        : "=r" (ret)
-        : "r" (increment)
-        : "eax", "ebx"
-    );
-
-    if(ret == -1)
-        return (void*) -1;
-
-    return (void*) ret;
 }
