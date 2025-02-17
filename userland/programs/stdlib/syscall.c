@@ -83,7 +83,16 @@ int close(int file)
 
 off_t lseek(int file, off_t offset, int whence)
 {
-    return 0;
+    off_t new_pos;
+    __asm volatile(
+        "int $0x80"
+        : "=a"(new_pos)
+        : "a"(9), "b"(file), "c"(offset), "d"(whence)
+
+    );
+
+    return new_pos;
+
 }
 
 
@@ -126,12 +135,25 @@ int read(int file, void *buf, size_t len)
 
 int stat(const char *path, struct stat *st)
 {
-    return -1;
+    int res;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(res)
+        : "a"(10), "b"(path), "c"(st)
+    );
+
+    return res;
 }
 
 int fstat(int file, struct stat *st) 
 {
-    return -1;
+    int res;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(res)
+        : "a"(11), "b"(file), "c"(st)
+    );
+    return res;
 }
 
 int unlink(const char *name)
@@ -141,7 +163,12 @@ int unlink(const char *name)
 
 int mkdir(const char *path, mode_t mode)
 {
-    return -1;
+    int res;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(res)
+        : "a"(12), "b"(path), "c"(mode)
+    );
 }
 
 int dup(int fd)

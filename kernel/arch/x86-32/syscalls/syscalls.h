@@ -21,7 +21,11 @@ enum syscall_numbers
     OPEN_SYSCALL,
     READDIR_SYSCALL,
     CLOSE_SYSCALL,
-    READ_SYSCALL
+    READ_SYSCALL,
+    LSEEK_SYSCALL,
+    STAT_SYSCALL,
+    FSTAT_SYSCALL,
+    MKDRI_SYSCALL
 };
 
 void add_syscalls(uint32_t syscall_number, syscalls_fun_ptr sys_function);

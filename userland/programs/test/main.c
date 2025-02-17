@@ -53,39 +53,9 @@ void main()
     void *p9 = malloc(8192);
     printf("big memory allocation: %p\n", p9);
 
+    int res = mkdir("senob", 0755);
     readdir("0:/");
 
-    /*
-        FILE *fp;
-    const char *str = "Hello, World!";
-
-    fp = fopen("test.txt", "w");
-    if (fp == NULL) {
-       perror("cant open fire for writing");
-       return 1;
-    }
-
-    size_t written = fwrite(str, sizeof(char), strlen(str), fp);
-    printf("nr written elems: %zu\n", written);
-
-    //fclose(fp);
-
-
-    FILE* fp2;
-    fp2 = fopen("test.txt", "r");
-     if (fp2 == NULL) {
-         perror("cant open file for reading");
-         return 1;
-     }
-
-     char buffer[256];
-     size_t read = fread(buffer, sizeof(char), sizeof(buffer) - 1, fp2);
-     buffer[read] = '\0';
-
-     printf("content of test.txt: %s\n", buffer);
-
-    fclose(fp)
-    */
 
 
     // fclose(fp);               //Required OS subroutines: close, fstat, isatty, lseek, read, sbrk, write.

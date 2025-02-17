@@ -4,6 +4,8 @@
 #include "../../../../drivers/video/vbe/vbe.h"
 #include "../../../libk/libk.h"
 #include "../fatfs/ff.h"
+#include <sys/types.h>
+
 
 
 syscalls_fun_ptr syscall_functions[1024] = {NULL};
@@ -130,6 +132,44 @@ void syscall_8_read(struct Interrupt_registers* regs)
     regs->eax = br;
 }
 
+void syscall_9_lseek(struct Interrupt_registers* regs)
+{
+    int file = regs->ebx;
+    off_t offset = (off_t)regs->ecx;
+    int whence = regs->edx;
+
+    off_t new_pos = lseek(file, offset, whence);
+    regs->eax = (off_t)new_pos;
+}
+
+
+void syscall_10_stat(struct Interrupt_registers* regs)
+{
+    const char* path = (const char*)regs->ebx;
+    struct stat* st = (struct stat*)regs->ecx;
+    
+    int res = stat(path, st);
+    
+    regs->eax = res;
+}
+
+
+void syscall_11_fstat(struct Interrupt_registers* regs)
+{
+    int file = regs->ebx;
+    struct stat* stat = (struct stat*)regs->ecx;
+    int res = fstat(file, stat);
+    regs->eax = res;
+}
+
+void syscall_12_mkdir(struct Interrupt_registers* regs)
+{
+    const char* path = (const char*)regs->ebx;
+    mode_t mode = (mode_t)regs->ecx;
+    
+    int res = mkdir(path, mode);
+    regs->eax = res;
+}
 
 void register_syscalls()
 {
@@ -143,4 +183,8 @@ void register_syscalls()
     add_syscalls(READDIR_SYSCALL, syscall_6_readdir);
     add_syscalls(CLOSE_SYSCALL, syscall_7_close);
     add_syscalls(READ_SYSCALL, syscall_8_read);
+    add_syscalls(LSEEK_SYSCALL, syscall_9_lseek);
+    add_syscalls(STAT_SYSCALL, syscall_10_stat);
+    add_syscalls(FSTAT_SYSCALL, syscall_11_fstat);
+    add_syscalls(MKDRI_SYSCALL, syscall_12_mkdir);
 }
