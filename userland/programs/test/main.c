@@ -4,18 +4,19 @@
 #include <stdlib.h>
 #include "../stdlib/syscall.h"
 #include <fcntl.h>
+#include <string.h>
 
 void main()
 {
 
-    //char input[1024];
+    // char input[1024];
     clear_screen(0);
     print("Welcome to the test programm 1 from senob!\n");
-    //printf("Is this newlib or what");
+    // printf("Is this newlib or what");
     /*int a = 200;
     char buffer[12];
     char buf[30];
-    
+
     char* string = "ich bin der string";
     int length = strlen(string);
 
@@ -25,15 +26,13 @@ void main()
     itoa(a, buffer, 10);
     print(buffer);*/
 
-
-    //char alloc[20];
-    int* p = (int*)malloc(5000);
+    // char alloc[20];
+    int *p = (int *)malloc(5000);
     print("funktioniert?\n");
-    //itoa(p, buf, 16);
-    //print(alloc);
+    // itoa(p, buf, 16);
+    // print(alloc);
 
     printf("hayyy, hier der pointer: %x\n", p);
-
 
     int a = 19000;
     printf("a ist : %d\n", a);
@@ -56,36 +55,46 @@ void main()
 
     readdir("0:/");
 
+    /*
+        FILE *fp;
+    const char *str = "Hello, World!";
 
-    FILE* fp;
-    fp = fopen("test.txt", "r");
+    fp = fopen("test.txt", "w");
     if (fp == NULL) {
-        perror("cant open file for reading");
-        return 1;
+       perror("cant open fire for writing");
+       return 1;
     }
 
-    char buffer[256];
-    size_t read = fread(buffer, sizeof(char), sizeof(buffer) - 1, fp);
-    buffer[read] = '\0';
-
-    printf("content of test.txt: %s\n", buffer);
+    size_t written = fwrite(str, sizeof(char), strlen(str), fp);
+    printf("nr written elems: %zu\n", written);
 
     //fclose(fp);
-    
 
 
+    FILE* fp2;
+    fp2 = fopen("test.txt", "r");
+     if (fp2 == NULL) {
+         perror("cant open file for reading");
+         return 1;
+     }
+
+     char buffer[256];
+     size_t read = fread(buffer, sizeof(char), sizeof(buffer) - 1, fp2);
+     buffer[read] = '\0';
+
+     printf("content of test.txt: %s\n", buffer);
+
+    fclose(fp)
+    */
 
 
+    // fclose(fp);               //Required OS subroutines: close, fstat, isatty, lseek, read, sbrk, write.
 
-
-    
     while (1)
     {
-        //shell implementation with a readline of user input comes here
-        //print("$");
+        // shell implementation with a readline of user input comes here
+        // print("$");
 
-        //print("\n");
-
+        // print("\n");
     }
-    
 }
