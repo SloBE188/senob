@@ -119,7 +119,7 @@ int read(int file, void *buf, size_t len)
 off_t lseek(int file, off_t offset, int whence)
 {
     off_t new_pos;
-    __asm volatile(
+    __asm__ volatile(
         "int $0x80"
         : "=a"(new_pos)
         : "a"(9), "b"(file), "c"(offset), "d"(whence)
