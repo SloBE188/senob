@@ -5,6 +5,8 @@
 #include "../stdlib/syscall.h"
 #include <fcntl.h>
 #include <string.h>
+#include <errno.h>      // errno
+
 
 void main()
 {
@@ -27,7 +29,7 @@ void main()
     print(buffer);*/
 
     // char alloc[20];
-    int *p = (int *)malloc(5000);
+    /*int *p = (int *)malloc(5000);
     print("funktioniert?\n");
     // itoa(p, buf, 16);
     // print(alloc);
@@ -53,8 +55,11 @@ void main()
     void *p9 = malloc(8192);
     printf("big memory allocation: %p\n", p9);
 
-    int res = mkdir("senob", 0755);
-    readdir("0:/");
+    int res = mkdir("senob", 0755);*/
+
+    FILE* fp = fopen("0:/test.txt", "r");
+    fclose(fp);
+
 
 
 

@@ -66,7 +66,7 @@ int readdir(const char* path)
     return fresult;
 }
 
-int close(int file)
+/*int close(int file)
 {
     int res;
     __asm__ volatile(
@@ -76,9 +76,21 @@ int close(int file)
         "mov %%eax, %0          \n"
         : "=r" (res)
         : "r" (file)
-    );
+        : "memory", "cc"
+    ); 
 
     return res;    
+}*/
+
+int close(int file)
+{
+    int res;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(res)
+        : "a"(7), "b"(file)
+        : "memory", "cc"
+    );
 }
 
 off_t lseek(int file, off_t offset, int whence)
@@ -169,6 +181,8 @@ int mkdir(const char *path, mode_t mode)
         : "=a"(res)
         : "a"(12), "b"(path), "c"(mode)
     );
+
+    return res;
 }
 
 int dup(int fd)
