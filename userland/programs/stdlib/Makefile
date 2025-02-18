@@ -4,8 +4,8 @@ AR = ar
 CFLAGS = -g -std=gnu99 -O2 -Wall -Wextra -ffreestanding
 ASMFLAGS = -f elf
 
-LIB_SRC = ./senob.s ./print.c ./proc.c ./build/vbe.c
-LIB_OBJ = ./build/syscall.o ./build/senob.o ./build/print.o ./build/proc.o ./build/vbe.o
+LIB_SRC = ./senob.s ./print.c ./proc.c
+LIB_OBJ = ./build/syscall.o ./build/senob.o ./build/print.o ./build/proc.o
 LIBRARY = ./build/libsenob.a
 
 all: $(LIBRARY)

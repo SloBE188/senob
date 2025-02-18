@@ -41,7 +41,7 @@ void putc_kernel(char c) {
             cursor_x = globalvbeinfo->framebuffer_width - FONT_WIDTH;
         }
         // delete the font at the cursor position
-        draw_rectangle(cursor_x, cursor_y, FONT_WIDTH, FONT_HEIGHT, COLOR_LIGHT_GREY, globalvbeinfo);
+        draw_rectangle(cursor_x, cursor_y, FONT_WIDTH, FONT_HEIGHT, get_background_color(), globalvbeinfo);
     } else {
         // draw font
         draw_char(cursor_x, cursor_y, c, COLOR_WHITE, globalvbeinfo);

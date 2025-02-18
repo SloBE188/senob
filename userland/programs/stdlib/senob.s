@@ -1,7 +1,6 @@
 
 global syscall_0_print
 global syscall_1_load_proc
-global syscall_2_clear_screen
 global syscall_4_sbrk
 
 syscall_0_print:
@@ -16,9 +15,4 @@ syscall_1_load_proc:
     int 0x80
     ret
 
-syscall_2_clear_screen:
-    mov eax, 2
-    mov ebx, [esp+4]
-    int 0x80
-    ret
 

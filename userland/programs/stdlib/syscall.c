@@ -1,6 +1,20 @@
 #include <errno.h>
 #include <sys/types.h>
+#include <stdint.h>
 
+
+int clear_screen(uint32_t color)
+{
+    int res;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(res)
+        : "a"(2), "b"(color)
+        : "memory", "cc"
+    );
+
+    return res;
+}
 
 int write(int fd, const void* buf, size_t len)
 {

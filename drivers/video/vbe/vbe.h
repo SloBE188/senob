@@ -19,6 +19,7 @@ struct vbe_info{
     uint32_t framebuffer_width;
     uint32_t framebuffer_height;
     uint8_t framebuffer_bpp;
+    uint32_t background_color;
 };
 
 
@@ -29,6 +30,7 @@ void draw_string(uint32_t x, uint32_t y, const char* str, uint32_t color, struct
 void draw_char(uint32_t x, uint32_t y, char c, uint32_t color, struct vbe_info* vbeinfo);
 void clear_screen(uint32_t color, struct vbe_info* vbeinfo);
 void clear_screen_sys_2(uint32_t color);
+uint32_t get_background_color();
 
 
 #endif

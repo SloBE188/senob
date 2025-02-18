@@ -25,16 +25,23 @@ struct vbe_info* globalvbeinfo;
 extern uint32_t cursor_x;
 extern uint32_t cursor_y;
 
+uint32_t get_background_color()
+{
+    return globalvbeinfo->background_color;
+}
+
 void clear_screen_sys_2(uint32_t color) 
 {
     cursor_x = 0;
     cursor_y = 0;
     draw_rectangle(0, 0, globalvbeinfo->framebuffer_width, globalvbeinfo->framebuffer_height, color, globalvbeinfo);
+    globalvbeinfo->background_color = color;
 }
 
 void clear_screen(uint32_t color, struct vbe_info* vbeinfo) 
 {
     draw_rectangle(0, 0, vbeinfo->framebuffer_width, vbeinfo->framebuffer_height, color, vbeinfo);
+    globalvbeinfo->background_color = color;
 }
 
 void draw_pixel(uint32_t x, uint32_t y, uint32_t color, struct vbe_info* vbeinfo) 
@@ -82,5 +89,6 @@ void init_vbe(struct vbe_info* vbeinfo)
 {
     globalvbeinfo = vbeinfo;
     clear_screen(COLOR_BLACK, vbeinfo);
+    globalvbeinfo->background_color = COLOR_BLACK;
 }
 

@@ -1,5 +1,4 @@
 #include "main.h"
-#include "../stdlib/vbe.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "../stdlib/syscall.h"
@@ -12,9 +11,18 @@
 void main()
 {
 
-    clear_screen(0);
-
+    int res = clear_screen(COLOR_RED);
+    
     printf("Hey, im a userprogramm\n");
+
+    char buff[100];  
+    int n = 10;
+  
+    printf("Enter a string: ");
+  
+    // Read input from the user
+    fgets(buff, n, stdin);
+    printf("You entered: %s", buff);
 
     while (1)
     {
