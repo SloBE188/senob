@@ -1,6 +1,8 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
+
 #include <sys/types.h>
+#include <stdint.h>
 
 #define COLOR_BLACK         0x000000
 #define COLOR_WHITE         0xFFFFFF

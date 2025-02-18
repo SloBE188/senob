@@ -123,11 +123,11 @@ void syscall_8_read(struct Interrupt_registers* regs)
     void* buf = (void*) regs->ecx;
     size_t len = (size_t) regs->edx;
 
-    printf("syscall_8_read: file=%d, buf=%p, len=%u\n", file, buf, len);
+    //printf("syscall_8_read: file=%d, buf=%p, len=%u\n", file, buf, len);
 
     int br = read(file, buf, len);
 
-    printf(" -> read returned br=%d\n", br);
+    //printf(" -> read returned br=%d\n", br);
 
     regs->eax = br;
 }

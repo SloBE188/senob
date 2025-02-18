@@ -86,7 +86,7 @@ static int map_fresult_to_errno(FRESULT res)
 // searches free file descriptor
 static int get_free_fd()
 {
-    for (int fd = 0; fd < MAX_FILES; fd++)
+    for (int fd = 3; fd < MAX_FILES; fd++)
     {
         if (file_table[fd] == NULL)
         {
@@ -243,23 +243,59 @@ off_t lseek(int file, off_t offset, int whence)
     return (off_t)new_pos;
 }
 
+int console_read_line(void* dst, size_t len)
+{
+    char* out = dst;
+    size_t count = 0;
+
+    while (count + 1 < len) 
+    {
+        uint32_t key;
+        //here im waiting till enter gets pressed. later should set the process in a wait state or smth like that
+        do {
+            key = get_key_from_buffer();
+            if(!key)
+            {
+                __asm__ volatile("sti; hlt");
+            }
+        } while (!key);
+
+        out[count++] = (char)key;
+
+        if (key == '\n') {
+            break;
+        }
+    }
+    out[count] = '\0';
+    dst = out;
+    return (int)count;
+}
+
+
 int read(int file, void *buf, size_t len)
 {
-    if (file < 0 || file >= MAX_FILES || file_table[file] == NULL || buf == NULL)
+    if (file < 0 || file >= MAX_FILES)
     {
         errno = EBADF;
         return -1;
     }
-
-    UINT br;
-    FRESULT res = f_read(file_table[file], buf, len, &br);
-    if (res != FR_OK)
+    //keyboard inputs
+    if(file == STDIN_FILENO)
     {
-        errno = map_fresult_to_errno(res);
-        return -1;
+        return console_read_line(buf, len);
+    }else
+    {
+        //"normal" file handling
+        UINT br;
+        FRESULT res = f_read(file_table[file], buf, len, &br);
+        if (res != FR_OK)
+        {
+            errno = map_fresult_to_errno(res);
+            return -1;
+        }
+    
+        return br;
     }
-
-    return br;
 }
 
 int stat(const char *path, struct stat *st)

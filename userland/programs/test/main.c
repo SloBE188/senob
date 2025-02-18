@@ -11,24 +11,19 @@
 void main()
 {
 
-    int res = clear_screen(COLOR_RED);
+    clear_screen(COLOR_BLUE);
     
     printf("Hey, im a userprogramm\n");
 
+
+    printf("enter smth\n");
     char buff[100];  
-    int n = 10;
-  
-    printf("Enter a string: ");
+    int n = 20;
+
   
     // Read input from the user
     fgets(buff, n, stdin);
-    printf("You entered: %s", buff);
+    printf("entered: %s", buff);
 
-    while (1)
-    {
-        // shell implementation with a readline of user input comes here
-        // print("$");
-
-        // print("\n");
-    }
+    while(1){}
 }
