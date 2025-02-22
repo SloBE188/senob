@@ -226,6 +226,14 @@ int unlink(const char *name)
 }
 
 
+int link(const char *old, const char *new)
+{
+    return -1;
+}
+void _fini()
+{}
+
+
 int dup(int fd)
 {
     return -1;

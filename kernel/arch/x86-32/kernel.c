@@ -129,7 +129,7 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     setup_vectors();
     init_keyboard();
     init_syscalls();
-    init_proc();
+    //init_proc();
     DIR dir;
     FILINFO fno;
 
