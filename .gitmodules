@@ -1,0 +1,3 @@
+[submodule "userland/programs/doomgeneric"]
+	path = userland/programs/doomgeneric
+	url = https://github.com/SloBE188/doomgeneric.git
