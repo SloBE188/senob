@@ -185,6 +185,41 @@ int mkdir(const char *path, mode_t mode)
     return res;
 }
 
+uint32_t get_key_from_buffer() 
+{
+    uint32_t key;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(key)
+        : "a"(13)
+        : "memory", "cc"
+    );
+
+    return key;
+}
+
+void draw_frame_doom(const uint8_t* buffer, int pitch) 
+{
+    __asm__ volatile(
+        "int $0x80"
+        :
+        : "a"(14), "b"(buffer), "c"(pitch)
+        : "memory", "cc"
+    );
+}
+
+uint32_t get_ticks_doom(void) 
+{
+    uint32_t ticks;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(ticks)
+        : "a"(15)
+        : "memory", "cc"
+    );
+    return ticks;
+}
+
 int unlink(const char *name)
 {
     return -1;

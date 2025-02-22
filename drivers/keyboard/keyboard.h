@@ -5,5 +5,6 @@
 
 void irq1_handler(struct Interrupt_registers *regs);
 void init_keyboard();
+uint32_t get_key_from_buffer();
 
 #endif // KEYBOARD_H

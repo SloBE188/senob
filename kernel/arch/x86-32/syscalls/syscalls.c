@@ -5,7 +5,17 @@
 #include "../../../libk/libk.h"
 #include "../fatfs/ff.h"
 #include <sys/types.h>
+#include "../../../../drivers/keyboard/keyboard.h"
+#include "../kernel.h"
 
+
+#define FRAMEBUFFER_ADDR ((volatile uint8_t*) 0xE0000000)
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 768
+#define SCREEN_BPP 4
+
+
+extern volatile uint64_t pit_ticks;
 
 
 syscalls_fun_ptr syscall_functions[1024] = {NULL};
@@ -171,6 +181,37 @@ void syscall_12_mkdir(struct Interrupt_registers* regs)
     regs->eax = res;
 }
 
+void syscall_13_get_key_from_buffer(struct Interrupt_registers* regs)
+{
+    uint32_t key = get_key_from_buffer();
+    regs->eax = key;
+}
+
+void syscall_14_draw_frame_doom(struct Interrupt_registers* regs) {
+    const uint8_t* buffer = (const uint8_t*) regs->ebx;
+    int pitch = regs->ecx;
+
+    for (int y = 0; y < SCREEN_HEIGHT; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            int fb_index = (y * SCREEN_WIDTH + x) * SCREEN_BPP;
+            int doom_index = (y * pitch) + x;
+
+            uint8_t color = buffer[doom_index]; // 8-Bit Farbwert aus Doom
+
+            FRAMEBUFFER_ADDR[fb_index + 0] = color; // Blau
+            FRAMEBUFFER_ADDR[fb_index + 1] = color; // Grün
+            FRAMEBUFFER_ADDR[fb_index + 2] = color; // Rot
+            FRAMEBUFFER_ADDR[fb_index + 3] = 255;   // Alpha (optional)
+        }
+    }
+}
+
+void syscall_15_get_ticks(struct Interrupt_registers* regs)
+{
+    regs->eax = pit_ticks;
+}
+
+
 void register_syscalls()
 {
     kernel_write("registering syscalls\n");
@@ -187,4 +228,7 @@ void register_syscalls()
     add_syscalls(STAT_SYSCALL, syscall_10_stat);
     add_syscalls(FSTAT_SYSCALL, syscall_11_fstat);
     add_syscalls(MKDRI_SYSCALL, syscall_12_mkdir);
+    add_syscalls(GKBUFFER_SYSCALL, syscall_13_get_key_from_buffer);
+    add_syscalls(DRAW_FRAME_DOOM_SYSCALL, syscall_14_draw_frame_doom);
+    add_syscalls(GETTICKS_SYSCALL, syscall_15_get_ticks);
 }

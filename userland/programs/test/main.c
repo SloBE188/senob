@@ -25,5 +25,11 @@ void main()
     fgets(buff, n, stdin);
     printf("entered: %s", buff);
 
+    uint32_t ticks = get_ticks_doom();
+    printf("ticks: %d\n", ticks);
+
+    uint32_t key = get_key_from_buffer();
+    printf("key: %d\n", key);
+
     while(1){}
 }
