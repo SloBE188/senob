@@ -8,6 +8,10 @@ Senob is a operating system with a monolithic kernel designed for the x86 archit
 - Planned support for ARM architecture
 - Open-source and freely available under the GNU General Public License v3.0
 
+DOOM on senob:
+![image](https://github.com/user-attachments/assets/d323cbfe-97a8-43c4-82af-122e2e423c9e)
+
+
 ### Prerequisites
 
 - An x86-based computer or emulator (as an example QEMU)
