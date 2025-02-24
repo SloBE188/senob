@@ -3,4 +3,4 @@ export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 export TARGET=i686-elf
 
-make all -j4
+make all

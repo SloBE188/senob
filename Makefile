@@ -125,13 +125,13 @@ programs:
 	@echo "Running make in programs/start..."
 	cd ./userland/programs/stdlib/ && $(MAKE) all
 	cd ./userland/programs/test/ && $(MAKE) all
-	cd ./userland/programs/doomgeneric/ && $(MAKE) all
+	#cd ./userland/programs/doomgeneric/ && $(MAKE) all
 
 
 programs_clean:
 	cd ./userland/programs/stdlib/ && $(MAKE) clean
 	cd ./userland/programs/test/ && $(MAKE) clean
-	cd ./userland/programs/doomgeneric/ && $(MAKE) clean
+	#cd ./userland/programs/doomgeneric/ && $(MAKE) clean
 
 clean: programs_clean
 	rm -rf ${FILES}

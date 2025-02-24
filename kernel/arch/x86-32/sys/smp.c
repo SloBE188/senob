@@ -125,7 +125,7 @@ void mp_init(struct mp_configuration_table *table)
             break;
         }
         default:
-            kernel_write("unknown: %u\n", type);
+            //kernel_write("unknown: %u\n", type);
             entry_ptr += 8;
             break;
         }

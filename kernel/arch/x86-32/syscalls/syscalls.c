@@ -10,9 +10,7 @@
 
 
 #define FRAMEBUFFER_ADDR ((volatile uint8_t*) 0xE0000000)
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 768
-#define SCREEN_BPP 4
+
 
 
 extern volatile uint64_t pit_ticks;
@@ -187,16 +185,21 @@ void syscall_13_get_key_from_buffer(struct Interrupt_registers* regs)
     regs->eax = key;
 }
 
-void syscall_14_draw_frame_doom(struct Interrupt_registers* regs) {
+
+
+void syscall_14_draw_frame_doom(struct Interrupt_registers* regs) 
+{
     const uint8_t* buffer = (const uint8_t*) regs->ebx;
     int pitch = regs->ecx;
 
-    for (int y = 0; y < SCREEN_HEIGHT; y++) {
-        for (int x = 0; x < SCREEN_WIDTH; x++) {
-            int fb_index = (y * SCREEN_WIDTH + x) * SCREEN_BPP;
-            int doom_index = (y * pitch) + x;
+    int doomWidth  = 640; // or pitch
+    int doomHeight = 400;
 
-            uint8_t color = buffer[doom_index]; // 8-Bit Farbwert aus Doom
+    for (int y = 0; y < doomHeight; y++) {
+        for (int x = 0; x < doomWidth; x++) {
+            int doom_index = y * pitch + x;
+            int fb_index = (y * 1024 + x) * 4; 
+            uint8_t color = buffer[doom_index];
 
             FRAMEBUFFER_ADDR[fb_index + 0] = color; // Blau
             FRAMEBUFFER_ADDR[fb_index + 1] = color; // Grün
