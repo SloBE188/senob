@@ -65,7 +65,7 @@ void syscall_3_write(struct Interrupt_registers* regs)
 
 
 static void* heap_end = 0x00800000;
-static void* heap_limit = 0x00C00000;
+static void* heap_limit = 0x01800000;
 #define ALIGN_UP(x, align) (((x) + (align - 1)) & ~(align - 1))
 
 void syscall_4_sbrk(struct Interrupt_registers* regs)

@@ -603,6 +603,15 @@ struct process *create_process(const char *filename)
     return new_process;
 }
 
+
+void map_file_for_program(const char* filename, struct process* proc)
+{
+    mem_change_page_directory(proc->page_directory);
+    uint32_t needed_pages = map_program_to_address(filename, 0x20000000);
+    copy_program_to_address(filename, needed_pages, 0x20000000);
+    mem_change_page_directory(kernel_directory);
+}
+
 struct thread *create_kernel_thread(struct process *process, void (*start_function)())
 {
     struct thread *new_kthread = (struct thread *)kmalloc(sizeof(struct thread));
@@ -658,7 +667,7 @@ struct thread *create_user_thread(struct process *process)
     new_thread->thread_id = get_thread_id();
     new_thread->owner = process;
 
-    uint32_t count_stack_pages = 40;
+    uint32_t count_stack_pages = 100;
 
     // untere grenze vom stack
     void *end_of_stack = (void *)(USER_STACK_TOP - (PAGE_SIZE * count_stack_pages));
@@ -687,7 +696,7 @@ struct thread *create_user_thread(struct process *process)
     mem_map_page(0xb0000000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
 
 
-    for (size_t i = 0; i < 1024; i++)
+    for (size_t i = 0; i < 4096; i++)
     {
         void* viraddrheap = 0x00800000 + (i * PAGE_SIZE);
         mem_map_page(viraddrheap, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
