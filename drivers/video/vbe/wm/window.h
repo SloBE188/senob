@@ -2,6 +2,7 @@
 #define WINDOW_H
 
 #include <stdint.h>
+#include "../vbe.h"
 
 struct window
 {

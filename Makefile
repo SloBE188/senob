@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/smp.o ./build/libk/libk.o ./build/sys/spinlock.o ./build/sys/apic.o ./build/sys/startother.s.o ./build/sys/startup.o ./build/libk/string.o ./build/sys/thread.s.o ./build/syscalls/syscalls.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/smp.o ./build/libk/libk.o ./build/vbe/wm/window.o ./build/sys/spinlock.o ./build/sys/apic.o ./build/sys/startother.s.o ./build/sys/startup.o ./build/libk/string.o ./build/sys/thread.s.o ./build/syscalls/syscalls.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 FLAGS= -std=gnu99 -O2 -Wall -Wextra -ffreestanding -fpermissive
 
 all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
@@ -125,13 +125,13 @@ programs:
 	@echo "Running make in programs/start..."
 	cd ./userland/programs/stdlib/ && $(MAKE) all
 	cd ./userland/programs/test/ && $(MAKE) all
-	#cd ./userland/programs/doomgeneric/ && $(MAKE) all
+	cd ./userland/programs/doomgeneric/ && $(MAKE) all
 
 
 programs_clean:
 	cd ./userland/programs/stdlib/ && $(MAKE) clean
 	cd ./userland/programs/test/ && $(MAKE) clean
-	#cd ./userland/programs/doomgeneric/ && $(MAKE) clean
+	cd ./userland/programs/doomgeneric/ && $(MAKE) clean
 
 clean: programs_clean
 	rm -rf ${FILES}

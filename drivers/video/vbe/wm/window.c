@@ -1,5 +1,4 @@
 #include "window.h"
-#include "../vbe.h"
 
 char* strncpy(char* dest, const char* src, int count)
 {
