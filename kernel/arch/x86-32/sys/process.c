@@ -778,6 +778,22 @@
      struct registers_save *registers = save_thread_state(thread);
      switch_task(registers);
  }
+
+ void switch_to_thread_no_return(struct thread *thread)
+ {
+    cpus[get_local_apic_id_cpuid()].proc = thread->owner;
+    mem_change_page_directory(thread->owner->page_directory);
+    update_tss_esp0(thread->kstack.esp0, get_local_apic_id_cpuid() + 5);
+
+    __asm__ volatile(
+        "mov %0, %%esp \n"
+        "jmp *%1"
+        :
+        : "r"(thread->regs.esp), "r"(thread->regs.eip)
+        : "memory", "cc"
+    );
+
+ }
  
  uint32_t get_curr_pid()
  {
@@ -1009,8 +1025,11 @@
  
      kernel_write("\n");
  
-     mem_change_page_directory(doom->page_directory);
-     switch_to_thread(doom->head_thread);
+     //mem_change_page_directory(doom->page_directory);
+     //switch_to_thread(doom->head_thread);
+
+     mem_change_page_directory(u1->page_directory);
+     switch_to_thread(u1->head_thread);
  
      //switch_to_thread(k1->head_thread);
  

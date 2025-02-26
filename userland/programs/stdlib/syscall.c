@@ -220,6 +220,20 @@ uint32_t get_ticks_doom(void)
     return ticks;
 }
 
+int execve(const char *__path, char *const __argv[], char *const __envp[])
+{
+    uint32_t res;
+    __asm__ volatile(
+        "in $0x80"
+        : "=a"(res)
+        : "a"(16), "b"(__path), "c"(__argv), "d"(__envp)
+        : "memory", "cc"
+    );
+
+    //this point should never be reached, execution should start in the new process (thread)
+    return res;
+}
+
 int unlink(const char *name)
 {
     return -1;
@@ -260,7 +274,9 @@ int kill(int pid, int sig)
     return -1; /* Always fails */
 }
 
+
 void _exit(int status)
 {
     for(;;){}
+
 }

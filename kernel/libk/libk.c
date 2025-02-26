@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include "memory.h"
 #include "../arch/x86-32/mm/heap/heap.h"
+#include "../arch/x86-32/mm/paging/paging.h"
 
 #undef errno
 extern int errno;
@@ -507,7 +508,11 @@ void _exit(int status)
 int execve(const char *__path, char *const __argv[], char *const __envp[])
 {
     errno = ENOMEM;
-    return -1; /* Always fails */
+    return -1;
+
+    struct process* new_process = create_process(__path);
+    switch_to_thread_no_return(new_process->head_thread);
+    
 }
 
 // TODO should be improved with copying the regs and the user & kernel stack from the parent process

@@ -215,10 +215,25 @@ void syscall_14_draw_frame_doom(struct Interrupt_registers *regs)
         }
     }
 }
-void syscall_15_get_ticks(struct Interrupt_registers * regs)
+void syscall_15_get_ticks(struct Interrupt_registers* regs)
 {
     regs->eax = pit_ticks;
 }
+
+void syscall_16_execve(struct Interrupt_registers* regs)
+{
+
+    const char* path = (const char*)regs->ebx;
+    char** argv = (char**)regs->ecx;
+    char** envp = (char**)regs->edx;
+
+    uint32_t res = execve(path, argv, envp);
+
+    //this point should never be reached, cu should starts its execution of the new process (thread)
+    regs->eax = res;
+}
+
+
 
 void register_syscalls()
 {
@@ -239,4 +254,5 @@ void register_syscalls()
         add_syscalls(GKBUFFER_SYSCALL, syscall_13_get_key_from_buffer);
         add_syscalls(DRAW_FRAME_DOOM_SYSCALL, syscall_14_draw_frame_doom);
         add_syscalls(GETTICKS_SYSCALL, syscall_15_get_ticks);
+        add_syscalls(EXECVE_SYSCALL, syscall_16_execve);
 }
