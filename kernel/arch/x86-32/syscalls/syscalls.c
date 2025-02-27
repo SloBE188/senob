@@ -227,7 +227,12 @@ void syscall_16_execve(struct Interrupt_registers* regs)
     char** argv = (char**)regs->ecx;
     char** envp = (char**)regs->edx;
 
-    uint32_t res = execve(path, argv, envp);
+    char name [20];
+    strcpy(name, path);
+    printf("%s\n", name);
+    
+
+    uint32_t res = execve(name, argv, envp);
 
     //this point should never be reached, cu should starts its execution of the new process (thread)
     regs->eax = 1;

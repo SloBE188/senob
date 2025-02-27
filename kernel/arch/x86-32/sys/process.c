@@ -799,15 +799,6 @@
 
  }
 
-int exec(char *name)
-{
-
-    struct process* new_process = create_process(name);
-    switch_to_thread_no_return(new_process->head_thread);
-
-    return -1;
-    
-}
  
  uint32_t get_curr_pid()
  {
