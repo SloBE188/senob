@@ -30,9 +30,9 @@ void main()
 
     uint32_t key = get_key_from_buffer();
     printf("key: %d\n", key);
-    char* program = "0:/test.bin";
 
-    execve(program, " ", " ");
+
+    execve("0:/test.bin", " ", " ");
 
     while(1){}
 }

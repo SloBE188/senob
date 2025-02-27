@@ -230,7 +230,7 @@ void syscall_16_execve(struct Interrupt_registers* regs)
     uint32_t res = execve(path, argv, envp);
 
     //this point should never be reached, cu should starts its execution of the new process (thread)
-    regs->eax = res;
+    regs->eax = 1;
 }
 
 

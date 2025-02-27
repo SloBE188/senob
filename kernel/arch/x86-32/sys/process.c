@@ -786,14 +786,28 @@
     update_tss_esp0(thread->kstack.esp0, get_local_apic_id_cpuid() + 5);
 
     __asm__ volatile(
-        "mov %0, %%esp \n"
-        "jmp *%1"
+        "push %0        \n"
+        "push %1        \n"
+        "push %2        \n"
+        "push %3        \n"
+        "push %4        \n"
+        "iret"
         :
-        : "r"(thread->regs.esp), "r"(thread->regs.eip)
+        : "r"(thread->regs.ss), "r"(thread->regs.esp), "r"(thread->regs.eflags), "r"(thread->regs.cs), "r"(thread->regs.eip)
         : "memory", "cc"
     );
 
  }
+
+int exec(char *name)
+{
+
+    struct process* new_process = create_process(name);
+    switch_to_thread_no_return(new_process->head_thread);
+
+    return -1;
+    
+}
  
  uint32_t get_curr_pid()
  {

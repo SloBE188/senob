@@ -220,13 +220,13 @@ uint32_t get_ticks_doom(void)
     return ticks;
 }
 
-int execve(const char *__path, char *const __argv[], char *const __envp[])
+int execve(const char *name, char** argv, char** envp)
 {
     uint32_t res;
     __asm__ volatile(
-        "in $0x80"
+        "int $0x80"
         : "=a"(res)
-        : "a"(16), "b"(__path), "c"(__argv), "d"(__envp)
+        : "a"(16), "b"(name), "c"(argv), "d"(envp)
         : "memory", "cc"
     );
 

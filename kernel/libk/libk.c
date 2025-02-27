@@ -505,13 +505,13 @@ void _exit(int status)
     process_exit(get_curr_pid());
 }
 
-int execve(const char *__path, char *const __argv[], char *const __envp[])
+int execve(char *name, char **argv, char **env)
 {
-    errno = ENOMEM;
-    return -1;
 
-    struct process* new_process = create_process(__path);
+    struct process* new_process = create_process(name);
     switch_to_thread_no_return(new_process->head_thread);
+
+    return -1;
     
 }
 
