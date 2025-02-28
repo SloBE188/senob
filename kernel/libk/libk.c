@@ -509,7 +509,8 @@ int execve(char *name, char **argv, char **env)
 {
 
     struct process* new_process = create_process(name);
-    switch_to_thread_no_return(new_process->head_thread);
+    mem_change_page_directory(new_process->page_directory);
+    switch_to_thread(new_process->head_thread);
 
     return -1;
     

@@ -779,25 +779,6 @@
      switch_task(registers);
  }
 
- void switch_to_thread_no_return(struct thread *thread)
- {
-    cpus[get_local_apic_id_cpuid()].proc = thread->owner;
-    mem_change_page_directory(thread->owner->page_directory);
-    update_tss_esp0(thread->kstack.esp0, get_local_apic_id_cpuid() + 5);
-
-    __asm__ volatile(
-        "push %0        \n"
-        "push %1        \n"
-        "push %2        \n"
-        "push %3        \n"
-        "push %4        \n"
-        "iret"
-        :
-        : "r"(thread->regs.ss), "r"(thread->regs.esp), "r"(thread->regs.eflags), "r"(thread->regs.cs), "r"(thread->regs.eip)
-        : "memory", "cc"
-    );
-
- }
 
  
  uint32_t get_curr_pid()
