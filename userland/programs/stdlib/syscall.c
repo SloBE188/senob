@@ -234,6 +234,20 @@ int execve(const char *name, char** argv, char** envp)
     return res;
 }
 
+int getpid()
+{
+    uint32_t pid;
+    __asm__ volatile(
+        "int $0x80"
+        : "=a"(pid)
+        : "a"(17)
+        : "memory", "cc"
+    );
+
+    return pid;
+
+}
+
 int unlink(const char *name)
 {
     return -1;
@@ -258,10 +272,6 @@ int dup2(int oldfd, int newfd)
     return -1;
 }
 
-int getpid()
-{
-    return -1;
-}
 
 int isatty(int file)
 {

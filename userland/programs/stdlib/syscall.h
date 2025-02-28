@@ -22,7 +22,7 @@ uint32_t get_key_from_buffer();
 void draw_frame_doom(const uint8_t* buffer, int pitch);
 uint32_t get_ticks_doom(void);
 int execve(const char *name, char** argv, char** envp);
-
+int getpid();
 
 
 #endif

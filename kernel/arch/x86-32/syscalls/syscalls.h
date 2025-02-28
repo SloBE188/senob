@@ -29,7 +29,8 @@ enum syscall_numbers
     GKBUFFER_SYSCALL,
     DRAW_FRAME_DOOM_SYSCALL,
     GETTICKS_SYSCALL,
-    EXECVE_SYSCALL
+    EXECVE_SYSCALL,
+    GETPID_SYSCALL
 };
 
 void add_syscalls(uint32_t syscall_number, syscalls_fun_ptr sys_function);

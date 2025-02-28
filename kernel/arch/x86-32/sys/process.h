@@ -118,7 +118,5 @@ void inOrderTraversal(struct process *x);
 void process_exit(uint32_t pid);
 uint32_t get_curr_pid();
 struct process *create_kernel_process(void (*start_function)());
-void switch_to_thread_no_return(struct thread *thread);
-int exec(char *name);
 
 #endif

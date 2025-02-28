@@ -241,6 +241,11 @@ void syscall_16_execve(struct Interrupt_registers* regs)
     regs->eax = 1;
 }
 
+void syscall_17_getpid(struct Interrupt_registers* regs)
+{
+    regs->eax = get_curr_pid();
+}
+
 
 
 void register_syscalls()
@@ -263,5 +268,6 @@ void register_syscalls()
         add_syscalls(DRAW_FRAME_DOOM_SYSCALL, syscall_14_draw_frame_doom);
         add_syscalls(GETTICKS_SYSCALL, syscall_15_get_ticks);
         add_syscalls(EXECVE_SYSCALL, syscall_16_execve);
+        add_syscalls(GETPID_SYSCALL, syscall_17_getpid);
         kernel_write("A total of %d Syscalls have been registered\n", syscalls_amount -1);
 }

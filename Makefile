@@ -17,6 +17,7 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 	sudo cp ./userland/programs/test/test.bin /mnt
 	sudo cp ./userland/programs/doomgeneric/doom.bin /mnt
 	sudo cp ./userland/programs/doomgeneric/DOOM1.WAD /mnt
+	sudo cp ./userland/programs/shell/shell.bin /mnt
 	sudo cp ./qemu_log.txt /mnt
 	sudo umount /mnt
 
@@ -126,12 +127,14 @@ programs:
 	cd ./userland/programs/stdlib/ && $(MAKE) all
 	cd ./userland/programs/test/ && $(MAKE) all
 	cd ./userland/programs/doomgeneric/ && $(MAKE) all
+	cd ./userland/programs/shell/ && $(MAKE) all
 
 
 programs_clean:
 	cd ./userland/programs/stdlib/ && $(MAKE) clean
 	cd ./userland/programs/test/ && $(MAKE) clean
 	cd ./userland/programs/doomgeneric/ && $(MAKE) clean
+	cd ./userland/programs/shell/ && $(MAKE) clean
 
 clean: programs_clean
 	rm -rf ${FILES}

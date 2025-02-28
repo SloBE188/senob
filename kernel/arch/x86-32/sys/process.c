@@ -936,7 +936,16 @@
      
      while(1){}
  }
+
  
+ void exec_proc(struct process* proc)
+ {
+    cpus[get_local_apic_id_cpuid()].proc = proc;
+    mem_change_page_directory(proc->page_directory);
+    switch_to_thread(proc->head_thread);
+ }
+
+
  uint32_t init_proc()
  {
  
@@ -948,6 +957,7 @@
      struct process *k3 = create_kernel_process(&thethirdone);
      struct process *u1 = create_process("0:/test.bin");
      struct process* doom = create_process("0:/doom.bin");
+     struct process* shell = create_process("0:/shell.bin");
 
 
      //map_file_for_program("0:/DOOM1.wad", doom);
@@ -956,6 +966,8 @@
      inOrderTraversal(root);
  
      kernel_write("\n");
+
+     exec_proc(shell);
 
      //rb_delete(4);
      //inOrderTraversal(root);
