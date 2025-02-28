@@ -13,6 +13,8 @@
 
 extern volatile uint64_t pit_ticks;
 
+uint32_t syscalls_amount = 0;
+
 syscalls_fun_ptr syscall_functions[1024] = {NULL};
 
 void init_syscalls()
@@ -22,8 +24,9 @@ void init_syscalls()
 
 void add_syscalls(uint32_t syscal_number, syscalls_fun_ptr sys_function)
 {
-    kernel_write("adding syscall %u at address %p\n", syscal_number, sys_function);
     syscall_functions[syscal_number] = sys_function;
+    syscalls_amount++;
+    
 }
 
 void syscall_0_print(struct Interrupt_registers *regs)
@@ -242,7 +245,7 @@ void syscall_16_execve(struct Interrupt_registers* regs)
 
 void register_syscalls()
 {
-        kernel_write("registering syscalls\n");
+        kernel_write("Registering syscalls\n");
         add_syscalls(PRINT_SYSCALL, syscall_0_print);
         add_syscalls(LOAD_PROCESS_SYSCALL, syscall_1_load_process);
         add_syscalls(CLEAR_SCREEN_SYSCALL, syscall_2_clear_screen);
@@ -260,4 +263,5 @@ void register_syscalls()
         add_syscalls(DRAW_FRAME_DOOM_SYSCALL, syscall_14_draw_frame_doom);
         add_syscalls(GETTICKS_SYSCALL, syscall_15_get_ticks);
         add_syscalls(EXECVE_SYSCALL, syscall_16_execve);
+        kernel_write("A total of %d Syscalls have been registered\n", syscalls_amount -1);
 }

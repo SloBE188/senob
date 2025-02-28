@@ -519,7 +519,7 @@ int execve(char *name, char **argv, char **env)
 // TODO should be improved with copying the regs and the user & kernel stack from the parent process
 int fork()
 {
-    struct process *calling_proc = rb_search(root, get_curr_pid());
+    struct process *calling_proc = rb_search(get_curr_pid());
 
     if (calling_proc == NULL)
     {
@@ -566,7 +566,7 @@ int link(const char *old, const char *new)
 }
 
 static void* heap_end = 0xC3000000;     //curr end of the heap, gets incremented with the sbrk func.
-static void* heap_limit = 0xC7000000;
+static void* heap_limit = 0xC500000;
 
 void *sbrk(ptrdiff_t increment)
 {

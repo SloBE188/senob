@@ -91,8 +91,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
 
     init_vbe(&vbeinfo);
     set_vbe_info(&vbeinfo);
-    // draw_rectangle(212, 300, 400, 100, COLOR_BLUE, &vbeinfo);
-    // draw_string(450, 300, "Herzlich willkommen bei senob ;)", COLOR_GREEN, &vbeinfo);
 
     init_ramdisk_disk(multibootinfo);
 
@@ -147,7 +145,6 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     kernel_write("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
 
 
-    printf("Heyy, i would love to see you\n");
 
     init_proc();
     //scheduler();

@@ -32,7 +32,7 @@ void main()
     printf("key: %d\n", key);
 
 
-    execve("0:/test.bin", " ", " ");
+    execve("0:/doom.bin", " ", " ");
 
     while(1){}
 }

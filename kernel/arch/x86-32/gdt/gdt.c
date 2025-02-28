@@ -1,6 +1,7 @@
 #include "gdt.h"
 #include "../../../libk/memory.h"
 #include "../mm/heap/heap.h"
+#include "../kernel.h"
 
 extern void tss_flush();
 extern void gdt_flush(uint32_t);
@@ -12,11 +13,10 @@ extern void gdt_flush(uint32_t);
 #define USER_DATA_SEG 0xF2
 #define TSS_SEG 0x89
 
-#define NUM_CPUS 4
 #define BAST_GDT_ENTRIES 5
-#define TOTAL_GDT_ENTRIES (BAST_GDT_ENTRIES + NUM_CPUS)
+#define TOTAL_GDT_ENTRIES (BAST_GDT_ENTRIES + MAX_CPUS)
 
-struct tss tss[NUM_CPUS];
+struct tss tss[MAX_CPUS];
 struct gdt_entry_struct gdt_entries[TOTAL_GDT_ENTRIES];
 struct gdt_ptr_struct gdt_ptr;
 
@@ -39,7 +39,7 @@ void init_gdt()
     setGdtEntry(5, tss_base, tss_limit, 0xE9, 0x00);
 
     // AP TSS
-    for (uint32_t i = 1; i < NUM_CPUS; i++)
+    for (uint32_t i = 1; i < MAX_CPUS; i++)
     {
         memset(&tss[i], 0, sizeof(struct tss));
         // These don't need to be set when we aren't using hardware

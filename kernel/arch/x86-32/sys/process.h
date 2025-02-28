@@ -112,7 +112,7 @@ uint32_t map_program_to_address(const char* filename, uint32_t program_address);
 struct registers_save* save_thread_state(struct thread* thread);
 uint32_t init_proc();
 void scheduler(void);
-struct process *rb_search(struct process *root, uint32_t pid);
+struct process *rb_search(uint32_t pid);
 struct process *rb_search_runnable(struct process *root);
 void inOrderTraversal(struct process *x);
 void process_exit(uint32_t pid);

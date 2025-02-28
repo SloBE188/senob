@@ -36,12 +36,10 @@
  #include <stdlib.h>
  
  
- #define NPROC 100
  
  uint32_t current_processid = 0;
  uint32_t current_threadid = 0;
  
- struct process processes[NPROC];
  extern struct cpu cpus[MAX_CPUS];
  
  struct process *root = NULL;
@@ -184,11 +182,10 @@
      root->color = BLACK; // has to be black ALWAYS
  }
  
- void rb_insert(uint32_t pid)
+ void rb_insert(struct process* new_process)
  {
  
-     struct process *new_process = &processes[pid];
-     kernel_write("inserting process with PID: %d\n", pid);
+     kernel_write("inserting process with PID: %d\n", new_process->pid);
  
      struct process *y = NULL; // follows the parent node
      struct process *x = root;
@@ -229,7 +226,7 @@
      fixup_insert(new_process);
  }
  
- struct process *rb_search(struct process *root, uint32_t pid)
+ struct process *rb_search(uint32_t pid)
  {
      struct process *current = root;
      while (current != NIL && current->pid != pid)
@@ -365,7 +362,7 @@
  void rb_delete(uint32_t pid)
  {
      // find node to delete
-     struct process *z = rb_search(root, pid);
+     struct process *z = rb_search(pid);
      if (z == NIL)
      {
          return;
@@ -415,9 +412,10 @@
          // y which just replaced z has to take over zs color
          y->color = z->color;
      }
- 
-     // kfree(z->proc);  if allocated
-     // kfree(z);
+
+        kfree(z->head_thread->kstack.stack_start);
+        kfree(z->head_thread);
+        kfree(z);
  
      // if y was a black node,fixuop
      if (y_original_color == BLACK)
@@ -489,44 +487,18 @@
  
  struct thread *create_kernel_thread(struct process *process, void (*start_function)());
  struct thread *create_user_thread(struct process *process);
- 
- struct process *get_unused_process()
- {
-     for (uint32_t i = 0; i < 100; i++)
-     {
-         if (processes[i].state == UNUSED)
-         {
-             return &processes[i];
-         }
-     }
-     kernel_write("No unused process found\n");
-     return NULL;
- }
- 
- struct process *get_runnable_process()
- {
-     for (uint32_t i = 0; i < 100; i++)
-     {
-         if (processes[i].state == RUNNABLE)
-         {
-             return &processes[i];
-         }
-     }
-     kernel_write("No runnable process found\n");
-     return NULL;
- }
+
  
  struct process *create_kernel_process(void (*start_function)())
  {
- 
-     struct process *new_process = get_unused_process();
+
+     struct process* new_process = (struct process*)kmalloc(sizeof(struct process));
      if (!new_process)
      {
          kernel_write("No more unused process slots\n");
          return;
      }
- 
-     // struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
+
      memset(new_process, 0x00, sizeof(struct process));
      kernel_write("Allocated process structure at: %p\n", new_process);
  
@@ -545,12 +517,12 @@
  
      new_process->head_thread = main_thread;
  
-     //update_tss_esp0(main_thread->kstack.esp0, get_local_apic_id_cpuid() + 5);
+     //update_tss_esp0(main_thread->kstack.esp0, get_local_apic_id_cpuid() + 5); //uncomment if i switch directly without scheduler etc.
  
      new_process->state = RUNNABLE;
  
      acquire(&rb_tree_lock);
-     rb_insert(new_process->pid);
+     rb_insert(new_process);
      release(&rb_tree_lock);
  
      return new_process;
@@ -558,8 +530,8 @@
  
  struct process *create_process(const char *filename)
  {
-     struct process *new_process = get_unused_process();
-     // struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
+
+     struct process *new_process = (struct process *)kmalloc(sizeof(struct process));
      memset(new_process, 0x00, sizeof(struct process));
      kernel_write("Allocated process structure at: %p\n", new_process);
  
@@ -570,12 +542,7 @@
      new_process->isuserproc = 1;
  
      new_process->page_directory = mem_alloc_page_dir();
-     /* uint32_t *pd = new_process->page_directory;
-      for (int i = 0; i < 1024; i++)
-      {
-          kernel_write("PDE[%d]: %x\n", i, pd[i]);
-      }*/
- 
+
      mem_change_page_directory(new_process->page_directory);
  
  
@@ -597,7 +564,7 @@
      mem_change_page_directory(kernel_directory);
  
      acquire(&rb_tree_lock);
-     rb_insert(new_process->pid);
+     rb_insert(new_process);
      release(&rb_tree_lock);
  
      return new_process;
@@ -679,18 +646,6 @@
          mem_map_page((uint32_t)vaddr, physical_frames[i], PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
      }
  
-     /*for (uint32_t addr = (USER_STACK_TOP - (PAGE_SIZE * count_stack_pages)); addr < USER_STACK_TOP; addr += PAGE_SIZE)
-     {
-         uint32_t phys = mem_get_phys_from_virt(addr);
-         if (phys == (uint32_t)-1)
-         {
-             kernel_write("address 0x%x is not mapped\n", addr);
-         }
-         else
-         {
-             kernel_write("address 0x%x is mapped to physical address 0x%x\n", addr, phys);
-         }
-     }*/
  
      mem_map_page(0xb0000000, pmm_alloc_pageframe(), PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_USER);
  
@@ -790,7 +745,7 @@
  
  void process_exit(uint32_t pid)
  {
-     struct process* proc = rb_search(root, pid);
+     struct process* proc = rb_search(pid);
      kfree(proc->head_thread);
      rb_delete(pid);
      scheduler();
@@ -805,22 +760,15 @@
      NIL->right = NIL;
      NIL->parent = NULL;
      root = NIL;
- 
-     for (uint32_t i = 0; i < NPROC; i++)
-     {
-         processes[i].color = BLACK;
-         processes[i].left = NIL;
-         processes[i].right = NIL;
-         processes[i].parent = NULL;
-         processes[i].state = UNUSED;
-         processes[i].pid = i;
-     }
  }
  
  
  
  static void context_switch(struct thread *new_thread);
  
+
+ //TODO: This scheduler absolutely sucks. Every CPU needs her own run queue and the run queue searches threw the threads, not processes. I need Thread states, RB BST is for the global proces mgmt (search terminating etc.).
+ //TODO: Every CPU starts a scheduler which wil just search her run queue, i have to do some load balancing between the run queues so every CPU has around the same threads in her run queue
  void scheduler(void) 
  {
      struct cpu *cpu = &cpus[get_local_apic_id_cpuid()];
@@ -995,29 +943,22 @@
      init_locks();
      node_preparation();
      
-     kernel_write("Creating kernel process 1\n");
      struct process *k1 = create_kernel_process(&test_process);
-     kernel_write("Creating kernel process 2\n");
      struct process *k2 = create_kernel_process(&anotherone);
-     kernel_write("Creating kernel process 3\n");
      struct process *k3 = create_kernel_process(&thethirdone);
-     kernel_write("Creating a uuser process (1)\n");
      struct process *u1 = create_process("0:/test.bin");
      struct process* doom = create_process("0:/doom.bin");
-     map_file_for_program("0:/DOOM1.wad", doom);
+
+
+     //map_file_for_program("0:/DOOM1.wad", doom);
      
      kernel_write("In-order traversal of RB Tree:\n");
      inOrderTraversal(root);
  
      kernel_write("\n");
- 
-     //mem_change_page_directory(doom->page_directory);
-     //switch_to_thread(doom->head_thread);
 
-     mem_change_page_directory(u1->page_directory);
-     switch_to_thread(u1->head_thread);
- 
-     //switch_to_thread(k1->head_thread);
+     //rb_delete(4);
+     //inOrderTraversal(root);
  
  
      return 0;
