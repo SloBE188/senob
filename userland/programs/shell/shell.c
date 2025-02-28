@@ -1,5 +1,6 @@
 #include "../stdlib/syscall.h"
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char** argv)
 {
@@ -18,6 +19,26 @@ int main(int argc, char** argv)
 
        if(r == NULL)
         continue;
+        
+        if(strncmp(inbuffer, "0:/", 3) == 0)
+        {
+            uint32_t res;
+
+            FILE* file = fopen(inbuffer, "rb");
+            if(file == NULL)
+            {
+                printf("There is no such program like %s\n", inbuffer);
+                continue;
+            }else
+            {
+                res = execve(inbuffer, " ", " ");
+            }
+            
+        }
+        if(strncmp(inbuffer, "ls", 2) == 0)
+        {
+            readdir("0:/");     //TODO: get curr directory
+        }
         
 
     }

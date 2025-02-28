@@ -148,7 +148,7 @@ int open(const char *name, int flags, ...)
     file_entries[fd].fil = kmalloc(sizeof(FIL));
     strncpy(file_entries[fd].path, name, _MAX_LFN);
     file_entries[fd].path[_MAX_LFN] = '\0';
-    printf("added file entry: %s\n", file_entries[fd].path);
+    //printf("added file entry: %s\n", file_entries[fd].path);
 
     FRESULT res = f_open(file_entries[fd].fil, file_entries[fd].path, translate_flags(flags));
     if (res != FR_OK)
