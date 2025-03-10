@@ -38,7 +38,7 @@ struct process
 
 
 
-struct registers_save 
+struct regs
 {
     uint32_t eax;     //  0
     uint32_t ebx;     //  4
@@ -60,7 +60,7 @@ struct registers_save
     uint32_t gs;      //  56
 
     uint32_t cr3;     //  60
-};
+} __attribute__ ((packed));
 
 struct thread
 {
@@ -69,29 +69,7 @@ struct thread
     struct thread* next;
     struct thread* prev;
 
-    struct
-    {
-        uint32_t eax;     //  0
-        uint32_t ebx;     //  4
-        uint32_t ecx;     //  8
-        uint32_t edx;     //  12
-
-        uint32_t esp;     //  16
-        uint32_t ebp;     //  20
-
-        uint32_t edi;     //  24
-        uint32_t eip;     //  28
-        uint32_t eflags;  //  32
-
-        uint32_t cs;      //  36
-        uint32_t ss;      //  40
-        uint32_t ds;      //  44
-        uint32_t es;      //  48
-        uint32_t fs;      //  52
-        uint32_t gs;      //  56
-
-        uint32_t cr3;     //  60
-    } regs __attribute__ ((packed));
+    struct regs* regs;
 
     
     struct
@@ -105,8 +83,7 @@ struct thread
 };
 
 struct process* create_process(const char* filename);
-extern void switch_task(struct registers_save* regs);
-void switch_to_thread(struct thread* thread);
+extern void switch_task(struct regs* regs);
 void copy_program_to_address(const char* filename, uint32_t pages_needed, uint32_t program_address);
 uint32_t map_program_to_address(const char* filename, uint32_t program_address);
 struct registers_save* save_thread_state(struct thread* thread);
@@ -118,5 +95,6 @@ void inOrderTraversal(struct process *x);
 void process_exit(uint32_t pid);
 uint32_t get_curr_pid();
 struct process *create_kernel_process(void (*start_function)());
+void exec_proc(struct process* proc);
 
 #endif

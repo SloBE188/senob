@@ -509,8 +509,7 @@ int execve(char *name, char **argv, char **env)
 {
 
     struct process* new_process = create_process(name);
-    mem_change_page_directory(new_process->page_directory);
-    switch_to_thread(new_process->head_thread);
+    exec_proc(new_process);
 
     return -1;
     
@@ -535,7 +534,7 @@ int fork()
     }
     else
     {
-        proc = create_kernel_process(calling_proc->head_thread->regs.eip);
+        proc = create_kernel_process(calling_proc->head_thread->regs->eip);
     }
 
     kernel_write("Fork successfull\n");

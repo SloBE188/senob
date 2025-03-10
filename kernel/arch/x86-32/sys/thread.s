@@ -2,12 +2,13 @@ global switch_task
 
 section .text
 switch_task:
+
     ; esi points to the register struct
     mov esi, [esp + 4]      ; address from the register struct
 
-    ; load pd
-    ;mov eax, [esi + 64]
-    ;mov cr3, eax
+    mov eax, [esi + 60]
+    sub eax, 0xC0000000
+    mov cr3, eax
 
     ; load segment register
     mov eax, [esi + 44]      ; ds
@@ -34,4 +35,5 @@ switch_task:
     push dword [esi + 32]   ; eflags
     push dword [esi + 36]   ; cs
     push dword [esi + 28]   ; eip
+
     iret

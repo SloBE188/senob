@@ -40,7 +40,7 @@ void syscall_1_load_process(struct Interrupt_registers *regs)
 {
     char *user_program_name = regs->ebx;
     struct process *new_program = create_process(user_program_name);
-    switch_to_thread(new_program->head_thread);
+    switch_task(new_program->head_thread->regs);
 }
 
 void syscall_2_clear_screen(struct Interrupt_registers *regs)

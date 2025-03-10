@@ -594,15 +594,15 @@
      new_kthread->kstack.stack_start = (uint32_t)kernel_stack;
  
      uint32_t segment_selector = 0x10;
-     new_kthread->regs.ss = segment_selector;
-     new_kthread->regs.eflags = 0x202;
-     new_kthread->regs.cs = 0x08;
-     new_kthread->regs.eip = (uint32_t)start_function;
-     new_kthread->regs.ds = segment_selector;
-     new_kthread->regs.es = segment_selector;
-     new_kthread->regs.fs = segment_selector;
-     new_kthread->regs.gs = segment_selector;
-     new_kthread->regs.esp = new_kthread->kstack.esp0;
+     new_kthread->regs->ss = segment_selector;
+     new_kthread->regs->eflags = 0x202;
+     new_kthread->regs->cs = 0x08;
+     new_kthread->regs->eip = (uint32_t)start_function;
+     new_kthread->regs->ds = segment_selector;
+     new_kthread->regs->es = segment_selector;
+     new_kthread->regs->fs = segment_selector;
+     new_kthread->regs->gs = segment_selector;
+     new_kthread->regs->esp = new_kthread->kstack.esp0;
  
      if (process->head_thread == NULL)
      {
@@ -662,17 +662,21 @@
          kernel_write("address 0xb0000000 is not mapped\n");
      }
  
+     new_thread->regs = (struct regs*)kmalloc(sizeof(struct regs));
      uint32_t segment_selector = 0x23;
-     new_thread->regs.ss = segment_selector;
-     new_thread->regs.eflags = 0x202;
-     new_thread->regs.cs = 0x1B;
-     new_thread->regs.eip = PROGRAMM_VIRTUAL_ADDRESS_START;
-     new_thread->regs.ds = segment_selector;
-     new_thread->regs.es = segment_selector;
-     new_thread->regs.fs = segment_selector;
-     new_thread->regs.gs = segment_selector;
+     new_thread->regs->ss = segment_selector;
+     new_thread->regs->eflags = 0x202;
+     new_thread->regs->cs = 0x1B;
+     new_thread->regs->eip = PROGRAMM_VIRTUAL_ADDRESS_START;
+     new_thread->regs->ds = segment_selector;
+     new_thread->regs->es = segment_selector;
+     new_thread->regs->fs = segment_selector;
+     new_thread->regs->gs = segment_selector;
      uint32_t user_stack_pointer = USER_STACK_TOP - 4;
-     new_thread->regs.esp = user_stack_pointer;
+     new_thread->regs->esp = user_stack_pointer;
+
+     //pd
+     new_thread->regs->cr3 = new_thread->owner->page_directory;
  
      // kernel stack
      new_thread->kstack.ss0 = 0x10;
@@ -700,7 +704,7 @@
      return new_thread;
  }
  
- struct registers_save *save_thread_state(struct thread *thread)
+ /*struct registers_save *save_thread_state(struct thread *thread)
  {
      struct registers_save *registers = (struct registers_save *)kmalloc(sizeof(struct registers_save));
  
@@ -726,13 +730,8 @@
      registers->cr3 = thread->regs.cr3;
  
      return registers;
- }
+ }*/
  
- void switch_to_thread(struct thread *thread)
- {
-     struct registers_save *registers = save_thread_state(thread);
-     switch_task(registers);
- }
 
 
  
@@ -835,10 +834,10 @@
  
      if(old_thread) 
      {
-         save_thread_state(old_thread);
+         //save_thread_state(old_thread);
      }
  
-     switch_to_thread(new_thread);
+     switch_task(new_thread->regs);
  }
  
  
@@ -874,7 +873,6 @@
      // struct process *p1 = create_process("0:/test.bin");
      //  inOrderTraversal(root);
      //  PitWait(8000);
-     //  switch_to_thread(p1->head_thread);
      /*
     FILE *fp;
     const char *str = "Hello, World!";
@@ -941,8 +939,7 @@
  void exec_proc(struct process* proc)
  {
     cpus[get_local_apic_id_cpuid()].proc = proc;
-    mem_change_page_directory(proc->page_directory);
-    switch_to_thread(proc->head_thread);
+    switch_task(proc->head_thread->regs);
  }
 
 
