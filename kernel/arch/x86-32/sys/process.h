@@ -2,40 +2,33 @@
 #define PROCESS_H
 
 #include <stdint.h>
-#include "../../../../drivers/video/vbe/vbe.h"
+
 
 #define USER_STACK_TOP 0xB0000000
 #define PROGRAMM_VIRTUAL_ADDRESS_START 0x00400000
-#define KERNEL_PROCESS 20
-#define USER_PROCESS 30
 #define BLACK 0
 #define RED 1
 
-enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+
+enum threadState {UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, WAITING};
+
+extern struct process* root;
 
 struct process
 {
     uint32_t pid;
-    char filename[20];
+    char* filename;
+    uint32_t* pageDirectory;
+    uint32_t isUserProc;
 
-    uint32_t* page_directory;
-
-    enum procstate state;
-    uint32_t assigned_cpu;
-    uint32_t isuserproc;
-    
+    uint32_t color;
     struct process* parent;
     struct process* left;
     struct process* right;
-    uint32_t color;
 
     struct thread* head_thread;
     struct thread* tail_thread;
-
-
-} __attribute__((packed));
-
-
+}__attribute__((packed));
 
 
 struct regs
@@ -64,37 +57,38 @@ struct regs
 
 struct thread
 {
-    uint32_t thread_id;
+    uint32_t threadID;
     struct process* owner;
+
     struct thread* next;
     struct thread* prev;
-
-    struct regs* regs;
-
     
+    struct regs* regs;
+    enum threadState state;
+
+    uint32_t basePriority;
+    uint32_t dynamicPriority;
+    uint32_t waitTicks;
+
     struct
     {
         uint32_t esp0;
         uint16_t ss0;
-        uint32_t stack_start;
+        uint32_t stackStart;
     } kstack __attribute__ ((packed));
-
-
 };
 
-struct process* create_process(const char* filename);
-extern void switch_task(struct regs* regs);
-void copy_program_to_address(const char* filename, uint32_t pages_needed, uint32_t program_address);
-uint32_t map_program_to_address(const char* filename, uint32_t program_address);
-struct registers_save* save_thread_state(struct thread* thread);
-uint32_t init_proc();
-void scheduler(void);
-struct process *rb_search(uint32_t pid);
-struct process *rb_search_runnable(struct process *root);
-void inOrderTraversal(struct process *x);
-void process_exit(uint32_t pid);
-uint32_t get_curr_pid();
-struct process *create_kernel_process(void (*start_function)());
-void exec_proc(struct process* proc);
+struct process* createKernelProcess(void *(function)());
+struct thread* createKernelThread(struct process* process, void *(function)());
+struct process* createUserProcess(const char* filename);
+struct thread* createUserThread(struct process* process);
+extern void switchTask(struct regs* regs);
+void initProc();
+void inOrderTraversal(struct process *x, void (*callback)(struct process*));
+uint32_t get_local_apic_id_cpuid();
+struct process *rbSearch(uint32_t pid);
+uint32_t initIdle();
+
+
 
 #endif

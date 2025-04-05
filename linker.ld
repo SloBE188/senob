@@ -41,10 +41,10 @@ SECTIONS
         _trampoline_end = .;
     }
 
-    .pmmc ALIGN(4): AT(ADDR(.pmmc) - 0xC0000000) {
-        _pmmc_start = .;
-        KEEP(*(.pmmc))
-        _pmmc_end = .;
+    .pMode ALIGN(4): AT(ADDR(.pMode) - 0xC0000000) {
+        _pMode_start = .;
+        KEEP(*(.pMode))
+        _pMode_end = .;
     }
 
     _kernel_end = .;

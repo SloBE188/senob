@@ -76,7 +76,7 @@ void setGdtEntry(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, ui
     gdt_entries[num].access = access;
 }
 
-void update_tss_esp0(uint32_t esp0, uint32_t AP_NR)
+void updateTssEsp0(uint32_t esp0, uint32_t AP_NR)
 {
     tss[AP_NR].esp0 = esp0;
 }

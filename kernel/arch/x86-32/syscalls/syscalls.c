@@ -1,6 +1,5 @@
 #include "syscalls.h"
 #include "../interrupts/idt.h"
-#include "../sys/process.h"
 #include "../../../../drivers/video/vbe/vbe.h"
 #include "../../../libk/libk.h"
 #include "../fatfs/ff.h"
@@ -8,6 +7,7 @@
 #include "../../../../drivers/keyboard/keyboard.h"
 #include "../kernel.h"
 #include "playpal.h"
+#include "../sys/process.h"
 
 #define FRAMEBUFFER_ADDR ((volatile uint8_t *)0xE0000000)
 
@@ -36,12 +36,12 @@ void syscall_0_print(struct Interrupt_registers *regs)
     kernel_write("%s", user_string);
 }
 
-void syscall_1_load_process(struct Interrupt_registers *regs)
+/*void syscall_1_load_process(struct Interrupt_registers *regs)
 {
     char *user_program_name = regs->ebx;
     struct process *new_program = create_process(user_program_name);
     switch_task(new_program->head_thread->regs);
-}
+}*/
 
 void syscall_2_clear_screen(struct Interrupt_registers *regs)
 {
@@ -243,7 +243,7 @@ void syscall_16_execve(struct Interrupt_registers* regs)
 
 void syscall_17_getpid(struct Interrupt_registers* regs)
 {
-    regs->eax = get_curr_pid();
+    //regs->eax = get_curr_pid();
 }
 
 
@@ -252,7 +252,7 @@ void register_syscalls()
 {
         kernel_write("Registering syscalls\n");
         add_syscalls(PRINT_SYSCALL, syscall_0_print);
-        add_syscalls(LOAD_PROCESS_SYSCALL, syscall_1_load_process);
+        //add_syscalls(LOAD_PROCESS_SYSCALL, syscall_1_load_process);
         add_syscalls(CLEAR_SCREEN_SYSCALL, syscall_2_clear_screen);
         add_syscalls(WRITE_SYSCALL, syscall_3_write);
         add_syscalls(SBRK_SYSCALL, syscall_4_sbrk);

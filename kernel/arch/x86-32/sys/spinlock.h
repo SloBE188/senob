@@ -2,7 +2,6 @@
 #define SPINLOCK_H
 
 #include <stdint.h>
-#include "smp.h"
 
 struct spinlock
 {
@@ -11,7 +10,7 @@ struct spinlock
     char* name;
 };
 
-void init_lock(struct spinlock* lock, char* name);
+void initLock(struct spinlock* lock, char* name);
 void acquire(struct spinlock* lock);
 void release(struct spinlock* lock);
 

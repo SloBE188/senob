@@ -25,7 +25,9 @@
         "heap.h": "c",
         "spinlock.h": "c",
         "stdio.h": "c",
-        "errno.h": "c"
+        "errno.h": "c",
+        "process.h": "c",
+        "array": "c"
     },
     "makefile.configureOnOpen": false
 }

@@ -22,14 +22,21 @@
 #include "../../../libk/stdiok.h"
 #include "../mm/paging/paging.h"
 #include "../syscalls/syscalls.h"
-#include "../sys/apic.h"
 #include "pit.h"
 #include "../kernel.h"
+#include "../sys/lapic.h"
+#include "../kernel.h"
+#include "../sys/process.h"
+#include "../sys/sched.h"
+#include "../sys/startup.h"
+
+#define TIME_SLICE_TICKS 5
 
 struct idt_entry_t idt_descriptors[256];
 struct idtr_t idtr;
 
 extern void idt_flush(uint32_t);
+
 
 void idt_set_descriptor(uint8_t interrupt_number, uint32_t isr, uint8_t dpl)
 {
@@ -60,12 +67,10 @@ void init_pic()
     outb(0x21, 0x00);
     outb(0xA1, 0x00);
 
-    //outb(0x21, 0xFD);
-    //outb(0xA1, 0xFF);
 }
 
 void spurious_interrupt_handler(struct Interrupt_registers *regs);
-void apic_timer_handler(struct Interrupt_registers *regs);
+void apicTimerHandler(struct Interrupt_registers *regs);
 void apic_error_handler(struct Interrupt_registers *regs);
 
 void idt_init()
@@ -114,7 +119,7 @@ void idt_init()
     // irqs;
     idt_set_descriptor(0x20, (uint32_t)irq0, 1);
     idt_set_descriptor(0x21, (uint32_t)irq1, 1);
-    idt_set_descriptor(0x32, (uint32_t)apic_timer_handler, 1);
+    idt_set_descriptor(0x40, (uint32_t)irq32, 1);
     idt_set_descriptor(0xFE, (uint32_t)apic_error_handler, 1);
     idt_set_descriptor(0xFF, (uint32_t)spurious_interrupt_handler, 1);
 
@@ -129,9 +134,23 @@ void spurious_interrupt_handler(struct Interrupt_registers *regs)
     kernel_write("Spurious interrupt received: 0x%x\n", regs->interrupt_number);
 }
 
-void apic_timer_handler(struct Interrupt_registers *regs)
+
+
+void apicTimerHandler(struct Interrupt_registers *regs)
 {
-    kernel_write("APIC TIMER Interrupt occured\n");
+    //kernel_write("APIC TIMER Interrupt occured\n");
+    uint32_t apic_id = get_local_apic_id_cpuid();
+    cpuTicks[apic_id]++;
+    ticksSinceLastSwitch[apic_id]++;
+
+    if (ticksSinceLastSwitch[apic_id] >= TIME_SLICE_TICKS)
+    {
+        ageThreads(apic_id);
+        schedule(apic_id);
+    }
+    
+
+    eoi();
 
 }
 
@@ -190,9 +209,8 @@ void page_fault_handler(struct Interrupt_registers *r)
         kernel_write("Page protection violation.\n");
     }
 
-    while (1)
-    {
-    }
+    sync_page_dirs();
+    mem_change_page_directory(kernel_directory);
 }
 
 void syscall_handler(struct Interrupt_registers *regs)
@@ -244,8 +262,8 @@ void vector_remove_handler(int vector)
 
 void setup_vectors()
 {
-    vector_add_handler(0x20, &pit_handler);
-    vector_add_handler(0x32, &apic_error_handler);
+    vector_add_handler(0, &pit_handler);
+    vector_add_handler(32, &apicTimerHandler);
     vector_add_handler(0xFE, apic_error_handler);
     vector_add_handler(0xFF, spurious_interrupt_handler);
 }
@@ -266,15 +284,5 @@ void irq_handler(struct Interrupt_registers *regs)
     {
         outb(0x20,0x20);
         outb(0xA0, 0x20);
-    }else
-    {
-        lapicw(EOI, 0);
     }
-    
-    // send EOI to the local apic
-    //lapicw(EOI, 0);
-    /*lapicw(EOI, 0);
-    
-    uint32_t esr = lapic_read(ESR);
-    kernel_write("ESR: 0x%x\n", esr);*/
 }

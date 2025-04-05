@@ -1,4 +1,4 @@
-FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/sys/smp.o ./build/libk/libk.o ./build/vbe/wm/window.o ./build/sys/spinlock.o ./build/sys/apic.o ./build/sys/startother.s.o ./build/sys/startup.o ./build/libk/string.o ./build/sys/thread.s.o ./build/syscalls/syscalls.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/sys/process.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
+FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/libk/libk.o ./build/sys/process.o ./build/sys/sched.o ./build/sys/mp.o ./build/sys/trampoline.o ./build/sys/startup.o ./build/sys/smp.o ./build/sys/spinlock.o ./build/sys/lapic.o ./build/sys/thread.o ./build/vbe/wm/window.o ./build/libk/string.o ./build/syscalls/syscalls.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 FLAGS= -std=gnu99 -O2 -Wall -Wextra -ffreestanding -fpermissive
 
 all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
@@ -18,7 +18,7 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 	sudo cp ./userland/programs/doomgeneric/doom.bin /mnt
 	sudo cp ./userland/programs/doomgeneric/DOOM1.WAD /mnt
 	sudo cp ./userland/programs/shell/shell.bin /mnt
-	sudo cp ./qemu_log.txt /mnt
+	#sudo cp ./qemu_log.txt /mnt
 	sudo umount /mnt
 
 ./build/kernel.o:
@@ -96,29 +96,41 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 ./build/fatfs/ff.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/fatfs/ff.c -o ./build/fatfs/ff.o $(FLAGS)
 
-./build/sys/thread.s.o:
-	nasm -f elf ./kernel/arch/x86-32/sys/thread.s -o ./build/sys/thread.s.o
 
 ./build/syscalls/syscalls.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/syscalls/syscalls.c -o ./build/syscalls/syscalls.o $(FLAGS)
 
+
+./build/libk/libk.o:
+	i686-elf-gcc -g -c ./kernel/libk/libk.c -o ./build/libk/libk.o $(FLAGS)
+
+./build/sys/process.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/process.c -o ./build/sys/process.o $(FLAGS)
+
+./build/sys/thread.o:
+	nasm -f elf ./kernel/arch/x86-32/sys/thread.s -o ./build/sys/thread.o
+
+./build/sys/mp.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/mp.c -o ./build/sys/mp.o $(FLAGS)
+
+./build/sys/lapic.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/lapic.c -o ./build/sys/lapic.o $(FLAGS)
+
+./build/sys/trampoline.o:
+	nasm -f elf ./kernel/arch/x86-32/sys/trampoline.s -o ./build/sys/trampoline.o
+
 ./build/sys/smp.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/smp.c -o ./build/sys/smp.o $(FLAGS)
-
-./build/sys/apic.o:
-	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/apic.c -o ./build/sys/apic.o $(FLAGS)
-
-./build/sys/startother.s.o:
-	nasm -f elf ./kernel/arch/x86-32/sys/startother.s -o ./build/sys/startother.s.o
 
 ./build/sys/startup.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/startup.c -o ./build/sys/startup.o $(FLAGS)
 
+./build/sys/sched.o:
+	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/sched.c -o ./build/sys/sched.o $(FLAGS)
+
+
 ./build/sys/spinlock.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/sys/spinlock.c -o ./build/sys/spinlock.o $(FLAGS)
-
-./build/libk/libk.o:
-	i686-elf-gcc -g -c ./kernel/libk/libk.c -o ./build/libk/libk.o $(FLAGS)
 
 
 .PHONY: programs

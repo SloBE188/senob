@@ -36,9 +36,10 @@
 #include "fatfs/diskio.h"
 #include "syscalls/syscalls.h"
 #include "sys/smp.h"
-#include "sys/apic.h"
+#include "sys/lapic.h"
 #include "interrupts/pit.h"
 #include <stdio.h>
+#include "sys/sched.h"
 
 extern void rust_testfunction();
 
@@ -51,8 +52,8 @@ void kernel_panic(const char *message)
         ;
 }
 
+uint64_t cpuTicks[MAX_CPUS];
 volatile uint64_t pit_ticks;
-
 void pit_handler(struct Interrupt_registers *regs)
 {
     pit_ticks++;
@@ -139,17 +140,13 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
         f_closedir(&dir);
     }
 
-    lapic_init();
-    struct addr *addr = smp_addresses(multibootinfo);
-    init_smp(addr->floating_ptr_addr, addr->mp_config_table_addr);
-    kernel_write("\n\n\nfloating_ptr_addr: 0x%x\nmp_table_addr: 0x%x\nlocal_apic_addr: 0x%x\n", addr->floating_ptr_addr, addr->mp_config_table_addr, addr->local_apic);
+    
 
+    initProc();
+    smpInit();
+    initIdle();
+    fillRunqueuesFromBST();
 
-
-    init_proc();
-    //scheduler();
-
-    // test_heap_shrink_and_reuse();
     while (1)
     {
         asm volatile("hlt");

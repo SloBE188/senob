@@ -20,7 +20,6 @@
 #include "../io/io.h"
 #include <stdint-gcc.h>
 #include "../../../libk/stdiok.h"
-#include "../sys/process.h"
 #include "../kernel.h"
 
 #define PIT_IRQ 0

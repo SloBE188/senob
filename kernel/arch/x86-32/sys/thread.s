@@ -1,7 +1,7 @@
-global switch_task
+global switchTask
 
 section .text
-switch_task:
+switchTask:
 
     ; esi points to the register struct
     mov esi, [esp + 4]      ; address from the register struct

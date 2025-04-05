@@ -1,16 +1,19 @@
 #include "spinlock.h"
-#include "startup.h"
-#include "smp.h"
 
 
-
-void init_lock(struct spinlock* lock, char* name)
+//Initializes a lock.
+//@lock = the lock structure.
+//@name = the name of the lock (ASCII string).
+void initLock(struct spinlock* lock, char* name)
 {
     lock->cpu = 0;
     lock->locked = 0;
     lock->name = name;
 }
 
+//Function which operate with the atomic operation from the cpu (xchgl).
+//@addr = address.
+//@newval = value of the lock (0 or 1).
 static inline uint32_t xchg(volatile uint32_t *addr, uint32_t newval)
 {
 
@@ -26,6 +29,8 @@ static inline uint32_t xchg(volatile uint32_t *addr, uint32_t newval)
 
 uint32_t holding(struct spinlock* lock);
 
+//Asks if the lock is free and if it is it locks it.
+//@lock = structure of the lock.
 void acquire(struct spinlock* lock)
 {
     if(holding(lock))
@@ -38,10 +43,12 @@ void acquire(struct spinlock* lock)
 
     __sync_synchronize();
 
-    lock->cpu = curr_cpu();
+    lock->cpu = get_local_apic_id_cpuid();
 
 }
 
+//Releases a lock.
+//@lock = lock structure.
 void release(struct spinlock* lock)
 {
     if(!holding(lock))
@@ -56,13 +63,14 @@ void release(struct spinlock* lock)
     asm volatile("sti");
 }
 
-
+//Holds the lock.
+//@lock = lock structure.
 uint32_t holding(struct spinlock* lock)
 {
     asm volatile("cli");
 
     uint32_t res;
-    res = lock->locked && lock->cpu == curr_cpu();
+    res = lock->locked && lock->cpu == get_local_apic_id_cpuid();
     
     return res;
 }

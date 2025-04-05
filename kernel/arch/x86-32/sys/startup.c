@@ -1,73 +1,44 @@
-/*
- * Copyright (C) 2024 Nils Burkard
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "startup.h"
 #include "../gdt/gdt.h"
 #include "../interrupts/idt.h"
-#include "../mm/paging/paging.h"
+#include <stdint.h>
 #include "smp.h"
+#include "../mm/paging/paging.h"
+#include "lapic.h"
+#include "sched.h"
 #include "process.h"
 #include "../kernel.h"
 
-extern struct idtr_t idtr;
-extern struct gdt_ptr_struct gdt_ptr;
-extern uint32_t kernel_directory[1024];
-
-extern struct process *root;
-
 extern void idt_flush(uint32_t);
 extern void gdt_flush(uint32_t);
+extern struct idtr_t idtr;
+extern struct gdt_ptr_struct gdt_ptr;
 
-void enable_paging()
+
+//Loads TSS.
+//@tssSelector = selector of the TSS which should get loader.
+static inline void loadTSS(uint16_t tssSelector)
 {
-    asm volatile(
-        "push %ebp \n"
-        "mov %esp, %ebp \n"
-        "mov %cr0, %eax \n"
-        "or $0x80000000, %eax \n"
-        "mov %eax, %cr0 \n"
-        "mov %ebp, %esp \n"
-        "pop %ebp \n"
-        "ret \n"
-    );
+    asm volatile("ltr %0" : : "r"(tssSelector));
 }
 
-static inline void load_tr(uint16_t tss_selector)
+//This function gets called from the trampoline code of every cpu and fully initializes the cpu.
+void initializeAP()
 {
-    asm volatile("ltr %0" : : "r"(tss_selector));
-}
+    mem_change_page_directory(kernel_directory);    //Wouldnt be necessary, just to make sure
 
+    sync_page_dirs();
+    uint32_t lapicID = get_local_apic_id_cpuid();
+    uint32_t apTSSSelector = (5 + lapicID) << 3;
 
-void initialize_ap()
-{
-
-    uint32_t apic_id = get_local_apic_id_cpuid();
-    uint32_t ap_tss_selector = (5 + apic_id) << 3;  //*8 for getting the right entry
-
-    gdt_flush((uint32_t)&gdt_ptr);
-    load_tr(ap_tss_selector);
-
+    gdt_flush((uint32_t)&gdt_ptr);  //Load global GDT
+    loadTSS(apTSSSelector); //Load TSS
     idt_flush((uint32_t)&idtr);
-    mem_change_page_directory(&kernel_directory);
+
+    lapicInit();        //Didnt know that one, a APIC can recieve IPIs even if shes not activated yet 
+
+    lapicTimerInit();
 
 
-    //direct switch works
-    //struct process* next_proc = rb_search_runnable(root);
-    //switch_to_thread(next_proc->head_thread);
-    //scheduler();
     while(1){}
 }

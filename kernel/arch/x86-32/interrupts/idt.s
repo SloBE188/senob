@@ -46,7 +46,7 @@ idt_flush:
     global irq%1
     irq%1:
         cli
-        push long 0
+        push long %0
         push long %2
         jmp irq_common_stub
 %endmacro
@@ -105,6 +105,7 @@ IRQ  12,    44
 IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
+IRQ  32,    64
 
 isr_common_stub:
     pusha

@@ -3,8 +3,8 @@
 #include "stdiok.h"
 #include "../../drivers/video/vbe/vbe.h"
 #include <unistd.h>
-#include "../arch/x86-32/sys/spinlock.h"
-#include "../arch/x86-32/sys/process.h"
+//#include "../arch/x86-32/sys/spinlock.h"
+//#include "../arch/x86-32/sys/process.h"
 #include <sys/stat.h>
 #include "../arch/x86-32/fatfs/ff.h"
 #include <fcntl.h>
@@ -13,6 +13,7 @@
 #include "memory.h"
 #include "../arch/x86-32/mm/heap/heap.h"
 #include "../arch/x86-32/mm/paging/paging.h"
+#include "../arch/x86-32/sys/process.h"
 
 #undef errno
 extern int errno;
@@ -23,7 +24,6 @@ extern int errno;
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 
-extern struct process *root;
 
 // struct for additionally saving the paths
 typedef struct
@@ -497,19 +497,19 @@ int dup2(int oldfd, int newfd)
 
 void exit(int status)
 {
-    process_exit(get_curr_pid());
+    //process_exit(get_curr_pid());
 }
 
 void _exit(int status)
 {
-    process_exit(get_curr_pid());
+    //process_exit(get_curr_pid());
 }
 
 int execve(char *name, char **argv, char **env)
 {
 
-    struct process* new_process = create_process(name);
-    exec_proc(new_process);
+    struct process* new_process = createUserProcess(name);
+    switchTask(new_process->head_thread->regs);
 
     return -1;
     
@@ -518,7 +518,7 @@ int execve(char *name, char **argv, char **env)
 // TODO should be improved with copying the regs and the user & kernel stack from the parent process
 int fork()
 {
-    struct process *calling_proc = rb_search(get_curr_pid());
+    /*struct process *calling_proc = rb_search(get_curr_pid());
 
     if (calling_proc == NULL)
     {
@@ -539,12 +539,12 @@ int fork()
 
     kernel_write("Fork successfull\n");
 
-    return proc->pid;
+    return proc->pid;*/
 }
 
 int getpid()
 {
-    return get_curr_pid();
+    //return get_curr_pid();
 }
 
 int isatty(int file)
