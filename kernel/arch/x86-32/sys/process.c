@@ -707,7 +707,7 @@ void nodePreparation()
 //Idle process.
 void idle()
 {
-    clear_screen_sys_2(COLOR_WHITE);
+    //clear_screen_sys_2(COLOR_WHITE);
     while(1)
     {
         asm volatile ( "hlt");

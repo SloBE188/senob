@@ -25,9 +25,9 @@ static inline void loadTSS(uint16_t tssSelector)
 //This function gets called from the trampoline code of every cpu and fully initializes the cpu.
 void initializeAP()
 {
-    mem_change_page_directory(kernel_directory);    //Wouldnt be necessary, just to make sure
+    //mem_change_page_directory(kernel_directory);    //Wouldnt be necessary, just to make sure
 
-    sync_page_dirs();
+    //sync_page_dirs();
     uint32_t lapicID = get_local_apic_id_cpuid();
     uint32_t apTSSSelector = (5 + lapicID) << 3;
 

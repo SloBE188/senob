@@ -41,8 +41,8 @@ void smpInit()
         PitWait(50);
     }
 
-    PitWait(50);
+    /*PitWait(50);
     outb(0x21, 0xFD);       //only 0xFC so the irq0 and irq1 still work over the pic
-    outb(0xA1, 0xFF);
-    lapicTimerInit();
+    outb(0xA1, 0xFF);*/
+    //lapicTimerInit();
 }

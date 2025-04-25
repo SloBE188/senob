@@ -147,6 +147,10 @@ void kernel_main(uint32_t magic_value, struct multiboot_info *multibootinfo)
     initIdle();
     fillRunqueuesFromBST();
 
+    struct process* doom = createUserProcess("0:/doom.bin");
+    updateTssEsp0(doom->head_thread->kstack.esp0, get_local_apic_id_cpuid());
+    switchTask(doom->head_thread->regs);
+
     while (1)
     {
         asm volatile("hlt");
