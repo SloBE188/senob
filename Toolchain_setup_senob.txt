@@ -22,7 +22,10 @@ mkdir build-binutils && cd build-binutils
     --prefix="$PREFIX" \
     --with-sysroot \
     --disable-nls \
-    --disable-werror
+    --disable-werror \
+    --host=arm-apple-darwin \ 
+    --build=arm-apple-darwin
+
 	
 make -j4
 make install -j4
@@ -60,7 +63,8 @@ mkdir build-newlib && cd build-newlib
     --disable-nls \
     --enable-newlib-io-c99-formats \
     --enable-newlib-io-long-long \
-    --enable-newlib-register-fini
+    --enable-newlib-register-fini \
+    --disable-newlib-supplied-syscalls
 
 make -j4
 make install -j4

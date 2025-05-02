@@ -21,7 +21,6 @@ extern void (*__fini_array_end []) (void) __attribute__((weak));
 extern void _fini (void);
 #endif
 
-
 /* Run all the cleanup routines.  */
 void
 __libc_fini_array (void)
@@ -34,7 +33,7 @@ __libc_fini_array (void)
     __fini_array_start[i-1] ();
 
 #ifdef _HAVE_INIT_FINI
- // _fini ();
+  _fini ();
 #endif
 }
 #endif

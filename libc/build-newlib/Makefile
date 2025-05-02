@@ -29,14 +29,14 @@
 # -------------------------------
 VPATH=../newlib-4.5.0
 
-build_alias=x86_64-pc-linux-gnu
-build_vendor=pc
-build_os=linux-gnu
-build=x86_64-pc-linux-gnu
-host_alias=x86_64-pc-linux-gnu
-host_vendor=pc
-host_os=linux-gnu
-host=x86_64-pc-linux-gnu
+build_alias=aarch64-apple-darwin24.4.0
+build_vendor=apple
+build_os=darwin24.4.0
+build=aarch64-apple-darwin24.4.0
+host_alias=aarch64-apple-darwin24.4.0
+host_vendor=apple
+host_os=darwin24.4.0
+host=aarch64-apple-darwin24.4.0
 target_alias=i686-elf
 target_vendor=pc
 target_os=elf
@@ -44,7 +44,7 @@ target=i686-pc-elf
 
 program_transform_name = s&^&i686-elf-&
 
-prefix = /home/slobe/opt/cross
+prefix = /opt/homebrew/opt/i686-elf-gcc
 exec_prefix = ${prefix}
 
 srcdir = ../newlib-4.5.0
@@ -90,14 +90,14 @@ MAINTAINER_MODE_TRUE = #
 # -------------------------------------------------
 
 # The gcc driver likes to know the arguments it was configured with.
-TOPLEVEL_CONFIGURE_ARGUMENTS=../newlib-4.5.0/configure --target=i686-elf --prefix=/home/slobe/opt/cross --disable-nls --enable-newlib-io-c99-formats --enable-newlib-io-long-long --enable-newlib-register-fini
+TOPLEVEL_CONFIGURE_ARGUMENTS=../newlib-4.5.0/configure --target=i686-elf --prefix=/opt/homebrew/opt/i686-elf-gcc --disable-nls --enable-newlib-io-c99-formats --enable-newlib-io-long-long --enable-newlib-register-fini --disable-newlib-supplied-syscalls
 
 tooldir = ${exec_prefix}/i686-elf
 build_tooldir = ${exec_prefix}/i686-elf
 
 # This is the name of the environment variable used for the path to
 # the libraries.
-RPATH_ENVVAR = LD_LIBRARY_PATH
+RPATH_ENVVAR = DYLD_LIBRARY_PATH
 
 # On targets where RPATH_ENVVAR is PATH, a subdirectory of the GCC build path
 # is used instead of the directory itself to avoid including built
@@ -105,14 +105,14 @@ RPATH_ENVVAR = LD_LIBRARY_PATH
 GCC_SHLIB_SUBDIR = 
 
 # Build programs are put under this directory.
-BUILD_SUBDIR = build-x86_64-pc-linux-gnu
+BUILD_SUBDIR = build-aarch64-apple-darwin24.4.0
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the build system.
-BUILD_CONFIGARGS =  --cache-file=./config.cache '--prefix=/home/slobe/opt/cross' '--disable-nls' '--enable-newlib-io-c99-formats' '--enable-newlib-io-long-long' '--enable-newlib-register-fini' --program-transform-name='s&^&i686-elf-&' --disable-option-checking --with-build-subdir="$(BUILD_SUBDIR)"
+BUILD_CONFIGARGS =  --cache-file=./config.cache '--prefix=/opt/homebrew/opt/i686-elf-gcc' '--disable-nls' '--enable-newlib-io-c99-formats' '--enable-newlib-io-long-long' '--enable-newlib-register-fini' '--disable-newlib-supplied-syscalls' --program-transform-name='s&^&i686-elf-&' --disable-option-checking --with-build-subdir="$(BUILD_SUBDIR)"
 
 # Linker flags to use on the host, for stage1 or when not
 # bootstrapping.
-STAGE1_LDFLAGS = -static-libstdc++ -static-libgcc
+STAGE1_LDFLAGS = 
 
 # Libraries to use on the host, for stage1 or when not bootstrapping.
 STAGE1_LIBS = 
@@ -171,7 +171,7 @@ SUBDIRS =  etc
 TARGET_CONFIGDIRS = libgloss newlib
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the host system.
-HOST_CONFIGARGS =  --cache-file=./config.cache  --with-system-zlib --with-newlib '--prefix=/home/slobe/opt/cross' '--disable-nls' '--enable-newlib-io-c99-formats' '--enable-newlib-io-long-long' '--enable-newlib-register-fini' --program-transform-name='s&^&i686-elf-&' --disable-option-checking
+HOST_CONFIGARGS =  --cache-file=./config.cache  --with-system-zlib --with-newlib '--prefix=/opt/homebrew/opt/i686-elf-gcc' '--disable-nls' '--enable-newlib-io-c99-formats' '--enable-newlib-io-long-long' '--enable-newlib-register-fini' '--disable-newlib-supplied-syscalls' --program-transform-name='s&^&i686-elf-&' --disable-option-checking
 # Host programs are put under this directory, which is . except if building
 # with srcdir=..
 HOST_SUBDIR = .
@@ -244,7 +244,7 @@ POSTSTAGE1_HOST_EXPORTS = \
 TARGET_SUBDIR = i686-elf
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the target.
-TARGET_CONFIGARGS = --cache-file=./config.cache --with-newlib --enable-multilib --with-cross-host=x86_64-pc-linux-gnu   '--prefix=/home/slobe/opt/cross' '--disable-nls' '--enable-newlib-io-c99-formats' '--enable-newlib-io-long-long' '--enable-newlib-register-fini' --program-transform-name='s&^&i686-elf-&' --disable-option-checking --with-target-subdir="$(TARGET_SUBDIR)"
+TARGET_CONFIGARGS = --cache-file=./config.cache --with-newlib --enable-multilib --with-cross-host=aarch64-apple-darwin24.4.0   '--prefix=/opt/homebrew/opt/i686-elf-gcc' '--disable-nls' '--enable-newlib-io-c99-formats' '--enable-newlib-io-long-long' '--enable-newlib-register-fini' '--disable-newlib-supplied-syscalls' --program-transform-name='s&^&i686-elf-&' --disable-option-checking --with-target-subdir="$(TARGET_SUBDIR)"
 # This is the list of variables to export in the environment when
 # configuring subdirectories for the target system.
 BASE_TARGET_EXPORTS = \
@@ -288,9 +288,9 @@ HOST_GMPLIBS = -lmpc -lmpfr -lgmp
 HOST_GMPINC = 
 
 # Where to find isl
-HOST_ISLLIBS =  -lisl
+HOST_ISLLIBS = 
 HOST_ISLINC = 
-HOST_ISLVER = 0.15
+HOST_ISLVER = 
 
 # Where to find libelf
 HOST_LIBELFLIBS = @libelflibs@
@@ -302,7 +302,7 @@ EXTRA_CONFIGARGS_LIBJAVA = --disable-static
 # Programs producing files for the BUILD machine
 # ----------------------------------------------
 
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 # pwd command to use.  Allow user to override default by setting PWDCMD in
 # the environment to account for automounters.  The make variable must not
@@ -342,13 +342,13 @@ BOOT_CFLAGS= -g -O2
 BOOT_LDFLAGS=
 BOOT_ADAFLAGS= -gnatpg
 
-AWK = gawk
+AWK = awk
 SED = /usr/bin/sed
 BISON = bison
 YACC = bison -y
 FLEX = flex
 LEX = flex
-M4 = m4
+M4 = gm4
 MAKEINFO = makeinfo
 EXPECT = expect
 RUNTEST = runtest
@@ -366,17 +366,17 @@ MAKEINFOFLAGS = --split-size=5000000
 # ---------------------------------------------
 
 AS = as
-AR = ar --plugin /usr/lib/gcc/x86_64-linux-gnu/11/liblto_plugin.so
+AR = ar 
 AR_FLAGS = rc
 CC = gcc
 CXX = g++
 DLLTOOL = dlltool
-LD = ld
+LD = /Library/Developer/CommandLineTools/usr/bin/ld
 LIPO = lipo
 NM = nm
 OBJCOPY = objcopy
 OBJDUMP = objdump
-RANLIB = ranlib --plugin /usr/lib/gcc/x86_64-linux-gnu/11/liblto_plugin.so
+RANLIB = ranlib 
 READELF = readelf
 STRIP = strip
 WINDRES = windres
@@ -543,6 +543,35 @@ XGCC_FLAGS_FOR_TARGET = $(FLAGS_FOR_TARGET) $(SYSROOT_CFLAGS_FOR_TARGET) $(DEBUG
 all:
 
 #### host and target specific makefile fragments come in here.
+# The -mdynamic-no-pic ensures that the compiler executable is built without
+# position-independent-code -- the usual default on Darwin. This fix speeds
+# compiles by 3-5%.  Don't add it if the compiler doesn't also support
+# -mno-dynamic-no-pic to undo it.
+DARWIN_MDYNAMIC_NO_PIC := \
+`case ${host} in i?86-*-darwin* | powerpc-*-darwin*) \
+   $(CC) -S -xc /dev/null -o /dev/null -mno-dynamic-no-pic 2>/dev/null \
+   && echo -mdynamic-no-pic ;; esac`
+DARWIN_GCC_MDYNAMIC_NO_PIC := \
+`case ${host} in i?86-*-darwin* | powerpc-*-darwin*) \
+   $(CC) -S -xc /dev/null -o /dev/null -mno-dynamic-no-pic 2>/dev/null \
+   || echo -mdynamic-no-pic ;; esac`
+
+# ld on Darwin versions >= 10.7 defaults to PIE executables. Disable this for
+# gcc components, since it is incompatible with our pch implementation.
+DARWIN_NO_PIE := `case ${host} in *-*-darwin[1][1-9]*) echo -Wl,-no_pie ;; esac;`
+
+BOOT_CFLAGS += $(DARWIN_MDYNAMIC_NO_PIC)
+BOOT_LDFLAGS += $(DARWIN_NO_PIE)
+
+# Similarly, for cross-compilation.
+STAGE1_CFLAGS += $(DARWIN_MDYNAMIC_NO_PIC)
+STAGE1_LDFLAGS += $(DARWIN_NO_PIE)
+
+# Without -mno-dynamic-no-pic support, add -mdynamic-no-pic just to later
+# stages when we know it is built with gcc.
+STAGE2_CFLAGS += $(DARWIN_GCC_MDYNAMIC_NO_PIC)
+STAGE3_CFLAGS += $(DARWIN_GCC_MDYNAMIC_NO_PIC)
+STAGE4_CFLAGS += $(DARWIN_GCC_MDYNAMIC_NO_PIC)
 ###
 
 # This is the list of directories that may be needed in RPATH_ENVVAR

@@ -1,8 +1,18 @@
 FILES= ./build/boot.o ./build/vbe/vbe.o ./build/mm/pmm.o ./build/libk/libk.o ./build/sys/process.o ./build/sys/sched.o ./build/sys/mp.o ./build/sys/trampoline.o ./build/sys/startup.o ./build/sys/smp.o ./build/sys/spinlock.o ./build/sys/lapic.o ./build/sys/thread.o ./build/vbe/wm/window.o ./build/libk/string.o ./build/syscalls/syscalls.o ./build/fatfs/diskio.o ./build/fatfs/ff.o ./build/mm/paging/paging.s.o ./build/disk/ramdisk.o ./build/mm/paging/paging.o ./build/mm/heap/heap.o ./build/vbe/font.o ./build/kernel.o ./build/gdt/gdt.o ./build/libk/stdiok.o ./build/interrupts/pit.o ./build/drivers/keyboard.o ./build/gdt/gdt.s.o ./build/vga/vga.o ./build/libk/memory.o ./build/interrupts/idt.o ./build/interrupts/idt.s.o ./build/io/io.s.o
 FLAGS= -std=gnu99 -O2 -Wall -Wextra -ffreestanding -fpermissive
 
-all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
-	grub-mkrescue -o senob.iso senob/
+all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img iso
+
+
+iso:
+	rm -f ./out/senob.iso
+	mkdir -p out
+	docker run --platform=linux/amd64 --rm \
+	  -v "$$(pwd):/work" -w /work/senob debian bash -c "\
+	    apt update && \
+	    apt install -y grub-pc-bin grub-common xorriso mtools && \
+	    grub-mkrescue -o /work/senob.iso ."
+
 
 
 ./senob/boot/senob.bin:
@@ -11,15 +21,9 @@ all: $(FILES) ./senob/boot/senob.bin programs ./senob/boot/ramdisk.img
 ./senob/boot/ramdisk.img:
 	dd if=/dev/zero of=./senob/boot/ramdisk.img bs=8M count=1
 	mkfs.vfat ./senob/boot/ramdisk.img
-	sudo mount -o loop ./senob/boot/ramdisk.img /mnt
 	# here i c1an copy files to /mnt (ramdisk)
-	sudo cp ./test.txt /mnt
-	sudo cp ./userland/programs/test/test.bin /mnt
-	sudo cp ./userland/programs/doomgeneric/doom.bin /mnt
-	sudo cp ./userland/programs/doomgeneric/DOOM1.WAD /mnt
-	sudo cp ./userland/programs/shell/shell.bin /mnt
-	#sudo cp ./qemu_log.txt /mnt
-	sudo umount /mnt
+	mcopy -i senob/boot/ramdisk.img ./test.txt ::test.txt
+	mcopy -i senob/boot/ramdisk.img ./userland/programs/shell/shell.bin ::shell.bin
 
 ./build/kernel.o:
 	i686-elf-gcc -g -c ./kernel/arch/x86-32/kernel.c -o ./build/kernel.o $(FLAGS)

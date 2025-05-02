@@ -1,33 +1,33 @@
 libm/common/libm_a-nanl.o: \
  ../../../newlib-4.5.0/newlib/libm/common/nanl.c \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/math.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h newlib.h \
- _newlib_version.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
- /home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/math.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
+ newlib.h _newlib_version.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
+ /opt/homebrew/Cellar/i686-elf-gcc/15.1.0/lib/gcc/i686-elf/15.1.0/include/stddef.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
  ../../../newlib-4.5.0/newlib/libm/common/local.h
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/math.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/math.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
 newlib.h:
 _newlib_version.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
-/home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
+/opt/homebrew/Cellar/i686-elf-gcc/15.1.0/lib/gcc/i686-elf/15.1.0/include/stddef.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
 ../../../newlib-4.5.0/newlib/libm/common/local.h:

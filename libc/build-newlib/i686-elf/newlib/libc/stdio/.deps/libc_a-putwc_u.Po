@@ -1,77 +1,77 @@
 libc/stdio/libc_a-putwc_u.o: \
  ../../../newlib-4.5.0/newlib/libc/stdio/putwc_u.c \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h newlib.h \
- _newlib_version.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/reent.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h \
- /home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdio.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
- /home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stdarg.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/stdio.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/wchar.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_locale.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
+ newlib.h _newlib_version.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/reent.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h \
+ /opt/homebrew/Cellar/i686-elf-gcc/15.1.0/lib/gcc/i686-elf/15.1.0/include/stddef.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdio.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h \
+ /opt/homebrew/Cellar/i686-elf-gcc/15.1.0/lib/gcc/i686-elf/15.1.0/include/stdarg.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/stdio.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/wchar.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_locale.h \
  ../../../newlib-4.5.0/newlib/libc/stdio/local.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdlib.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/stdlib.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/alloca.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/unistd.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/unistd.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/types.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_stdint.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/select.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_sigset.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timeval.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/timespec.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timespec.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_pthreadtypes.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/sched.h \
- /home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/types.h
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdlib.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/stdlib.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/alloca.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/unistd.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/unistd.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/types.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_stdint.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/select.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_sigset.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timeval.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/timespec.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timespec.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_pthreadtypes.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/sched.h \
+ /Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/types.h
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
 newlib.h:
 _newlib_version.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/reent.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h:
-/home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stddef.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdio.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
-/home/slobe/opt/cross/lib/gcc/i686-elf/14.2.0/include/stdarg.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/stdio.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/wchar.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_locale.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/config.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/ieeefp.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/features.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/reent.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/reent.h:
+/opt/homebrew/Cellar/i686-elf-gcc/15.1.0/lib/gcc/i686-elf/15.1.0/include/stddef.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/cdefs.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_default_types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/lock.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdio.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/_ansi.h:
+/opt/homebrew/Cellar/i686-elf-gcc/15.1.0/lib/gcc/i686-elf/15.1.0/include/stdarg.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/stdio.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/wchar.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_locale.h:
 ../../../newlib-4.5.0/newlib/libc/stdio/local.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdlib.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/stdlib.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/alloca.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/unistd.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/unistd.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/types.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_stdint.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/select.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_sigset.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timeval.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/timespec.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timespec.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_pthreadtypes.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/sched.h:
-/home/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/stdlib.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/stdlib.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/alloca.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/unistd.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/unistd.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/types.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_stdint.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/endian.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/_endian.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/select.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_sigset.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timeval.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/timespec.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_timespec.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/_pthreadtypes.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/sys/sched.h:
+/Users/slobe/senob/libc/newlib-4.5.0/newlib/libc/include/machine/types.h:
